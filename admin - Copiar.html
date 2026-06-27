@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - MiMenú Digital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+</head>
+<body class="text-gray-800 antialiased min-h-screen">
+
+    <div id="loading-view" class="min-h-screen flex flex-col items-center justify-center p-4">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mb-4"></div>
+        <p class="text-gray-500 font-bold tracking-wide">Cargando tu panel de control...</p>
+    </div>
+
+    <div id="dashboard-view" class="hidden h-screen bg-gray-50 overflow-hidden">
+        
+        <div id="mobile-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-40 lg:hidden hidden transition-opacity" onclick="toggleSidebar()"></div>
+
+        <div class="flex h-full w-full">
+            
+            <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transform -translate-x-full transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 lg:flex lg:flex-col flex-shrink-0 shadow-xl lg:shadow-none">
+                
+                <div class="flex items-center justify-between h-16 px-6 border-b border-gray-100">
+                    <span class="text-xl font-black text-gray-900 tracking-tight">Menú Admin</span>
+                    <button onclick="toggleSidebar()" class="lg:hidden text-gray-400 hover:text-gray-600 focus:outline-none p-1 bg-gray-50 rounded-md">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                
+                <nav class="flex-1 p-4 space-y-2 overflow-y-auto no-scrollbar">
+                    <button onclick="switchTab('productos')" id="tab-productos" class="w-full text-left px-4 py-3 rounded-xl font-bold bg-orange-50 text-orange-600 transition-colors flex items-center gap-3">
+                        <span class="text-lg">📦</span> Productos
+                    </button>
+                    <button onclick="switchTab('categorias')" id="tab-categorias" class="w-full text-left px-4 py-3 rounded-xl font-bold text-gray-600 hover:bg-gray-50 transition-colors flex items-center gap-3">
+                        <span class="text-lg">📁</span> Categorías
+                    </button>
+                    <button onclick="switchTab('redes')" id="tab-redes" class="w-full text-left px-4 py-3 rounded-xl font-bold text-gray-600 hover:bg-gray-50 transition-colors flex items-center gap-3">
+                        <span class="text-lg">🔗</span> Redes Sociales
+                    </button>
+                    <button onclick="switchTab('apariencia')" id="tab-apariencia" class="w-full text-left px-4 py-3 rounded-xl font-bold text-gray-600 hover:bg-gray-50 transition-colors flex items-center gap-3">
+                        <span class="text-lg">🎨</span> Apariencia
+                    </button>
+                </nav>
+            </aside>
+
+            <div class="flex flex-col flex-1 overflow-hidden w-full relative">
+                
+                <header class="flex items-center justify-between h-16 px-4 sm:px-6 bg-white border-b border-gray-200 shadow-sm z-30 flex-shrink-0">
+                    <div class="flex items-center gap-3">
+                        <button onclick="toggleSidebar()" class="lg:hidden text-gray-500 hover:text-orange-600 focus:outline-none bg-gray-50 p-2 rounded-lg transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                        </button>
+                        <div>
+                            <h2 class="text-xl font-bold text-gray-900 hidden sm:block" id="header-nombre-tienda">Panel de Control</h2>
+                            <a href="#" target="_blank" id="header-link-tienda" class="text-xs text-orange-600 font-semibold hover:underline hidden sm:block"></a>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-2 sm:gap-4 ml-auto">
+                        <span class="text-xs sm:text-sm font-semibold text-gray-500 hidden md:block truncate max-w-[200px]" id="header-user-email">
+                            Cargando...
+                        </span>
+                        <button onclick="cerrarSesion()" class="text-xs sm:text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 sm:px-4 py-2 rounded-lg font-bold transition-colors active:scale-95 shadow-sm border border-gray-200">
+                            Cerrar Sesión
+                        </button>
+                    </div>
+                </header>
+                
+                <main class="flex-1 overflow-y-auto p-4 sm:p-6 w-full">
+                    
+                    <div id="seccion-productos" class="max-w-6xl mx-auto">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-2xl font-black text-gray-800 tracking-tight">Gestión de Productos</h3>
+                            <button onclick="abrirModalProducto()" class="bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-xl shadow-md transition-transform active:scale-95 text-sm flex items-center gap-2">
+                                <span class="text-lg leading-none">+</span> Agregar
+                            </button>
+                        </div>
+
+                        <div id="modal-producto" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+                            <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-xl border border-gray-100 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                                <div class="flex justify-between items-center mb-5 border-b pb-2">
+                                    <h4 id="modal-title" class="font-bold text-gray-900">Agregar Nuevo Producto</h4>
+                                    <button onclick="cerrarModalProducto()" class="text-gray-400 hover:text-gray-700 text-2xl font-bold leading-none">&times;</button>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Nombre del Producto</label>
+                                        <input type="text" id="prod-nombre" class="w-full bg-gray-50 border border-transparent rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-orange-500 focus:bg-white transition-all">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Categoría</label>
+                                        <select id="prod-categoria" class="w-full bg-gray-50 border border-transparent rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-orange-500 focus:bg-white transition-all cursor-pointer">
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Precio ($)</label>
+                                        <input type="number" id="prod-precio" class="w-full bg-gray-50 border border-transparent rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-orange-500 focus:bg-white transition-all">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Stock Disponible</label>
+                                        <input type="number" id="prod-stock" class="w-full bg-gray-50 border border-transparent rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-orange-500 focus:bg-white transition-all">
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Imagen del Producto</label>
+                                        <input type="file" id="prod-imagen-file" accept="image/*" class="w-full bg-gray-50 border border-transparent rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-orange-500 focus:bg-white transition-all cursor-pointer">
+                                        <p class="text-[10px] text-gray-500 mt-1">Selecciona una imagen desde tu dispositivo.</p>
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Descripción corta</label>
+                                        <input type="text" id="prod-desc" class="w-full bg-gray-50 border border-transparent rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-orange-500 focus:bg-white transition-all">
+                                    </div>
+                                </div>
+                                <div class="flex justify-end gap-3 mt-6">
+                                    <button onclick="cerrarModalProducto()" class="bg-gray-100 text-gray-700 font-bold py-3 px-6 rounded-xl hover:bg-gray-200 transition-colors text-sm">
+                                        Cancelar
+                                    </button>
+                                    <button id="btn-guardar-prod" onclick="guardarProducto()" class="bg-gray-900 text-white font-bold py-3 px-8 rounded-xl shadow-md hover:bg-gray-800 transition-transform active:scale-95 text-sm flex items-center justify-center min-w-[160px]">
+                                        Guardar Producto
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                            <div class="overflow-x-auto w-full no-scrollbar">
+                                <table class="w-full text-left text-sm min-w-[600px]">
+                                    <thead class="bg-gray-50 border-b border-gray-100 text-gray-500 uppercase tracking-wider text-[11px]">
+                                        <tr>
+                                            <th class="px-5 py-4 font-bold">Producto</th>
+                                            <th class="px-5 py-4 font-bold">Categoría</th>
+                                            <th class="px-5 py-4 font-bold">Precio</th>
+                                            <th class="px-5 py-4 font-bold">Stock</th>
+                                            <th class="px-5 py-4 font-bold text-right">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tabla-productos" class="divide-y divide-gray-50">
+                                        </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="seccion-categorias" class="hidden max-w-4xl mx-auto">
+                        <h3 class="text-2xl font-black text-gray-800 mb-6 tracking-tight">Gestión de Categorías</h3>
+                        
+                        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                            <label class="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Nueva Categoría</label>
+                            <div class="flex flex-col sm:flex-row gap-3">
+                                <input type="text" id="cat-nombre" class="flex-1 bg-gray-50 border border-transparent rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500 focus:bg-white transition-all">
+                                <button onclick="agregarCategoria()" class="bg-gray-900 text-white font-bold py-3 px-8 rounded-xl shadow-md hover:bg-gray-800 transition-transform active:scale-95 text-sm">
+                                    Agregar Categoría
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                            <ul id="lista-categorias" class="divide-y divide-gray-50">
+                                </ul>
+                        </div>
+                    </div>
+
+                    <div id="seccion-redes" class="hidden max-w-4xl mx-auto">
+                        <h3 class="text-2xl font-black text-gray-800 mb-6 tracking-tight">Gestión de Redes Sociales</h3>
+                        
+                        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-gray-100 mb-8 space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">WhatsApp (Número sin espacios)</label>
+                                <input type="text" id="link-wa" class="w-full bg-gray-50 border border-transparent rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500 focus:bg-white transition-all" value="">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Instagram (URL completa)</label>
+                                <input type="text" id="link-ig" class="w-full bg-gray-50 border border-transparent rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500 focus:bg-white transition-all" value="">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Facebook (URL completa)</label>
+                                <input type="text" id="link-fb" class="w-full bg-gray-50 border border-transparent rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500 focus:bg-white transition-all" value="">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Google Maps (URL de cómo llegar)</label>
+                                <input type="text" id="link-maps" class="w-full bg-gray-50 border border-transparent rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500 focus:bg-white transition-all" value="">
+                            </div>
+                            <div class="flex justify-end pt-4">
+                                <button onclick="guardarRedes()" class="bg-gray-900 text-white font-bold py-3 px-8 rounded-xl shadow-md hover:bg-gray-800 transition-transform active:scale-95 text-sm">
+                                    Guardar Enlaces
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="seccion-apariencia" class="hidden max-w-4xl mx-auto">
+                        <h3 class="text-2xl font-black text-gray-800 mb-6 tracking-tight">Gestión de Apariencia</h3>
+                        
+                        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-gray-100 mb-8 space-y-5">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Logo de la Tienda</label>
+                                <input type="file" id="logo-file" accept="image/*" class="w-full bg-gray-50 border border-transparent rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500 transition-all cursor-pointer">
+                                <div class="mt-3" id="preview-logo-container"></div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Imagen de Portada (Fondo)</label>
+                                <input type="file" id="portada-file" accept="image/*" class="w-full bg-gray-50 border border-transparent rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500 transition-all cursor-pointer">
+                                <div class="mt-3" id="preview-portada-container"></div>
+                            </div>
+                            
+                            <div class="flex justify-end pt-4">
+                                <button id="btn-guardar-apariencia" onclick="guardarApariencia()" class="bg-gray-900 text-white font-bold py-3 px-8 rounded-xl shadow-md hover:bg-gray-800 transition-transform active:scale-95 text-sm flex items-center gap-2">
+                                    Actualizar Imágenes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </main>
+                
+                <footer class="bg-white border-t border-gray-200 text-center py-4 text-xs font-semibold text-gray-400 mt-auto flex-shrink-0">
+                    © 2026 Creado por Juan Zamora. Administrador de Tienda Virtual.
+                </footer>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- CONFIGURACIÓN DE FIREBASE ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCg3yObk6x5NDkbc5w0N2oPU1V0mmvQs9w", // Coloca tus credenciales reales
+            authDomain: "mimenu-digital.firebaseapp.com",
+            projectId: "mimenu-digital",
+            storageBucket: "mimenu-digital.firebasestorage.app",
+            messagingSenderId: "129063923724",
+            appId: "1:129063923724:web:6297dda94753bea2a53e29"
+        };
+        
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        
+        const auth = firebase.auth();
+        const dbFirestore = firebase.firestore();
+
+        // --- DATOS GLOBALES DEL USUARIO LOGUEADO ---
+        let miTiendaId = null; // Este será el enlace (ej: sushi-ramirez)
+        let idProductoEdicion = null; 
+        
+        let dbLocal = {
+            categorias: [],
+            productos: []
+        };
+        let currentApariencia = { logo: '', portada: '' };
+
+        // --- 1. DETECCIÓN DE SESIÓN (EL GUARDIÁN) ---
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                // Usuario autenticado, buscar su tienda en Firestore
+                document.getElementById('header-user-email').innerText = user.email;
+                await inicializarPanel(user.uid);
+            } else {
+                // No hay sesión, regresar a la página principal
+                window.location.href = "plataforma.html";
+            }
+        });
+
+        async function inicializarPanel(uid) {
+            try {
+                // Buscamos el documento en "tiendas" donde el propietario sea este usuario
+                const snapshot = await dbFirestore.collection('tiendas').where('propietarioUid', '==', uid).get();
+                
+                if (snapshot.empty) {
+                    alert("No se encontró una tienda vinculada a esta cuenta. Por favor, crea una.");
+                    window.location.href = "plataforma.html";
+                    return;
+                }
+
+                const docTienda = snapshot.docs[0];
+                miTiendaId = docTienda.id; // ¡Este es el slug de la tienda!
+                const dataTienda = docTienda.data();
+
+                // Actualizar Interfaz
+                document.getElementById('header-nombre-tienda').innerText = dataTienda.nombreTienda;
+                const linkTienda = document.getElementById('header-link-tienda');
+                linkTienda.innerText = `mimenudigitalmx.com/${miTiendaId}`;
+                linkTienda.href = `/${miTiendaId}`; // Redirigirá a la tienda final
+
+                // Ocultar pantalla de carga y mostrar panel
+                document.getElementById('loading-view').classList.add('hidden');
+                document.getElementById('dashboard-view').classList.remove('hidden');
+
+                // Arrancar la carga de datos específicos de ESTA tienda
+                iniciarListenersTienda();
+
+            } catch (error) {
+                console.error("Error al cargar la tienda:", error);
+                alert("Hubo un error al conectar con la base de datos.");
+            }
+        }
+
+        // --- 2. CARGA DINÁMICA DE DATOS (Múltiples inquilinos) ---
+        function iniciarListenersTienda() {
+            
+            // Escuchar el documento maestro de ESTA tienda (Categorías, Redes, Apariencia)
+            dbFirestore.collection('tiendas').doc(miTiendaId).onSnapshot(doc => {
+                if(doc.exists) {
+                    const data = doc.data();
+                    
+                    // Categorías
+                    dbLocal.categorias = data.categorias || [];
+                    
+                    // Redes Sociales
+                    if(data.redes) {
+                        document.getElementById('link-wa').value = data.redes.whatsapp || '';
+                        document.getElementById('link-ig').value = data.redes.instagram || '';
+                        document.getElementById('link-fb').value = data.redes.facebook || '';
+                        document.getElementById('link-maps').value = data.redes.maps || '';
+                    }
+
+                    // Apariencia
+                    if(data.apariencia) {
+                        currentApariencia = data.apariencia;
+                        if(currentApariencia.logo) {
+                            document.getElementById('preview-logo-container').innerHTML = `<img src="${currentApariencia.logo}" class="h-20 w-20 object-cover rounded-full shadow-sm border border-gray-200 mt-2">`;
+                        }
+                        if(currentApariencia.portada) {
+                            document.getElementById('preview-portada-container').innerHTML = `<img src="${currentApariencia.portada}" class="h-24 w-full object-cover rounded-xl shadow-sm border border-gray-200 mt-2">`;
+                        }
+                    }
+
+                    renderizarListas();
+                }
+            });
+
+            // Escuchar SOLO los productos que pertenezcan a ESTA tienda
+            dbFirestore.collection('productos').where('tiendaId', '==', miTiendaId).onSnapshot(snapshot => {
+                dbLocal.productos = [];
+                snapshot.forEach(doc => {
+                    dbLocal.productos.push({ id: doc.id, ...doc.data() });
+                });
+                renderizarListas();
+            });
+        }
+
+        function cerrarSesion() {
+            auth.signOut().then(() => {
+                window.location.href = "plataforma.html";
+            });
+        }
+
+        // --- MÉTODOS DE GUARDADO (Ahora guardan en el perfil de la tienda) ---
+        
+        function guardarDB() {
+            // Guarda las categorías dentro del documento de la tienda
+            dbFirestore.collection('tiendas').doc(miTiendaId).update({ 
+                categorias: dbLocal.categorias 
+            }).catch(error => console.error("Error al guardar categorías:", error));
+        }
+
+        function guardarRedes() {
+            const redes = {
+                whatsapp: document.getElementById('link-wa').value.trim(),
+                instagram: document.getElementById('link-ig').value.trim(),
+                facebook: document.getElementById('link-fb').value.trim(),
+                maps: document.getElementById('link-maps').value.trim()
+            };
+            dbFirestore.collection('tiendas').doc(miTiendaId).update({ redes: redes })
+                .then(() => alert("Enlaces guardados correctamente."))
+                .catch(error => console.error("Error al guardar redes:", error));
+        }
+
+        async function guardarApariencia() {
+            const btn = document.getElementById('btn-guardar-apariencia');
+            const textoOriginal = btn.innerText;
+            const logoFile = document.getElementById('logo-file').files[0];
+            const portadaFile = document.getElementById('portada-file').files[0];
+            
+            btn.disabled = true;
+            btn.innerText = 'Subiendo imágenes...';
+            
+            let logoUrl = currentApariencia.logo;
+            let portadaUrl = currentApariencia.portada;
+
+            try {
+                if (logoFile) {
+                    const fd = new FormData(); 
+                    fd.append('image', logoFile);
+                    const res = await fetch('https://api.imgbb.com/1/upload?key=a2a96bb6d777ff80437b447dd305982c', { method: 'POST', body: fd });
+                    const data = await res.json();
+                    if (data.success) logoUrl = data.data.url;
+                }
+                if (portadaFile) {
+                    const fd = new FormData(); 
+                    fd.append('image', portadaFile);
+                    const res = await fetch('https://api.imgbb.com/1/upload?key=a2a96bb6d777ff80437b447dd305982c', { method: 'POST', body: fd });
+                    const data = await res.json();
+                    if (data.success) portadaUrl = data.data.url;
+                }
+
+                // Guardar en el documento de la tienda
+                await dbFirestore.collection('tiendas').doc(miTiendaId).update({ 
+                    apariencia: { logo: logoUrl, portada: portadaUrl } 
+                });
+                
+                alert('Apariencia actualizada correctamente.');
+                document.getElementById('logo-file').value = '';
+                document.getElementById('portada-file').value = '';
+            } catch (error) {
+                console.error("Error al actualizar apariencia:", error);
+                alert('Hubo un problema de conexión al subir las imágenes.');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = textoOriginal;
+            }
+        }
+
+        async function guardarProducto() {
+            const btnGuardar = document.getElementById('btn-guardar-prod');
+            const fileInput = document.getElementById('prod-imagen-file');
+            
+            const nombre = document.getElementById('prod-nombre').value.trim();
+            const precio = parseFloat(document.getElementById('prod-precio').value);
+
+            if(!nombre || isNaN(precio)) {
+                alert("El nombre y el precio son obligatorios.");
+                return;
+            }
+
+            let imagenUrl = '';
+            if(idProductoEdicion) {
+                const prodExistente = dbLocal.productos.find(x => x.id === idProductoEdicion);
+                if(prodExistente) imagenUrl = prodExistente.imagen || '';
+            }
+
+            const textoOriginal = btnGuardar.innerText;
+            btnGuardar.disabled = true;
+
+            try {
+                if (fileInput.files.length > 0) {
+                    btnGuardar.innerText = 'Subiendo imagen...';
+                    const formData = new FormData();
+                    formData.append('image', fileInput.files[0]);
+
+                    const response = await fetch('https://api.imgbb.com/1/upload?key=a2a96bb6d777ff80437b447dd305982c', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        imagenUrl = data.data.url;
+                    } else {
+                        throw new Error("Fallo al subir imagen a Imgbb");
+                    }
+                }
+
+                // IMPORTANTE: Etiquetar el producto con el ID de la tienda
+                const prodData = {
+                    tiendaId: miTiendaId, 
+                    nombre: nombre,
+                    categoria: document.getElementById('prod-categoria').value,
+                    precio: precio,
+                    stock: parseInt(document.getElementById('prod-stock').value) || 0,
+                    imagen: imagenUrl,
+                    desc: document.getElementById('prod-desc').value.trim()
+                };
+
+                if(idProductoEdicion) {
+                    await dbFirestore.collection('productos').doc(idProductoEdicion).update(prodData);
+                } else {
+                    await dbFirestore.collection('productos').add(prodData);
+                }
+                
+                cerrarModalProducto();
+
+            } catch (error) {
+                console.error("Error al guardar producto:", error);
+                alert("Hubo un error al guardar. Intenta de nuevo.");
+            } finally {
+                btnGuardar.disabled = false;
+                btnGuardar.innerText = textoOriginal;
+            }
+        }
+
+        // --- FUNCIONES DE INTERFAZ (Listas, Modales, Navegación) ---
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        function switchTab(tab) {
+            document.getElementById('seccion-productos').classList.add('hidden');
+            document.getElementById('seccion-categorias').classList.add('hidden');
+            document.getElementById('seccion-redes').classList.add('hidden');
+            document.getElementById('seccion-apariencia').classList.add('hidden');
+            
+            const inactiveStyle = "w-full text-left px-4 py-3 rounded-xl font-bold text-gray-600 hover:bg-gray-50 transition-colors flex items-center gap-3";
+            const activeStyle = "w-full text-left px-4 py-3 rounded-xl font-bold bg-orange-50 text-orange-600 transition-colors flex items-center gap-3";
+            
+            document.getElementById('tab-productos').className = inactiveStyle;
+            document.getElementById('tab-categorias').className = inactiveStyle;
+            document.getElementById('tab-redes').className = inactiveStyle;
+            document.getElementById('tab-apariencia').className = inactiveStyle;
+
+            document.getElementById(`seccion-${tab}`).classList.remove('hidden');
+            document.getElementById(`tab-${tab}`).className = activeStyle;
+
+            if(window.innerWidth < 1024) toggleSidebar();
+        }
+
+        function abrirModalProducto() {
+            document.getElementById('modal-producto').classList.remove('hidden');
+        }
+
+        function cerrarModalProducto() {
+            document.getElementById('modal-producto').classList.add('hidden');
+            document.getElementById('prod-nombre').value = '';
+            document.getElementById('prod-precio').value = '';
+            document.getElementById('prod-stock').value = '';
+            document.getElementById('prod-imagen-file').value = '';
+            document.getElementById('prod-desc').value = '';
+            idProductoEdicion = null;
+            document.getElementById('modal-title').innerText = "Agregar Nuevo Producto";
+            document.getElementById('btn-guardar-prod').innerText = "Guardar Producto";
+        }
+
+        function editarProducto(id) {
+            const p = dbLocal.productos.find(x => x.id === id);
+            if(!p) return;
+            idProductoEdicion = id;
+            document.getElementById('prod-nombre').value = p.nombre;
+            document.getElementById('prod-categoria').value = p.categoria;
+            document.getElementById('prod-precio').value = p.precio;
+            document.getElementById('prod-stock').value = p.stock;
+            document.getElementById('prod-desc').value = p.desc || '';
+            
+            document.getElementById('modal-title').innerText = "Editar Producto";
+            document.getElementById('btn-guardar-prod').innerText = "Actualizar Producto";
+            abrirModalProducto();
+        }
+
+        function eliminarProducto(id) {
+            if(confirm('¿Seguro que deseas eliminar este producto definitivamente?')) {
+                dbFirestore.collection('productos').doc(id).delete();
+            }
+        }
+
+        function agregarCategoria() {
+            const input = document.getElementById('cat-nombre');
+            const nombre = input.value.trim();
+            if(nombre && !dbLocal.categorias.includes(nombre)) {
+                dbLocal.categorias.push(nombre);
+                input.value = '';
+                guardarDB();
+            }
+        }
+
+        function eliminarCategoria(index) {
+            if(confirm('¿Seguro que deseas eliminar esta categoría?')) {
+                dbLocal.categorias.splice(index, 1);
+                guardarDB();
+            }
+        }
+
+        function renderizarListas() {
+            const selectCat = document.getElementById('prod-categoria');
+            selectCat.innerHTML = '';
+            dbLocal.categorias.forEach(cat => {
+                selectCat.innerHTML += `<option value="${cat}">${cat}</option>`;
+            });
+
+            const listaCat = document.getElementById('lista-categorias');
+            listaCat.innerHTML = '';
+            dbLocal.categorias.forEach((cat, index) => {
+                listaCat.innerHTML += `
+                <li class="flex justify-between items-center p-4 hover:bg-gray-50 transition-colors border-b border-gray-50">
+                    <span class="font-bold text-gray-800">${cat}</span>
+                    <button onclick="eliminarCategoria(${index})" class="text-red-500 hover:text-red-700 bg-red-50 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">Eliminar</button>
+                </li>`;
+            });
+
+            const tablaProd = document.getElementById('tabla-productos');
+            tablaProd.innerHTML = '';
+            
+            if(dbLocal.productos.length === 0) {
+                tablaProd.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-gray-400 font-medium">No hay productos registrados.</td></tr>`;
+                return;
+            }
+
+            dbLocal.productos.forEach(p => {
+                tablaProd.innerHTML += `
+                <tr class="hover:bg-gray-50 transition-colors border-b border-gray-50">
+                    <td class="px-5 py-4">
+                        <div class="flex items-center gap-3">
+                            <img src="${p.imagen || 'https://via.placeholder.com/40'}" class="w-12 h-12 rounded-xl object-cover bg-gray-100 shadow-sm border border-gray-200">
+                            <div>
+                                <p class="font-bold text-gray-900">${p.nombre}</p>
+                                <p class="text-xs text-gray-500 truncate w-40" title="${p.desc}">${p.desc || 'Sin descripción'}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-5 py-4 font-semibold text-gray-600">${p.categoria}</td>
+                    <td class="px-5 py-4 font-black text-gray-900">$${p.precio}</td>
+                    <td class="px-5 py-4">
+                        <span class="px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm ${p.stock > 0 ? 'bg-green-50 border border-green-200 text-green-700' : 'bg-red-50 border border-red-200 text-red-700'}">
+                            ${p.stock}
+                        </span>
+                    </td>
+                    <td class="px-5 py-4 text-right">
+                        <div class="flex justify-end gap-2">
+                            <button onclick="editarProducto('${p.id}')" class="text-blue-600 hover:text-white bg-blue-50 hover:bg-blue-600 border border-blue-100 px-3 py-2 rounded-lg font-bold text-xs transition-colors shadow-sm flex items-center gap-1">
+                                ✏️
+                            </button>
+                            <button onclick="eliminarProducto('${p.id}')" class="text-red-600 hover:text-white bg-red-50 hover:bg-red-600 border border-red-100 px-3 py-2 rounded-lg font-bold text-xs transition-colors shadow-sm flex items-center gap-1">
+                                🗑️
+                            </button>
+                        </div>
+                    </td>
+                </tr>`;
+            });
+        }
+    </script>
+</body>
+</html>
