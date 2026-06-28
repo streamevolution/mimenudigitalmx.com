@@ -340,6 +340,7 @@
         let tiendaDataActual = null;
         let menuData = [];
         let categoriasOrdenadas = [];
+        let storesData = []; // Ahora es dinámico
         let cart = {};
         let orderType = null; 
         let currentModalItemId = null;
@@ -353,10 +354,6 @@
         let deliveryInfo = JSON.parse(localStorage.getItem('cevicheDeliveryData')) || { name: '', phone: '', address: '', streetNumber: '', reference: '' };
         let pickupInfo = JSON.parse(localStorage.getItem('cevichePickupData')) || { name: '', phone: '' };
 
-        const storesData = [
-            { id: 1, name: "Sucursal Centro", address: "Av. Juárez #405, Col. Centro, Pachuca, Hgo.", phone: "527719624236", logo: "https://i.postimg.cc/TwyVXDVr/1782665038599.png" },
-            { id: 2, name: "Sucursal Zona Plateada", address: "Camino Real de la Plata #120, Zona Plateada, Pachuca, Hgo.", phone: "527711112233", logo: "https://i.postimg.cc/TwyVXDVr/1782665038599.png" }
-        ];
         let selectedStore = null;
 
         async function inicializarTienda() {
@@ -373,8 +370,22 @@
                         document.title = `${tiendaDataActual.nombreTienda} - MiMenú Digital`;
                         document.getElementById('home-store-name').innerText = tiendaDataActual.nombreTienda;
                         document.getElementById('menu-store-name').innerText = tiendaDataActual.nombreTienda;
+                        
+                        if(tiendaDataActual.mensajeBienvenida) {
+                            document.getElementById('home-store-desc').innerText = tiendaDataActual.mensajeBienvenida;
+                        }
 
                         categoriasOrdenadas = tiendaDataActual.categorias || [];
+                        
+                        // Cargar sucursales dinámicamente
+                        const sucursalesDb = tiendaDataActual.sucursales || [];
+                        storesData = sucursalesDb.map((s, i) => ({
+                            id: s.id || i,
+                            name: s.nombre,
+                            address: s.direccion,
+                            phone: s.telefono,
+                            logo: (tiendaDataActual.apariencia && tiendaDataActual.apariencia.logo) ? tiendaDataActual.apariencia.logo : 'https://i.postimg.cc/TwyVXDVr/1782665038599.png'
+                        }));
 
                         if(tiendaDataActual.apariencia) {
                             if(tiendaDataActual.apariencia.logo) {
@@ -534,21 +545,26 @@
         function renderStoreList() {
             const container = document.getElementById('store-list-container');
             let html = '';
-            storesData.forEach(store => {
-                html += `
-                <div onclick="selectStore(${store.id})" class="bg-[#F2F2F7] hover:bg-orange-50 border border-transparent hover:border-orange-200 p-4 rounded-2xl flex items-center gap-4 cursor-pointer transition-all active:scale-[0.99]">
-                    <img src="${store.logo}" alt="${store.name}" class="w-14 h-14 rounded-full object-cover shadow-sm bg-white border border-gray-200">
-                    <div class="flex-1">
-                        <h4 class="font-bold text-[16px] text-gray-900 leading-tight">${store.name}</h4>
-                        <p class="text-[12px] text-gray-500 mt-1 leading-snug">${store.address}</p>
-                    </div>
-                </div>`;
-            });
+            
+            if (storesData.length === 0) {
+                html = `<p class="text-center text-gray-500 py-6 text-sm">No hay sucursales disponibles en este momento.</p>`;
+            } else {
+                storesData.forEach(store => {
+                    html += `
+                    <div onclick="selectStore('${store.id}')" class="bg-[#F2F2F7] hover:bg-orange-50 border border-transparent hover:border-orange-200 p-4 rounded-2xl flex items-center gap-4 cursor-pointer transition-all active:scale-[0.99]">
+                        <img src="${store.logo}" alt="${store.name}" class="w-14 h-14 rounded-full object-cover shadow-sm bg-white border border-gray-200">
+                        <div class="flex-1">
+                            <h4 class="font-bold text-[16px] text-gray-900 leading-tight">${store.name}</h4>
+                            <p class="text-[12px] text-gray-500 mt-1 leading-snug">${store.address}</p>
+                        </div>
+                    </div>`;
+                });
+            }
             container.innerHTML = html;
         }
 
         function selectStore(id) {
-            const store = storesData.find(s => s.id === id);
+            const store = storesData.find(s => String(s.id) === String(id));
             selectedStore = store;
             orderType = 'recoja';
 
