@@ -55,14 +55,19 @@
 
             <div class="flex flex-col flex-1 overflow-hidden w-full relative">
                 
-                <header class="flex items-center justify-between h-16 px-4 sm:px-6 bg-white border-b border-gray-200 shadow-sm z-30 flex-shrink-0">
+                <header class="flex items-center justify-between h-auto py-3 px-4 sm:px-6 bg-white border-b border-gray-200 shadow-sm z-30 flex-shrink-0 flex-wrap gap-3">
                     <div class="flex items-center gap-3">
                         <button onclick="toggleSidebar()" class="lg:hidden text-gray-500 hover:text-orange-600 focus:outline-none bg-gray-50 p-2 rounded-lg transition-colors">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                         </button>
                         <div>
                             <h2 class="text-xl font-bold text-gray-900 hidden sm:block" id="header-nombre-tienda">Panel de Control</h2>
-                            <a href="#" target="_blank" id="header-link-tienda" class="text-xs text-orange-600 font-semibold hover:underline hidden sm:block"></a>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span id="display-link-tienda" class="text-xs font-mono bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200 hidden sm:block">Cargando enlace...</span>
+                                <button onclick="copiarEnlaceTiendaBtn()" class="bg-orange-100 text-orange-700 hover:bg-orange-200 border border-orange-200 px-3 py-1.5 rounded-md text-xs font-bold transition-colors shadow-sm flex items-center gap-1 active:scale-95">
+                                    📋 Copiar Link de Tienda
+                                </button>
+                            </div>
                         </div>
                     </div>
                     
@@ -70,7 +75,7 @@
                         <span class="text-xs sm:text-sm font-semibold text-gray-500 hidden md:block truncate max-w-[200px]" id="header-user-email">
                             Cargando...
                         </span>
-                        <button onclick="cerrarSesion()" class="text-xs sm:text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 sm:px-4 py-2 rounded-lg font-bold transition-colors active:scale-95 shadow-sm border border-gray-200">
+                        <button onclick="cerrarSesion()" class="text-xs sm:text-sm bg-gray-900 hover:bg-black text-white px-3 sm:px-4 py-2 rounded-lg font-bold transition-colors active:scale-95 shadow-sm">
                             Cerrar Sesión
                         </button>
                     </div>
@@ -230,9 +235,8 @@
     </div>
 
     <script>
-        // --- CONFIGURACIÓN DE FIREBASE ---
         const firebaseConfig = {
-            apiKey: "AIzaSyCg3yObk6x5NDkbc5w0N2oPU1V0mmvQs9w", // Coloca tus credenciales reales
+            apiKey: "AIzaSyCg3yObk6x5NDkbc5w0N2oPU1V0mmvQs9w", 
             authDomain: "mimenu-digital.firebaseapp.com",
             projectId: "mimenu-digital",
             storageBucket: "mimenu-digital.firebasestorage.app",
@@ -247,8 +251,7 @@
         const auth = firebase.auth();
         const dbFirestore = firebase.firestore();
 
-        // --- DATOS GLOBALES DEL USUARIO LOGUEADO ---
-        let miTiendaId = null; // Este será el enlace (ej: sushi-ramirez)
+        let miTiendaId = null; 
         let idProductoEdicion = null; 
         
         let dbLocal = {
@@ -257,44 +260,37 @@
         };
         let currentApariencia = { logo: '', portada: '' };
 
-        // --- 1. DETECCIÓN DE SESIÓN (EL GUARDIÁN) ---
         auth.onAuthStateChanged(async (user) => {
             if (user) {
-                // Usuario autenticado, buscar su tienda en Firestore
                 document.getElementById('header-user-email').innerText = user.email;
                 await inicializarPanel(user.uid);
             } else {
-                // No hay sesión, regresar a la página principal
-                window.location.href = "plataforma.html";
+                window.location.href = "registro.html";
             }
         });
 
         async function inicializarPanel(uid) {
             try {
-                // Buscamos el documento en "tiendas" donde el propietario sea este usuario
                 const snapshot = await dbFirestore.collection('tiendas').where('propietarioUid', '==', uid).get();
                 
                 if (snapshot.empty) {
                     alert("No se encontró una tienda vinculada a esta cuenta. Por favor, crea una.");
-                    window.location.href = "plataforma.html";
+                    window.location.href = "registro.html";
                     return;
                 }
 
                 const docTienda = snapshot.docs[0];
-                miTiendaId = docTienda.id; // ¡Este es el slug de la tienda!
+                miTiendaId = docTienda.id; // Aquí se guarda el SLUG que el usuario creó (ej. ceviche-elsonorence)
                 const dataTienda = docTienda.data();
 
-                // Actualizar Interfaz
                 document.getElementById('header-nombre-tienda').innerText = dataTienda.nombreTienda;
-                const linkTienda = document.getElementById('header-link-tienda');
-                linkTienda.innerText = `mimenudigitalmx.com/${miTiendaId}`;
-                linkTienda.href = `/${miTiendaId}`; // Redirigirá a la tienda final
+                
+                // Mostrar la URL visualmente en la cabecera
+                document.getElementById('display-link-tienda').innerText = `mimenudigitalmx.com/${miTiendaId}`;
 
-                // Ocultar pantalla de carga y mostrar panel
                 document.getElementById('loading-view').classList.add('hidden');
                 document.getElementById('dashboard-view').classList.remove('hidden');
 
-                // Arrancar la carga de datos específicos de ESTA tienda
                 iniciarListenersTienda();
 
             } catch (error) {
@@ -302,19 +298,30 @@
                 alert("Hubo un error al conectar con la base de datos.");
             }
         }
-
-        // --- 2. CARGA DINÁMICA DE DATOS (Múltiples inquilinos) ---
-        function iniciarListenersTienda() {
+        
+        // FUNCIÓN PARA COPIAR EL ENLACE DE LA TIENDA CON EL DOMINIO EXACTO
+        function copiarEnlaceTiendaBtn() {
+            if (!miTiendaId) {
+                alert("Aún no se ha cargado el enlace de tu tienda. Espera un momento.");
+                return;
+            }
+            const urlCompleta = `https://mimenudigitalmx.com/${miTiendaId}`;
             
-            // Escuchar el documento maestro de ESTA tienda (Categorías, Redes, Apariencia)
+            navigator.clipboard.writeText(urlCompleta).then(() => {
+                alert(`¡Enlace copiado al portapapeles!\n\n${urlCompleta}\n\nYa puedes pegarlo y enviarlo a tus clientes.`);
+            }).catch(err => {
+                console.error('Error al copiar el enlace: ', err);
+                alert('No se pudo copiar el enlace. Tu navegador bloqueó la acción.');
+            });
+        }
+
+        function iniciarListenersTienda() {
             dbFirestore.collection('tiendas').doc(miTiendaId).onSnapshot(doc => {
                 if(doc.exists) {
                     const data = doc.data();
                     
-                    // Categorías
                     dbLocal.categorias = data.categorias || [];
                     
-                    // Redes Sociales
                     if(data.redes) {
                         document.getElementById('link-wa').value = data.redes.whatsapp || '';
                         document.getElementById('link-ig').value = data.redes.instagram || '';
@@ -322,7 +329,6 @@
                         document.getElementById('link-maps').value = data.redes.maps || '';
                     }
 
-                    // Apariencia
                     if(data.apariencia) {
                         currentApariencia = data.apariencia;
                         if(currentApariencia.logo) {
@@ -337,7 +343,6 @@
                 }
             });
 
-            // Escuchar SOLO los productos que pertenezcan a ESTA tienda
             dbFirestore.collection('productos').where('tiendaId', '==', miTiendaId).onSnapshot(snapshot => {
                 dbLocal.productos = [];
                 snapshot.forEach(doc => {
@@ -347,16 +352,16 @@
             });
         }
 
+        // REDIRECCIÓN ESTRICTA A INDEX.HTML AL CERRAR SESIÓN
         function cerrarSesion() {
             auth.signOut().then(() => {
-                window.location.href = "plataforma.html";
+                window.location.href = "index.html";
+            }).catch((error) => {
+                console.error("Error al cerrar sesión: ", error);
             });
         }
 
-        // --- MÉTODOS DE GUARDADO (Ahora guardan en el perfil de la tienda) ---
-        
         function guardarDB() {
-            // Guarda las categorías dentro del documento de la tienda
             dbFirestore.collection('tiendas').doc(miTiendaId).update({ 
                 categorias: dbLocal.categorias 
             }).catch(error => console.error("Error al guardar categorías:", error));
@@ -402,7 +407,6 @@
                     if (data.success) portadaUrl = data.data.url;
                 }
 
-                // Guardar en el documento de la tienda
                 await dbFirestore.collection('tiendas').doc(miTiendaId).update({ 
                     apariencia: { logo: logoUrl, portada: portadaUrl } 
                 });
@@ -459,7 +463,6 @@
                     }
                 }
 
-                // IMPORTANTE: Etiquetar el producto con el ID de la tienda
                 const prodData = {
                     tiendaId: miTiendaId, 
                     nombre: nombre,
@@ -486,8 +489,6 @@
                 btnGuardar.innerText = textoOriginal;
             }
         }
-
-        // --- FUNCIONES DE INTERFAZ (Listas, Modales, Navegación) ---
 
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
