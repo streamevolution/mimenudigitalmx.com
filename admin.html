@@ -10,14 +10,15 @@
         body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        /* Animación suave para los acordeones nativos */
         details > summary { list-style: none; }
         details > summary::-webkit-details-marker { display: none; }
     </style>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <!-- Bibliotecas para generar el PDF del ticket -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body class="text-gray-800 antialiased min-h-screen">
 
@@ -61,6 +62,10 @@
                 <button onclick="switchTab('sucursales')" id="tab-sucursales" class="w-full text-left px-4 py-3 rounded-xl font-semibold text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors flex items-center gap-3">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                     Sucursales
+                </button>
+                <button onclick="switchTab('mesas')" id="tab-mesas" class="w-full text-left px-4 py-3 rounded-xl font-semibold text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors flex items-center gap-3">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z"></path></svg>
+                    Mesas
                 </button>
                 <button onclick="switchTab('configuracion')" id="tab-configuracion" class="w-full text-left px-4 py-3 rounded-xl font-semibold text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors flex items-center gap-3">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
@@ -111,7 +116,7 @@
                             <div onclick="switchTab('sucursales')" class="bg-white rounded-2xl p-5 sm:p-6 border border-gray-100 shadow-sm cursor-pointer hover:shadow-md transition-all active:scale-[0.99] relative overflow-hidden group">
                                 <div class="flex justify-between items-start mb-2">
                                     <h3 class="font-bold text-gray-800 text-lg group-hover:text-[#2d7d9a] transition-colors">Dirección de sucursales</h3>
-                                    <div class="w-6 h-6 rounded-full border-2 border-gray-200 flex items-center justify-center text-white transition-colors" id="check-sucursales">✓</div>
+                                    <div class="w-6 h-6 rounded-full border-2 border-gray-200 flex items-center justify-center text-white transition-colors" id="check-sucursales"></div>
                                 </div>
                                 <p class="text-gray-500 text-sm mb-5 pr-8">Agrega al menos una sucursal con dirección y teléfono.</p>
                                 <div class="flex justify-between items-center border-t border-gray-50 pt-4">
@@ -123,7 +128,7 @@
                             <div onclick="switchTab('configuracion')" class="bg-white rounded-2xl p-5 sm:p-6 border border-gray-100 shadow-sm cursor-pointer hover:shadow-md transition-all active:scale-[0.99] relative overflow-hidden group">
                                 <div class="flex justify-between items-start mb-2">
                                     <h3 class="font-bold text-gray-800 text-lg group-hover:text-[#2d7d9a] transition-colors">Configurar Tienda</h3>
-                                    <div class="w-6 h-6 rounded-full border-2 border-gray-200 flex items-center justify-center text-white transition-colors" id="check-info">✓</div>
+                                    <div class="w-6 h-6 rounded-full border-2 border-gray-200 flex items-center justify-center text-white transition-colors" id="check-info"></div>
                                 </div>
                                 <p class="text-gray-500 text-sm mb-5 pr-8">Agrega logotipo, portada, bienvenida y al menos tu número de WhatsApp.</p>
                                 <div class="flex justify-between items-center border-t border-gray-50 pt-4">
@@ -135,7 +140,7 @@
                             <div onclick="switchTab('productos')" class="bg-white rounded-2xl p-5 sm:p-6 border border-gray-100 shadow-sm cursor-pointer hover:shadow-md transition-all active:scale-[0.99] relative overflow-hidden group">
                                 <div class="flex justify-between items-start mb-2">
                                     <h3 class="font-bold text-gray-800 text-lg group-hover:text-[#2d7d9a] transition-colors">Platillos</h3>
-                                    <div class="w-6 h-6 rounded-full border-2 border-gray-200 flex items-center justify-center text-white transition-colors" id="check-prod">✓</div>
+                                    <div class="w-6 h-6 rounded-full border-2 border-gray-200 flex items-center justify-center text-white transition-colors" id="check-prod"></div>
                                 </div>
                                 <p class="text-gray-500 text-sm mb-5 pr-8">Agrega al menos un platillo al menú de tu restaurante.</p>
                                 <div class="flex justify-between items-center border-t border-gray-50 pt-4">
@@ -271,6 +276,10 @@
                                     </div>
                                 </div>
                                 <div>
+                                    <label class="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Cantidad de mesas</label>
+                                    <input type="number" id="suc-mesas" placeholder="Ej. 10" min="1" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#2d7d9a] focus:bg-white transition-all">
+                                </div>
+                                <div>
                                     <label class="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Logotipo de Sucursal (Opcional)</label>
                                     <input type="file" id="suc-logo-file" accept="image/*" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#2d7d9a] focus:bg-white transition-all cursor-pointer">
                                 </div>
@@ -287,7 +296,39 @@
                         </div>
                     </div>
 
-                    <div id="grid-sucursales" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <div id="grid-sucursales" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+                </div>
+
+                <!-- SECCIÓN MESAS -->
+                <div id="seccion-mesas" class="hidden max-w-7xl mx-auto pb-10">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+                        <h3 class="text-2xl font-black text-gray-800 tracking-tight">Gestión de Mesas</h3>
+                        <div class="w-full sm:w-auto">
+                            <select id="select-sucursal-mesas" onchange="renderizarMesas()" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-bold text-gray-700 shadow-sm focus:outline-none focus:border-[#2d7d9a] transition-all">
+                                <option value="">Selecciona Sucursal...</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div id="grid-mesas" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                        <!-- Las mesas se generarán aquí -->
+                    </div>
+                </div>
+
+                <!-- Modal Detalle Mesa (Actualizado) -->
+                <div id="modal-detalle-mesa" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-[60] hidden flex items-center justify-center p-4">
+                    <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] flex flex-col">
+                        <div class="flex justify-between items-center mb-4 border-b pb-2">
+                            <h4 id="titulo-modal-mesa" class="font-bold text-gray-900 text-lg">Mesa X - Pedido</h4>
+                            <button onclick="cerrarModalDetalleMesa()" class="text-gray-400 hover:text-gray-700 text-2xl font-bold leading-none">&times;</button>
+                        </div>
+                        <div id="contenido-pedido-mesa" class="overflow-y-auto flex-grow text-sm text-gray-700 mb-4 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                        </div>
+                        <div class="flex justify-between items-center w-full gap-2 mt-auto border-t border-gray-100 pt-4">
+                            <button onclick="cerrarModalDetalleMesa()" class="bg-gray-100 text-gray-700 font-bold py-2.5 px-4 rounded-xl hover:bg-gray-200 transition-colors text-sm flex-1">Cerrar</button>
+                            <button id="btn-liberar-sin-ticket" class="bg-red-500 text-white font-bold py-2.5 px-3 rounded-xl shadow-md hover:bg-red-600 transition-transform active:scale-95 text-[11px] sm:text-xs flex-1">Liberar sin ticket</button>
+                            <button id="btn-liberar-con-ticket" class="bg-[#2d7d9a] text-white font-bold py-2.5 px-3 rounded-xl shadow-md hover:bg-[#23647a] transition-transform active:scale-95 text-[11px] sm:text-xs flex-1">Liberar y Descargar PDF</button>
+                        </div>
                     </div>
                 </div>
 
@@ -454,7 +495,8 @@
         let dbLocal = {
             categorias: [],
             productos: [],
-            sucursales: []
+            sucursales: [],
+            mesasActivas: []
         };
         let currentApariencia = { logo: '', portada: '' };
 
@@ -564,6 +606,7 @@
                     actualizarChecklist(data);
                     renderizarListas();
                     renderizarSucursales();
+                    actualizarSelectSucursalesMesas();
                 }
             });
 
@@ -574,6 +617,17 @@
                 });
                 actualizarChecklistProd();
                 renderizarListas();
+            });
+
+            // Listener de Mesas Activas
+            dbFirestore.collection('mesas_activas').where('tiendaId', '==', miTiendaId).onSnapshot(snapshot => {
+                dbLocal.mesasActivas = [];
+                snapshot.forEach(doc => {
+                    dbLocal.mesasActivas.push({ id: doc.id, ...doc.data() });
+                });
+                if(!document.getElementById('seccion-mesas').classList.contains('hidden')){
+                    renderizarMesas();
+                }
             });
         }
 
@@ -587,14 +641,18 @@
             const hasWa = !!(data.redes && data.redes.whatsapp && data.redes.whatsapp.trim() !== '');
             
             if (hasLogo && hasPortada && hasBienvenida && hasWa) {
+                document.getElementById('check-info').innerHTML = '✓';
                 document.getElementById('check-info').className = successClass;
             } else {
+                document.getElementById('check-info').innerHTML = '';
                 document.getElementById('check-info').className = emptyClass;
             }
 
-            if (dbLocal.sucursales && dbLocal.sucursales.length > 0) {
+            if (dbLocal.sucursales && dbLocal.sucursales.length > 0 && dbLocal.sucursales.every(s => s.nombre && s.direccion && s.telefono)) {
+                document.getElementById('check-sucursales').innerHTML = '✓';
                 document.getElementById('check-sucursales').className = successClass;
             } else {
+                document.getElementById('check-sucursales').innerHTML = '';
                 document.getElementById('check-sucursales').className = emptyClass;
             }
         }
@@ -605,8 +663,10 @@
             const emptyClass = "w-6 h-6 rounded-full border-2 border-gray-200 flex items-center justify-center text-white transition-colors";
             
             if (dbLocal.productos && dbLocal.productos.length > 0) {
+                checkProd.innerHTML = '✓';
                 checkProd.className = successClass;
             } else {
+                checkProd.innerHTML = '';
                 checkProd.className = emptyClass;
             }
         }
@@ -772,7 +832,7 @@
         }
 
         function switchTab(tab) {
-            const tabs = ['inicio', 'productos', 'sucursales', 'configuracion']; 
+            const tabs = ['inicio', 'productos', 'sucursales', 'mesas', 'configuracion']; 
             
             tabs.forEach(t => {
                 const seccion = document.getElementById(`seccion-${t}`);
@@ -795,6 +855,10 @@
             const sidebar = document.getElementById('sidebar');
             if(window.innerWidth < 1024 && !sidebar.classList.contains('-translate-x-full')) {
                 toggleSidebar();
+            }
+
+            if(tab === 'mesas') {
+                renderizarMesas();
             }
         }
 
@@ -881,6 +945,7 @@
             document.getElementById('suc-direccion').value = '';
             document.getElementById('suc-telefono').value = '';
             document.getElementById('suc-horario').value = '';
+            document.getElementById('suc-mesas').value = '';
             document.getElementById('suc-logo-file').value = '';
             indexSucursalEdicion = null;
             document.getElementById('titulo-modal-sucursal').innerText = "Agregar Nueva Sucursal";
@@ -894,6 +959,7 @@
             document.getElementById('suc-direccion').value = suc.direccion || '';
             document.getElementById('suc-telefono').value = suc.telefono || '';
             document.getElementById('suc-horario').value = suc.horario || '';
+            document.getElementById('suc-mesas').value = suc.cantidadMesas || '';
             document.getElementById('suc-logo-file').value = ''; 
             
             document.getElementById('titulo-modal-sucursal').innerText = "Editar Sucursal";
@@ -907,6 +973,7 @@
             const direccion = document.getElementById('suc-direccion').value.trim();
             const telefono = document.getElementById('suc-telefono').value.trim();
             const horario = document.getElementById('suc-horario').value.trim();
+            const cantidadMesas = parseInt(document.getElementById('suc-mesas').value) || 0;
             const fileInput = document.getElementById('suc-logo-file');
             
             if(!nombre || !direccion || !telefono) {
@@ -949,6 +1016,7 @@
                     direccion: direccion,
                     telefono: telefono,
                     horario: horario,
+                    cantidadMesas: cantidadMesas,
                     logo: logoUrl
                 };
                 
@@ -1000,7 +1068,7 @@
                     <div class="flex-1 min-w-0">
                         <h4 class="font-bold text-gray-900 truncate text-lg">${suc.nombre}</h4>
                         <p class="text-[12px] text-gray-500 truncate mt-0.5" title="${suc.direccion}">${suc.direccion}</p>
-                        <p class="text-[12px] text-gray-500 mt-0.5 truncate">🕒 ${suc.horario || 'Sin horario configurado'}</p>
+                        <p class="text-[12px] text-gray-500 mt-0.5 truncate">🪑 Mesas: ${suc.cantidadMesas || 0}</p>
                         <p class="text-[13px] font-bold text-[#2d7d9a] mt-1.5">📞 ${suc.telefono}</p>
                     </div>
                     <div class="flex flex-col gap-2 shrink-0">
@@ -1012,6 +1080,213 @@
                         </button>
                     </div>
                 </div>`;
+            });
+        }
+
+        // --- MANEJO DE MESAS (VISTA ADMIN) ---
+        function actualizarSelectSucursalesMesas() {
+            const select = document.getElementById('select-sucursal-mesas');
+            select.innerHTML = '<option value="">Selecciona Sucursal...</option>';
+            dbLocal.sucursales.forEach(suc => {
+                select.innerHTML += `<option value="${suc.id}">${suc.nombre}</option>`;
+            });
+        }
+
+        function renderizarMesas() {
+            const sucursalId = document.getElementById('select-sucursal-mesas').value;
+            const grid = document.getElementById('grid-mesas');
+            grid.innerHTML = '';
+
+            if(!sucursalId) {
+                grid.innerHTML = `<div class="col-span-full text-center py-10 bg-white rounded-2xl border border-dashed border-gray-300 text-gray-500">Selecciona una sucursal arriba para ver sus mesas.</div>`;
+                return;
+            }
+
+            const sucursal = dbLocal.sucursales.find(s => s.id === sucursalId);
+            if(!sucursal || !sucursal.cantidadMesas) {
+                grid.innerHTML = `<div class="col-span-full text-center py-10 bg-white rounded-2xl border border-dashed border-gray-300 text-gray-500">Esta sucursal no tiene mesas configuradas. Edítala en la pestaña Sucursales.</div>`;
+                return;
+            }
+
+            for(let i=1; i <= sucursal.cantidadMesas; i++) {
+                // Buscamos si la mesa está en la colección de mesas activas
+                const mesaActiva = dbLocal.mesasActivas.find(m => String(m.mesaId) === String(i) && String(m.sucursalId) === String(sucursalId));
+                
+                const isOcupado = !!mesaActiva;
+                const estadoText = isOcupado ? 'Ocupado' : 'Disponible';
+                const bgClass = isOcupado ? 'bg-red-500 hover:bg-red-600 shadow-red-200' : 'bg-green-500 hover:bg-green-600 shadow-green-200';
+                
+                // Si está ocupada, le pasamos el ID del documento para poder abrirla
+                const onClickFunc = isOcupado ? `abrirDetalleMesa('${mesaActiva.id}')` : `alert('Mesa libre. Los usuarios pueden solicitarla desde el menú.')`;
+
+                grid.innerHTML += `
+                    <div onclick="${onClickFunc}" class="${bgClass} text-white p-5 rounded-2xl shadow-lg cursor-pointer transition-all active:scale-95 flex flex-col items-center justify-center h-32 relative overflow-hidden group">
+                        <div class="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
+                        <span class="text-3xl font-black mb-1 drop-shadow-md">${i}</span>
+                        <span class="text-[11px] font-bold uppercase tracking-wider bg-black/20 px-2 py-0.5 rounded-full">${estadoText}</span>
+                    </div>
+                `;
+            }
+        }
+
+        let idMesaActivaAbierta = null;
+
+        function abrirDetalleMesa(docId) {
+            const mesaActiva = dbLocal.mesasActivas.find(m => m.id === docId);
+            if(!mesaActiva) return;
+
+            idMesaActivaAbierta = docId;
+            document.getElementById('titulo-modal-mesa').innerText = `Mesa ${mesaActiva.mesaId} - Pedido`;
+
+            let htmlPedido = '<ul class="divide-y divide-gray-200">';
+            let total = 0;
+            for (const [prodId, qty] of Object.entries(mesaActiva.pedido)) {
+                const item = dbLocal.productos.find(i => i.id == prodId);
+                const nombre = item ? item.nombre : 'Producto desconocido';
+                const precio = item ? Number(item.precio) : 0;
+                const subtotal = precio * qty;
+                total += subtotal;
+
+                htmlPedido += `
+                    <li class="py-3 flex justify-between items-center">
+                        <div class="flex flex-col">
+                            <span class="font-bold text-gray-900">${qty}x ${nombre}</span>
+                            <span class="text-xs text-gray-500">Precio unitario: $${precio.toFixed(2)}</span>
+                        </div>
+                        <span class="font-bold text-[#2d7d9a]">$${subtotal.toFixed(2)}</span>
+                    </li>
+                `;
+            }
+            htmlPedido += `
+                <li class="py-3 flex justify-between items-center bg-gray-100/50 mt-2 px-2 rounded-lg">
+                    <span class="font-black text-gray-900 text-base">Total Mesa:</span>
+                    <span class="font-black text-orange-600 text-lg">$${total.toFixed(2)}</span>
+                </li>
+            </ul>`;
+
+            document.getElementById('contenido-pedido-mesa').innerHTML = htmlPedido;
+
+            const btnLiberarSinTicket = document.getElementById('btn-liberar-sin-ticket');
+            const btnLiberarConTicket = document.getElementById('btn-liberar-con-ticket');
+            
+            btnLiberarSinTicket.onclick = () => liberarMesa(docId, false);
+            btnLiberarConTicket.onclick = () => liberarMesa(docId, true);
+
+            document.getElementById('modal-detalle-mesa').classList.remove('hidden');
+        }
+
+        function cerrarModalDetalleMesa() {
+            document.getElementById('modal-detalle-mesa').classList.add('hidden');
+            idMesaActivaAbierta = null;
+        }
+
+        async function liberarMesa(docId, generarPDF) {
+            const mensaje = generarPDF 
+                ? '¿Seguro que deseas liberar esta mesa y generar el ticket de cobro en PDF?' 
+                : '¿Seguro que deseas liberar esta mesa sin generar ticket? El pedido se borrará.';
+                
+            if(confirm(mensaje)) {
+                if (generarPDF) {
+                    await generarTicketPDF(docId);
+                }
+                
+                dbFirestore.collection('mesas_activas').doc(docId).delete()
+                    .then(() => {
+                        cerrarModalDetalleMesa();
+                    })
+                    .catch(e => console.error("Error al liberar mesa:", e));
+            }
+        }
+
+        function generarTicketPDF(docId) {
+            return new Promise((resolve) => {
+                try {
+                    const mesaActiva = dbLocal.mesasActivas.find(m => m.id === docId);
+                    if(!mesaActiva) return resolve();
+                    const sucursal = dbLocal.sucursales.find(s => s.id === mesaActiva.sucursalId);
+                    const nombreTienda = document.getElementById('conf-nombre-tienda').value || 'Restaurante';
+                    
+                    const { jsPDF } = window.jspdf;
+                    // Formato ticket térmico (80mm ancho)
+                    const doc = new jsPDF({ unit: 'mm', format: [80, 200] });
+
+                    let y = 15;
+                    const centerX = 40; 
+                    
+                    // Cabecera Tienda
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(14);
+                    doc.text(nombreTienda, centerX, y, { align: "center" });
+                    y += 6;
+                    
+                    doc.setFont("helvetica", "normal");
+                    doc.setFontSize(10);
+                    if (sucursal) {
+                        doc.text(sucursal.nombre, centerX, y, { align: "center" });
+                        y += 5;
+                        const dirLines = doc.splitTextToSize(sucursal.direccion || '', 70);
+                        doc.text(dirLines, centerX, y, { align: "center" });
+                        y += (dirLines.length * 4) + 2;
+                    }
+                    
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(12);
+                    doc.text(`MESA: ${mesaActiva.mesaId}`, centerX, y, { align: "center" });
+                    y += 6;
+                    
+                    // Línea separadora
+                    doc.setLineWidth(0.5);
+                    doc.line(5, y, 75, y);
+                    y += 4;
+                    
+                    let total = 0;
+                    const tableData = [];
+                    for (const [prodId, qty] of Object.entries(mesaActiva.pedido)) {
+                        const item = dbLocal.productos.find(i => i.id == prodId);
+                        const nombre = item ? item.nombre : 'Producto genérico';
+                        const precio = item ? Number(item.precio) : 0;
+                        const subtotal = precio * qty;
+                        total += subtotal;
+                        tableData.push([`${qty}x ${nombre}`, `$${subtotal.toFixed(2)}`]);
+                    }
+
+                    // Insertar Tabla
+                    doc.autoTable({
+                        startY: y,
+                        head: [['Cant. Artículo', 'Subtotal']],
+                        body: tableData,
+                        theme: 'plain',
+                        styles: { fontSize: 9, cellPadding: 1, overflow: 'linebreak', font: 'helvetica' },
+                        columnStyles: { 1: { halign: 'right', cellWidth: 20 } },
+                        margin: { left: 5, right: 5 }
+                    });
+
+                    y = doc.lastAutoTable.finalY + 5;
+                    doc.line(5, y, 75, y);
+                    y += 5;
+                    
+                    // Total
+                    doc.setFontSize(11);
+                    doc.setFont("helvetica", "bold");
+                    doc.text("TOTAL:", 5, y);
+                    doc.text(`$${total.toFixed(2)}`, 75, y, { align: "right" });
+                    y += 10;
+                    
+                    // Despedida
+                    doc.setFontSize(10);
+                    doc.setFont("helvetica", "italic");
+                    doc.text("¡Gracias por su visita!", centerX, y, { align: "center" });
+                    y += 5;
+                    doc.text("Vuelva pronto.", centerX, y, { align: "center" });
+                    
+                    // Guardar
+                    doc.save(`Ticket_Mesa_${mesaActiva.mesaId}.pdf`);
+                    resolve();
+                } catch(e) {
+                    console.error("Error generando PDF:", e);
+                    alert("No se pudo generar el PDF. Verifica que tu navegador permita descargas.");
+                    resolve();
+                }
             });
         }
 
