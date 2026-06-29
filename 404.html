@@ -21,17 +21,15 @@
         .ios-shadow { box-shadow: 0 4px 24px rgba(0,0,0,0.04); }
         .ios-shadow-lg { box-shadow: 0 8px 32px rgba(0,0,0,0.08); }
 
-        /* Ajustes para el escáner QR */
-        #reader button { background-color: #f2f2f7; color: #1f2937; padding: 8px 16px; border-radius: 12px; font-weight: bold; margin: 5px; border: 1px solid #e5e7eb; cursor: pointer; }
-        #reader button:hover { background-color: #e5e7eb; }
-        #reader select { padding: 8px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #e5e7eb; width: 100%; }
-        #reader a { display: none !important; }
+        /* Ajustes para el escáner QR limpio y profesional */
+        #reader { width: 100%; border: none !important; background: transparent; }
+        #reader video { width: 100% !important; object-fit: cover; border-radius: 14px; display: block; }
+        #qr-shaded-region { border-color: rgba(0,0,0,0.65) !important; border-radius: 14px; }
     </style>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <!-- Librería para escanear Códigos QR -->
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 </head>
 <body class="bg-[#F2F2F7] text-gray-900 transition-colors antialiased">
@@ -125,7 +123,6 @@
                 </div>
             </div>
 
-            <!-- Botones de tipo de servicio responsivos -->
             <div class="max-w-4xl mx-auto px-4 md:px-8 -mt-5 relative z-10">
                 <div class="bg-white/80 backdrop-blur-xl rounded-2xl ios-shadow p-1.5 flex justify-between gap-1.5 border border-white">
                     <button onclick="setOrderType('domicilio')" id="btn-domicilio" class="flex-1 flex flex-col md:flex-row md:gap-3 items-center justify-center py-2.5 rounded-xl bg-transparent text-gray-400 hover:bg-gray-50 transition-all duration-200">
@@ -143,12 +140,10 @@
                 </div>
             </div>
 
-            <!-- Navegación pegajosa responsiva -->
             <div class="sticky top-0 z-30 bg-[#F2F2F7]/80 backdrop-blur-xl border-b border-gray-200/60 mt-3 transition-all">
                 <div class="max-w-7xl mx-auto px-4 py-3 flex overflow-x-auto no-scrollbar gap-2.5" id="category-nav"></div>
             </div>
 
-            <!-- Contenedor del Menú Responsivo -->
             <main class="max-w-7xl mx-auto px-4 md:px-8 py-6" id="menu-container"></main>
 
             <footer class="max-w-7xl mx-auto text-center pt-4 pb-8 text-[11px] md:text-[13px] font-semibold text-gray-400 tracking-wide">
@@ -158,7 +153,6 @@
         
     </div>
 
-    <!-- Modales -->
     <button onclick="openCartModal()" id="fab-cart" class="fixed bottom-6 right-5 md:bottom-10 md:right-10 z-40 bg-white p-4 md:p-5 rounded-full ios-shadow-lg text-gray-800 transition-transform duration-300 scale-out focus:outline-none active:scale-95 hidden">
         <span id="fab-badge" class="absolute -top-1.5 -right-1.5 md:-top-2 md:-right-2 bg-orange-600 text-white text-[11px] md:text-[13px] font-black w-[22px] h-[22px] md:w-[28px] md:h-[28px] flex items-center justify-center rounded-full border-2 border-white shadow-sm">0</span>
         <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" viewBox="0 0 16 16" class="md:w-8 md:h-8">
@@ -222,7 +216,6 @@
         </div>
     </div>
 
-    <!-- Modal Domicilio -->
     <div id="delivery-modal" class="fixed inset-0 z-[55] hidden opacity-0 transition-opacity duration-300">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeDeliveryModal()"></div>
         <div id="delivery-modal-content" class="absolute bottom-0 w-full bg-[#F2F2F7] rounded-t-[32px] md:max-w-md md:left-1/2 md:-translate-x-1/2 md:top-1/2 md:bottom-auto md:rounded-3xl overflow-hidden ios-shadow-lg transform slide-down transition-transform duration-300 flex flex-col max-h-[90vh]">
@@ -269,7 +262,6 @@
         </div>
     </div>
 
-    <!-- Modal Sucursales Recoja -->
     <div id="store-modal" class="fixed inset-0 z-[55] hidden opacity-0 transition-opacity duration-300">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeStoreModal()"></div>
         <div id="store-modal-content" class="absolute bottom-0 w-full bg-[#F2F2F7] rounded-t-[32px] md:max-w-md md:left-1/2 md:-translate-x-1/2 md:top-1/2 md:bottom-auto md:rounded-3xl overflow-hidden ios-shadow-lg transform slide-down transition-transform duration-300 flex flex-col max-h-[90vh]">
@@ -287,7 +279,6 @@
         </div>
     </div>
 
-    <!-- Modal Recoja -->
     <div id="pickup-modal" class="fixed inset-0 z-[55] hidden opacity-0 transition-opacity duration-300">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closePickupModal()"></div>
         <div id="pickup-modal-content" class="absolute bottom-0 w-full bg-[#F2F2F7] rounded-t-[32px] md:max-w-md md:left-1/2 md:-translate-x-1/2 md:top-1/2 md:bottom-auto md:rounded-3xl overflow-hidden ios-shadow-lg transform slide-down transition-transform duration-300 flex flex-col max-h-[90vh]">
@@ -318,7 +309,6 @@
         </div>
     </div>
 
-    <!-- Modal Lector QR de Mesa -->
     <div id="qr-modal" class="fixed inset-0 z-[60] hidden opacity-0 transition-opacity duration-300">
         <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeQrModal()"></div>
         <div id="qr-modal-content" class="absolute bottom-0 w-full bg-[#F2F2F7] rounded-t-[32px] md:max-w-md md:left-1/2 md:-translate-x-1/2 md:top-1/2 md:bottom-auto md:rounded-3xl overflow-hidden ios-shadow-lg transform slide-down transition-transform duration-300 flex flex-col">
@@ -332,13 +322,14 @@
             </div>
             
             <div class="p-6 bg-white flex flex-col items-center">
-                <p class="text-[13px] text-gray-500 mb-4 text-center">Apunta la cámara al código QR que está en tu mesa para poder ordenar.</p>
-                <div id="reader" class="w-full max-w-sm rounded-2xl overflow-hidden shadow-inner border border-gray-200 bg-black"></div>
+                <p class="text-[14px] text-gray-500 mb-5 text-center font-medium">Apunta tu cámara trasera al código QR de la mesa para ordenar.</p>
+                <div class="w-full max-w-[280px] sm:max-w-xs mx-auto rounded-[16px] overflow-hidden shadow-lg border border-gray-100 bg-gray-900 relative">
+                    <div id="reader" class="rounded-[16px] overflow-hidden bg-black"></div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal Localización -->
     <div id="location-modal" class="fixed inset-0 z-[60] hidden opacity-0 transition-opacity duration-300">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeLocationModal()"></div>
         <div id="location-modal-content" class="absolute bottom-0 w-full bg-white rounded-t-[32px] md:max-w-md md:left-1/2 md:-translate-x-1/2 md:top-1/2 md:bottom-auto md:rounded-3xl overflow-hidden ios-shadow-lg transform slide-down transition-transform duration-300 flex flex-col">
@@ -354,7 +345,6 @@
         </div>
     </div>
 
-    <!-- Modal Alerta Personalizada (Estilo iOS) -->
     <div id="custom-alert" class="fixed inset-0 z-[100] hidden flex items-center justify-center">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity opacity-0" id="custom-alert-bg" onclick="closeCustomAlert()"></div>
         <div id="custom-alert-content" class="bg-[#F2F2F7]/95 backdrop-blur-xl w-[270px] rounded-[14px] flex flex-col items-center overflow-hidden transform scale-90 opacity-0 transition-all duration-200 ios-shadow-lg relative z-10">
@@ -441,8 +431,8 @@
 
         let selectedStore = null;
 
-        // Variables globales para la detección del código QR
-        let html5QrcodeScanner = null;
+        // Variables globales para la detección del código QR directo (Html5Qrcode)
+        let html5Qrcode = null;
         let qrSucursalId = null;
         let qrMesaNumber = null;
 
@@ -483,7 +473,6 @@
                             logo: (tiendaDataActual.apariencia && tiendaDataActual.apariencia.logo) ? tiendaDataActual.apariencia.logo : 'https://i.postimg.cc/TwyVXDVr/1782665038599.png'
                         }));
 
-                        // MAGIA 2: Verificar si el usuario escaneó el QR desde la cámara nativa de su celular
                         const params = new URLSearchParams(window.location.search);
                         let urlSucursal = params.get('sucursal');
                         let urlMesa = params.get('mesa');
@@ -625,7 +614,6 @@
             } else if (type === 'comedor') {
                 userCoords = null; 
                 
-                // MAGIA 1: Si ya tenemos los datos (por lectura de cámara o lectura previa) no preguntamos nada
                 const params = new URLSearchParams(window.location.search);
                 let urlSucursal = params.get('sucursal');
                 let urlMesa = params.get('mesa');
@@ -645,7 +633,6 @@
                          renderCartAction();
                      }
                 } else {
-                    // Si no tenemos los datos de la mesa, lanzamos la alerta para escanear
                     showCustomAlert("Para ordenar en el restaurante, necesitas habilitar tu cámara para escanear el código QR de tu mesa.", "Servicio en Comedor", () => {
                         applyOrderTypeUI(type);
                         startQrScanner();
@@ -661,6 +648,7 @@
             }
         }
 
+        // LÓGICA DE ESCÁNER MEJORADA
         function startQrScanner() {
             const modal = document.getElementById('qr-modal');
             const content = document.getElementById('qr-modal-content');
@@ -670,18 +658,22 @@
             content.classList.remove('slide-down'); 
             content.classList.add('slide-up');
 
-            if (!html5QrcodeScanner) {
-                html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
+            if (!html5Qrcode) {
+                html5Qrcode = new Html5Qrcode("reader");
             }
             
-            html5QrcodeScanner.render((decodedText) => {
+            const qrCodeSuccessCallback = (decodedText) => {
                 try {
                     let url = new URL(decodedText);
                     let params = new URLSearchParams(url.search);
                     let suc = params.get('sucursal');
                     let mesa = params.get('mesa');
+                    
+                    // Extraemos el slug escaneado, ignorando si tiene o no slash inicial/final
+                    let scannedSlug = url.pathname.replace(/^\/|\/$/g, '');
 
-                    if (suc && mesa) {
+                    // Validamos explícitamente que corresponda a esta misma tienda
+                    if (scannedSlug === slugTienda && suc && mesa) {
                         qrSucursalId = suc;
                         qrMesaNumber = mesa;
                         
@@ -695,21 +687,36 @@
                             renderCartAction();
                         }
                     } else {
-                        showCustomAlert("El código QR escaneado no pertenece a una mesa válida.", "Error");
+                        // QR válido pero no pertenece a este restaurante o no tiene los parámetros correctos
+                        html5Qrcode.pause();
+                        showCustomAlert("El código QR escaneado no pertenece a este restaurante o no es válido para mesas.", "Código Inválido", () => {
+                            html5Qrcode.resume();
+                        });
                     }
                 } catch(e) {
-                    showCustomAlert("El código no es un enlace válido.", "Error");
+                    html5Qrcode.pause();
+                    showCustomAlert("El código escaneado no es un enlace válido de MiMenú Digital.", "Error", () => {
+                        html5Qrcode.resume();
+                    });
                 }
-            }, (error) => {
-                // ignorar errores de escaneo constante de la librería
+            };
+
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+            // Iniciar directamente con la cámara trasera ('environment') sin preguntar.
+            html5Qrcode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback)
+            .catch((err) => {
+                console.error("Error iniciando cámara:", err);
+                closeQrModal();
+                showCustomAlert("No se pudo iniciar la cámara trasera. Asegúrate de dar los permisos a tu navegador.", "Error de Cámara");
             });
         }
 
         function closeQrModal() {
-            if(html5QrcodeScanner) {
-                html5QrcodeScanner.clear().catch(error => {
-                    console.error("Fallo al limpiar html5QrcodeScanner. ", error);
-                });
+            if(html5Qrcode) {
+                try {
+                    html5Qrcode.stop().catch(e => { /* ignorar si ya estaba detenido */ });
+                } catch(e) {}
             }
             const modal = document.getElementById('qr-modal');
             const content = document.getElementById('qr-modal-content');
