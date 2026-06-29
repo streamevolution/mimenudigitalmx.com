@@ -1223,7 +1223,13 @@
             }
 
             mensaje += `\n💰 *Total a pagar:* $${total.toFixed(2)}\n\nQuedo a la espera de confirmación. ¡Gracias!`;
-            window.open(`https://wa.me/${telefonoTienda}?text=${encodeURIComponent(mensaje)}`, '_blank');
+            
+            // MODIFICACIÓN APLICADA AQUÍ: Si es en comedor, no enviamos mensaje por WhatsApp y mostramos alerta.
+            if (orderType === 'comedor') {
+                alert("¡Tu pedido ha sido enviado a la cocina! En breve te atenderemos.");
+            } else {
+                window.open(`https://wa.me/${telefonoTienda}?text=${encodeURIComponent(mensaje)}`, '_blank');
+            }
             
             cart = {};
             updateCartFAB();
