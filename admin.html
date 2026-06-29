@@ -16,7 +16,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <!-- Bibliotecas para generar el PDF del ticket -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
@@ -169,7 +168,7 @@
                         <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-xl border border-gray-100 w-full max-w-md max-h-[90vh] flex flex-col">
                             <div class="flex justify-between items-center mb-5 border-b pb-2">
                                 <h4 class="font-bold text-gray-900">Gestionar Categorías</h4>
-                                <button onclick="cerrarModalCategoria()" class="text-gray-400 hover:text-gray-700 text-2xl font-bold leading-none">&times;</button>
+                                <button onclick="cerrarModalCategoria()" class="text-gray-400 hover:text-gray-700 text-2xl font-bold leading-none">×</button>
                             </div>
                             
                             <div class="mb-5">
@@ -197,7 +196,7 @@
                         <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-xl border border-gray-100 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
                             <div class="flex justify-between items-center mb-5 border-b pb-2">
                                 <h4 id="modal-title" class="font-bold text-gray-900">Agregar Nuevo Platillo</h4>
-                                <button onclick="cerrarModalProducto()" class="text-gray-400 hover:text-gray-700 text-2xl font-bold leading-none">&times;</button>
+                                <button onclick="cerrarModalProducto()" class="text-gray-400 hover:text-gray-700 text-2xl font-bold leading-none">×</button>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
                                 <div>
@@ -253,7 +252,7 @@
                         <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-xl border border-gray-100 w-full max-w-lg max-h-[90vh] overflow-y-auto">
                             <div class="flex justify-between items-center mb-5 border-b pb-2">
                                 <h4 id="titulo-modal-sucursal" class="font-bold text-gray-900">Agregar Nueva Sucursal</h4>
-                                <button onclick="cerrarModalSucursal()" class="text-gray-400 hover:text-gray-700 text-2xl font-bold leading-none">&times;</button>
+                                <button onclick="cerrarModalSucursal()" class="text-gray-400 hover:text-gray-700 text-2xl font-bold leading-none">×</button>
                             </div>
                             
                             <div class="space-y-4">
@@ -299,7 +298,6 @@
                     <div id="grid-sucursales" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
                 </div>
 
-                <!-- SECCIÓN MESAS -->
                 <div id="seccion-mesas" class="hidden max-w-7xl mx-auto pb-10">
                     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
                         <h3 class="text-2xl font-black text-gray-800 tracking-tight">Gestión de Mesas</h3>
@@ -311,23 +309,22 @@
                     </div>
                     
                     <div id="grid-mesas" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                        <!-- Las mesas se generarán aquí -->
-                    </div>
+                        </div>
                 </div>
 
-                <!-- Modal Detalle Mesa (Actualizado) -->
                 <div id="modal-detalle-mesa" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-[60] hidden flex items-center justify-center p-4">
-                    <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] flex flex-col">
+                    <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] flex flex-col">
                         <div class="flex justify-between items-center mb-4 border-b pb-2">
                             <h4 id="titulo-modal-mesa" class="font-bold text-gray-900 text-lg">Mesa X - Pedido</h4>
-                            <button onclick="cerrarModalDetalleMesa()" class="text-gray-400 hover:text-gray-700 text-2xl font-bold leading-none">&times;</button>
+                            <button onclick="cerrarModalDetalleMesa()" class="text-gray-400 hover:text-gray-700 text-2xl font-bold leading-none">×</button>
                         </div>
                         <div id="contenido-pedido-mesa" class="overflow-y-auto flex-grow text-sm text-gray-700 mb-4 bg-gray-50 p-3 rounded-lg border border-gray-100">
                         </div>
-                        <div class="flex justify-between items-center w-full gap-2 mt-auto border-t border-gray-100 pt-4">
-                            <button onclick="cerrarModalDetalleMesa()" class="bg-gray-100 text-gray-700 font-bold py-2.5 px-4 rounded-xl hover:bg-gray-200 transition-colors text-sm flex-1">Cerrar</button>
-                            <button id="btn-liberar-sin-ticket" class="bg-red-500 text-white font-bold py-2.5 px-3 rounded-xl shadow-md hover:bg-red-600 transition-transform active:scale-95 text-[11px] sm:text-xs flex-1">Liberar sin ticket</button>
-                            <button id="btn-liberar-con-ticket" class="bg-[#2d7d9a] text-white font-bold py-2.5 px-3 rounded-xl shadow-md hover:bg-[#23647a] transition-transform active:scale-95 text-[11px] sm:text-xs flex-1">Liberar y Descargar PDF</button>
+                        <div class="grid grid-cols-2 gap-2 mt-auto border-t border-gray-100 pt-4">
+                            <button onclick="cerrarModalDetalleMesa()" class="bg-gray-100 text-gray-700 font-bold py-2.5 px-2 rounded-xl hover:bg-gray-200 transition-colors text-xs col-span-2 sm:col-span-1">Cerrar</button>
+                            <button id="btn-liberar-sin-ticket" class="bg-red-500 text-white font-bold py-2.5 px-2 rounded-xl shadow-md hover:bg-red-600 transition-transform active:scale-95 text-xs col-span-2 sm:col-span-1">Liberar sin ticket</button>
+                            <button id="btn-liberar-con-ticket" class="bg-[#2d7d9a] text-white font-bold py-2.5 px-2 rounded-xl shadow-md hover:bg-[#23647a] transition-transform active:scale-95 text-xs col-span-1">Descargar PDF</button>
+                            <button id="btn-liberar-imprimir" class="bg-orange-500 text-white font-bold py-2.5 px-2 rounded-xl shadow-md hover:bg-orange-600 transition-transform active:scale-95 text-xs col-span-1">Imprimir</button>
                         </div>
                     </div>
                 </div>
@@ -1109,14 +1106,12 @@
             }
 
             for(let i=1; i <= sucursal.cantidadMesas; i++) {
-                // Buscamos si la mesa está en la colección de mesas activas
                 const mesaActiva = dbLocal.mesasActivas.find(m => String(m.mesaId) === String(i) && String(m.sucursalId) === String(sucursalId));
                 
                 const isOcupado = !!mesaActiva;
                 const estadoText = isOcupado ? 'Ocupado' : 'Disponible';
                 const bgClass = isOcupado ? 'bg-red-500 hover:bg-red-600 shadow-red-200' : 'bg-green-500 hover:bg-green-600 shadow-green-200';
                 
-                // Si está ocupada, le pasamos el ID del documento para poder abrirla
                 const onClickFunc = isOcupado ? `abrirDetalleMesa('${mesaActiva.id}')` : `alert('Mesa libre. Los usuarios pueden solicitarla desde el menú.')`;
 
                 grid.innerHTML += `
@@ -1168,9 +1163,11 @@
 
             const btnLiberarSinTicket = document.getElementById('btn-liberar-sin-ticket');
             const btnLiberarConTicket = document.getElementById('btn-liberar-con-ticket');
+            const btnLiberarImprimir = document.getElementById('btn-liberar-imprimir');
             
-            btnLiberarSinTicket.onclick = () => liberarMesa(docId, false);
-            btnLiberarConTicket.onclick = () => liberarMesa(docId, true);
+            btnLiberarSinTicket.onclick = () => liberarMesa(docId, 'ninguno');
+            btnLiberarConTicket.onclick = () => liberarMesa(docId, 'descargar');
+            btnLiberarImprimir.onclick = () => liberarMesa(docId, 'imprimir');
 
             document.getElementById('modal-detalle-mesa').classList.remove('hidden');
         }
@@ -1180,14 +1177,18 @@
             idMesaActivaAbierta = null;
         }
 
-        async function liberarMesa(docId, generarPDF) {
-            const mensaje = generarPDF 
-                ? '¿Seguro que deseas liberar esta mesa y generar el ticket de cobro en PDF?' 
-                : '¿Seguro que deseas liberar esta mesa sin generar ticket? El pedido se borrará.';
+        // --- SISTEMA DE TICKETS E IMPRESORA TÉRMICA ---
+        async function liberarMesa(docId, accion) {
+            let mensaje = '';
+            if (accion === 'descargar') mensaje = '¿Seguro que deseas liberar esta mesa y descargar el ticket en PDF?';
+            else if (accion === 'imprimir') mensaje = '¿Seguro que deseas liberar esta mesa e imprimir el ticket?';
+            else mensaje = '¿Seguro que deseas liberar esta mesa sin generar ticket? El pedido se borrará.';
                 
             if(confirm(mensaje)) {
-                if (generarPDF) {
-                    await generarTicketPDF(docId);
+                if (accion === 'descargar') {
+                    await generarTicketPDF(docId, false);
+                } else if (accion === 'imprimir') {
+                    await generarTicketPDF(docId, true);
                 }
                 
                 dbFirestore.collection('mesas_activas').doc(docId).delete()
@@ -1198,16 +1199,17 @@
             }
         }
 
-        function generarTicketPDF(docId) {
+        function generarTicketPDF(docId, autoImprimir = false) {
             return new Promise((resolve) => {
                 try {
                     const mesaActiva = dbLocal.mesasActivas.find(m => m.id === docId);
                     if(!mesaActiva) return resolve();
+                    
                     const sucursal = dbLocal.sucursales.find(s => s.id === mesaActiva.sucursalId);
                     const nombreTienda = document.getElementById('conf-nombre-tienda').value || 'Restaurante';
                     
                     const { jsPDF } = window.jspdf;
-                    // Formato ticket térmico (80mm ancho)
+                    // Formato para impresora térmica (80mm ancho x longitud autoajustable)
                     const doc = new jsPDF({ unit: 'mm', format: [80, 200] });
 
                     let y = 15;
@@ -1219,6 +1221,7 @@
                     doc.text(nombreTienda, centerX, y, { align: "center" });
                     y += 6;
                     
+                    // Información Sucursal
                     doc.setFont("helvetica", "normal");
                     doc.setFontSize(10);
                     if (sucursal) {
@@ -1227,8 +1230,15 @@
                         const dirLines = doc.splitTextToSize(sucursal.direccion || '', 70);
                         doc.text(dirLines, centerX, y, { align: "center" });
                         y += (dirLines.length * 4) + 2;
+                        
+                        // Añadimos el teléfono que solicitaste
+                        if (sucursal.telefono) {
+                            doc.text(`Tel: ${sucursal.telefono}`, centerX, y, { align: "center" });
+                            y += 6;
+                        }
                     }
                     
+                    // Mesa
                     doc.setFont("helvetica", "bold");
                     doc.setFontSize(12);
                     doc.text(`MESA: ${mesaActiva.mesaId}`, centerX, y, { align: "center" });
@@ -1239,6 +1249,7 @@
                     doc.line(5, y, 75, y);
                     y += 4;
                     
+                    // Cuerpo del pedido
                     let total = 0;
                     const tableData = [];
                     for (const [prodId, qty] of Object.entries(mesaActiva.pedido)) {
@@ -1250,7 +1261,7 @@
                         tableData.push([`${qty}x ${nombre}`, `$${subtotal.toFixed(2)}`]);
                     }
 
-                    // Insertar Tabla
+                    // Insertar Tabla usando autoTable
                     doc.autoTable({
                         startY: y,
                         head: [['Cant. Artículo', 'Subtotal']],
@@ -1279,16 +1290,24 @@
                     y += 5;
                     doc.text("Vuelva pronto.", centerX, y, { align: "center" });
                     
-                    // Guardar
-                    doc.save(`Ticket_Mesa_${mesaActiva.mesaId}.pdf`);
+                    // Acción final
+                    if (autoImprimir) {
+                        doc.autoPrint();
+                        const blob = doc.output('bloburl');
+                        window.open(blob, '_blank');
+                    } else {
+                        doc.save(`Ticket_Mesa_${mesaActiva.mesaId}.pdf`);
+                    }
+
                     resolve();
                 } catch(e) {
                     console.error("Error generando PDF:", e);
-                    alert("No se pudo generar el PDF. Verifica que tu navegador permita descargas.");
+                    alert("No se pudo generar el PDF. Verifica que tu navegador no esté bloqueando ventanas emergentes.");
                     resolve();
                 }
             });
         }
+
 
         function renderizarListas() {
             const selectCat = document.getElementById('prod-categoria');
