@@ -202,8 +202,8 @@
             <div id="cart-items-container" class="p-4 overflow-y-auto flex-grow space-y-3">
             </div>
 
-            <div class="p-6 bg-white shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.02)] border-t border-gray-100">
-                <div class="flex justify-between items-center mb-5">
+            <div class="p-6 bg-white shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.02)] border-t border-gray-100 flex flex-col">
+                <div class="flex justify-between items-center mb-4">
                     <span class="text-gray-500 font-semibold text-[15px]">Total a pagar</span>
                     <span id="cart-modal-total" class="text-[24px] font-black tracking-tight text-gray-900">$0.00</span>
                 </div>
@@ -354,7 +354,51 @@
         </div>
     </div>
 
+    <!-- Modal Alerta Personalizada (Estilo iOS) -->
+    <div id="custom-alert" class="fixed inset-0 z-[100] hidden flex items-center justify-center">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity opacity-0" id="custom-alert-bg" onclick="closeCustomAlert()"></div>
+        <div id="custom-alert-content" class="bg-[#F2F2F7]/95 backdrop-blur-xl w-[270px] rounded-[14px] flex flex-col items-center overflow-hidden transform scale-90 opacity-0 transition-all duration-200 ios-shadow-lg relative z-10">
+            <div class="p-4 pt-5 pb-4 text-center w-full">
+                <h3 id="custom-alert-title" class="text-[17px] font-semibold text-black leading-tight mb-1">mimenudigitalmx.com dice</h3>
+                <p id="custom-alert-message" class="text-[13px] text-black/80 leading-tight mt-2"></p>
+            </div>
+            <div class="w-full border-t border-gray-300/50 flex">
+                <button onclick="closeCustomAlert()" class="flex-1 py-2.5 text-[17px] text-[#007AFF] font-semibold hover:bg-black/5 transition-colors active:bg-black/10">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        let metodosPagoTienda = [];
+
+        function showCustomAlert(message, title = "mimenudigitalmx.com dice") {
+            document.getElementById('custom-alert-title').innerText = title;
+            document.getElementById('custom-alert-message').innerText = message;
+            
+            const modal = document.getElementById('custom-alert');
+            const bg = document.getElementById('custom-alert-bg');
+            const content = document.getElementById('custom-alert-content');
+            
+            modal.classList.remove('hidden');
+            void modal.offsetWidth; 
+            
+            bg.classList.remove('opacity-0');
+            content.classList.remove('scale-90', 'opacity-0');
+            content.classList.add('scale-100', 'opacity-100');
+        }
+
+        function closeCustomAlert() {
+            const modal = document.getElementById('custom-alert');
+            const bg = document.getElementById('custom-alert-bg');
+            const content = document.getElementById('custom-alert-content');
+            
+            bg.classList.add('opacity-0');
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-90', 'opacity-0');
+            
+            setTimeout(() => { modal.classList.add('hidden'); }, 200);
+        }
+
         const firebaseConfig = {
             apiKey: "AIzaSyCg3yObk6x5NDkbc5w0N2oPU1V0mmvQs9w", 
             authDomain: "mimenu-digital.firebaseapp.com",
@@ -408,6 +452,7 @@
                             document.getElementById('home-store-desc').innerText = tiendaDataActual.mensajeBienvenida;
                         }
 
+                        metodosPagoTienda = tiendaDataActual.metodosPago || ['Efectivo'];
                         categoriasOrdenadas = tiendaDataActual.categorias || [];
                         
                         const sucursalesDb = tiendaDataActual.sucursales || [];
@@ -640,7 +685,6 @@
                 select.innerHTML += `<option value="${i}">Mesa ${i}</option>`;
             }
 
-            // Cargar de localStorage si existe
             let activeTableInfo = JSON.parse(localStorage.getItem('mesaActiva_v1'));
             if (activeTableInfo && String(activeTableInfo.sucursalId) === String(selectedStore.id)) {
                 tableNumber = activeTableInfo.tableNumber;
@@ -669,7 +713,7 @@
         function saveComedorDetails() {
             const val = document.getElementById('comedor-table-number').value;
             if(!val) {
-                alert("Por favor selecciona una mesa.");
+                showCustomAlert("Por favor selecciona una mesa.");
                 return;
             }
             tableNumber = val;
@@ -712,7 +756,7 @@
             pickupInfo.phone = document.getElementById('pickup-phone').value.trim();
             
             if(!pickupInfo.name) {
-                alert("Por favor ingresa un nombre para poder identificarte al recoger tu pedido.");
+                showCustomAlert("Por favor ingresa un nombre para poder identificarte al recoger tu pedido.");
                 return;
             }
 
@@ -757,7 +801,7 @@
             deliveryInfo.reference = document.getElementById('dev-ref').value.trim();
             
             if (!deliveryInfo.address && !userCoords) {
-                alert("Por favor usa el botón del mapa para ubicar tu dirección de entrega.");
+                showCustomAlert("Por favor usa el botón del mapa para ubicar tu dirección de entrega.");
                 return;
             }
 
@@ -770,11 +814,11 @@
             if (navigator.geolocation) {
                 document.getElementById('dev-address').value = "Obteniendo ubicación...";
                 navigator.geolocation.getCurrentPosition(showMapModal, function(error) {
-                    alert("No pudimos obtener tu ubicación. Por favor, asegúrate de dar permisos en tu navegador.");
+                    showCustomAlert("No pudimos obtener tu ubicación. Por favor, asegúrate de dar permisos en tu navegador.");
                     document.getElementById('dev-address').value = deliveryInfo.address || ''; 
                 }, { enableHighAccuracy: true });
             } else {
-                alert("Tu navegador no soporta geolocalización.");
+                showCustomAlert("Tu navegador no soporta geolocalización.");
             }
         }
 
@@ -842,7 +886,6 @@
             }
         }
 
-        // --- CARGA DE MENÚ RESPONSIVA ---
         function initMenu() {
             const container = document.getElementById('menu-container');
             const navContainer = document.getElementById('category-nav');
@@ -869,7 +912,6 @@
                 html += `<div id="${categoryId}" class="pt-5 scroll-mt-36">`;
                 html += `<h2 class="text-[22px] md:text-[28px] font-black tracking-tight text-gray-900 mb-4 ml-1">${category}</h2>`;
                 
-                // Aplicación de GRID RESPONSIVO (Columnas adaptables)
                 html += `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">`;
                 
                 const items = menuData.filter(item => (item.categoria || item.category) === category);
@@ -899,7 +941,7 @@
                         </div>
                     </div>`;
                 });
-                html += `</div></div>`; // Cierre de Grid y Categoria
+                html += `</div></div>`; 
             });
             container.innerHTML = html; navContainer.innerHTML = navHtml;
             setTimeout(() => setupScrollSpy(), 100);
@@ -1072,6 +1114,18 @@
             renderCartAction();
         }
 
+        function checkPaymentMethod() {
+            const select = document.getElementById('payment-method-select');
+            const container = document.getElementById('cash-change-container');
+            if(select && container) {
+                if(select.value.toLowerCase().includes('efectivo')) {
+                    container.classList.remove('hidden');
+                } else {
+                    container.classList.add('hidden');
+                }
+            }
+        }
+
         function renderCartAction() {
             const container = document.getElementById('cart-action-container');
             
@@ -1083,14 +1137,35 @@
                 `;
             } else {
                 let textExtra = '';
+                let extraUI = '';
+
                 if (orderType === 'recoja' && selectedStore) {
-                    textExtra = `<br><span class="text-[11px] opacity-90">Recoge en: ${selectedStore.name}</span>`;
+                    textExtra = `<span class="text-[11px] opacity-90 block mt-0.5">Recoge en: ${selectedStore.name}</span>`;
                 } else if (orderType === 'comedor' && tableNumber && selectedStore) {
-                    textExtra = `<br><span class="text-[11px] opacity-90">Suc. ${selectedStore.name} | Mesa: ${tableNumber}</span>`;
+                    textExtra = `<span class="text-[11px] opacity-90 block mt-0.5">Suc. ${selectedStore.name} | Mesa: ${tableNumber}</span>`;
+                } else if (orderType === 'domicilio') {
+                    let optionsHtml = '<option value="">Selecciona...</option>';
+                    (metodosPagoTienda.length > 0 ? metodosPagoTienda : ['Efectivo']).forEach(m => {
+                        optionsHtml += `<option value="${m}">${m}</option>`;
+                    });
+                    
+                    extraUI = `
+                    <div class="w-full mb-4 text-left p-3 bg-gray-50 rounded-xl border border-gray-100 animate-[slide-up_0.3s_ease-out]">
+                        <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Método de pago</label>
+                        <select id="payment-method-select" onchange="checkPaymentMethod()" class="w-full bg-white border border-gray-200 focus:border-orange-500 rounded-lg px-3 py-2.5 text-[14px] outline-none mb-2 transition-all">
+                            ${optionsHtml}
+                        </select>
+                        <div id="cash-change-container" class="hidden transition-all mt-2">
+                            <label class="block text-[12px] font-bold text-gray-600 mb-1">¿Con cuánto vas a pagar? ($)</label>
+                            <input type="number" id="cash-change-input" placeholder="Ej. 500" class="w-full bg-white border border-gray-200 focus:border-orange-500 rounded-lg px-3 py-2 text-[14px] outline-none transition-all">
+                        </div>
+                    </div>
+                    `;
                 }
 
                 container.innerHTML = `
-                    <button onclick="realizarOrden()" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 rounded-[16px] shadow-md transition-colors active:scale-[0.98] flex flex-col justify-center items-center gap-0.5 text-[17px]">
+                    ${extraUI}
+                    <button onclick="realizarOrden()" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 rounded-[16px] shadow-md transition-colors active:scale-[0.98] flex flex-col justify-center items-center text-[17px]">
                         Realizar Orden
                         ${textExtra}
                     </button>
@@ -1123,24 +1198,44 @@
 
         async function realizarOrden() {
             if (Object.keys(cart).length === 0) {
-                alert("Tu carrito está vacío.");
+                showCustomAlert("Tu carrito está vacío.");
                 return;
             }
 
             if (orderType === 'recoja' && !pickupInfo.name) {
-                alert("Por favor, ingresa los datos para recoger.");
+                showCustomAlert("Por favor, ingresa los datos para recoger.");
                 return openPickupModal();
             }
-            if (orderType === 'domicilio' && (!deliveryInfo.address && !userCoords)) {
-                alert("Por favor, ingresa los detalles de entrega.");
-                return openDeliveryModal();
-            }
             if (orderType === 'comedor' && !tableNumber) {
-                alert("Por favor, selecciona tu mesa.");
+                showCustomAlert("Por favor, selecciona tu mesa.");
                 return openComedorModal();
             }
 
-            // GUARDAR O SUMAR MESA EN FIREBASE SI ES SERVICIO EN COMEDOR
+            let metodoPagoSeleccionado = '';
+            let cambioPara = '';
+            if (orderType === 'domicilio') {
+                const pmSelect = document.getElementById('payment-method-select');
+                if (pmSelect && !pmSelect.value) {
+                    showCustomAlert("Por favor selecciona un método de pago.");
+                    return;
+                }
+                metodoPagoSeleccionado = pmSelect.value;
+                
+                if (metodoPagoSeleccionado.toLowerCase().includes('efectivo')) {
+                    const cashInput = document.getElementById('cash-change-input');
+                    if (cashInput && !cashInput.value) {
+                        showCustomAlert("Por favor indica con cuánto vas a pagar para llevar el cambio exacto.");
+                        return;
+                    }
+                    cambioPara = cashInput.value;
+                }
+
+                if (!deliveryInfo.address && !userCoords) {
+                    showCustomAlert("Por favor, ingresa los detalles de entrega.");
+                    return openDeliveryModal();
+                }
+            }
+
             if (orderType === 'comedor' && tableNumber && selectedStore) {
                 try {
                     const docId = `${slugTienda}_${selectedStore.id}_mesa_${tableNumber}`;
@@ -1152,7 +1247,6 @@
                         pedidoActual = docSnap.data().pedido || {};
                     }
                     
-                    // Sumamos el carrito al pedido existente (así se acumulan si piden varias veces)
                     for (const [id, qty] of Object.entries(cart)) {
                         pedidoActual[id] = (pedidoActual[id] || 0) + qty;
                     }
@@ -1220,13 +1314,17 @@
                 if (userCoords) {
                     mensaje += `🗺️ *Ubicación GPS:* https://maps.google.com/?q=${userCoords.lat},${userCoords.lng}\n`;
                 }
+
+                mensaje += `\n💳 *Método de pago:* ${metodoPagoSeleccionado}\n`;
+                if(cambioPara) {
+                    mensaje += `💵 Paga con: $${cambioPara}\n`;
+                }
             }
 
             mensaje += `\n💰 *Total a pagar:* $${total.toFixed(2)}\n\nQuedo a la espera de confirmación. ¡Gracias!`;
             
-            // MODIFICACIÓN APLICADA AQUÍ: Si es en comedor, no enviamos mensaje por WhatsApp y mostramos alerta.
             if (orderType === 'comedor') {
-                alert("¡Tu pedido ha sido enviado a la cocina! En breve te atenderemos.");
+                showCustomAlert("¡Tu pedido ha sido enviado a la cocina! En breve te atenderemos.", "¡Pedido Enviado!");
             } else {
                 window.open(`https://wa.me/${telefonoTienda}?text=${encodeURIComponent(mensaje)}`, '_blank');
             }
