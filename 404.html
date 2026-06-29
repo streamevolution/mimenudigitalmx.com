@@ -1120,9 +1120,11 @@
             const select = document.getElementById('payment-method-select');
             const cashContainer = document.getElementById('cash-change-container');
             const transferContainer = document.getElementById('transfer-details-container');
+            const cardContainer = document.getElementById('card-details-container');
             
             if(cashContainer) cashContainer.classList.add('hidden');
             if(transferContainer) transferContainer.classList.add('hidden');
+            if(cardContainer) cardContainer.classList.add('hidden');
 
             if(select && select.value !== '') {
                 const index = parseInt(select.value);
@@ -1144,6 +1146,8 @@
                     }
                     
                     if(transferContainer) transferContainer.classList.remove('hidden');
+                } else if(tipoStr.includes('tarjeta') || tipoStr.includes('terminal')) {
+                    if(cardContainer) cardContainer.classList.remove('hidden');
                 }
             }
         }
@@ -1191,6 +1195,13 @@
                                 <p><b>Beneficiario:</b> <span id="td-beneficiario"></span></p>
                                 <p id="td-concepto-wrap"><b>Concepto:</b> <span id="td-concepto"></span></p>
                             </div>
+                            <div class="mt-2 bg-blue-100 text-blue-800 p-2 rounded-lg text-[11px] font-medium leading-tight">
+                                💡 Por seguridad de la tienda, te pedimos amablemente realizar el pago mediante transferencia antes de enviar la orden. (Podrás adjuntar el comprobante por WhatsApp).
+                            </div>
+                        </div>
+
+                        <div id="card-details-container" class="hidden mt-3 p-3 bg-orange-50 border border-orange-100 rounded-xl text-[12px] text-orange-800 font-medium leading-tight">
+                            💳 <b>Pago contra entrega:</b> No necesitas ingresar ningún dato de tu tarjeta aquí. El repartidor llevará una terminal física. Por tu seguridad, recuerda nunca exponer tu NIP al momento de pagar.
                         </div>
                     </div>
                     `;
