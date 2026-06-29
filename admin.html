@@ -102,15 +102,17 @@
             
             <main class="flex-1 overflow-y-auto p-4 sm:p-8 w-full relative bg-[#f8f9fa]">
                 
-                <div id="seccion-inicio" class="max-w-3xl mx-auto w-full pt-2 sm:pt-6">
+                <div id="seccion-inicio" class="max-w-4xl mx-auto w-full pt-2 sm:pt-6">
                     <div class="text-center px-2 mb-10">
                         <h1 class="text-3xl sm:text-4xl font-normal text-gray-700 tracking-tight mb-3 leading-tight">Bienvenido a tu menú digital <br><strong id="welcome-store-name" class="text-gray-900 font-black"></strong></h1>
                         <p class="text-gray-500 text-sm sm:text-base max-w-md mx-auto">Completa la siguiente información para tener tu menú listo al 100%.</p>
                     </div>
 
-                    <div class="mb-10">
+                    <div class="mb-10 bg-white p-6 sm:p-8 rounded-[24px] shadow-sm border border-gray-100 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1.5 h-full bg-[#2d7d9a]"></div>
+                        
                         <label class="block text-sm font-bold text-gray-700 mb-2 ml-1">Enlace de tu menú digital:</label>
-                        <div class="bg-white border border-gray-200 rounded-xl p-2.5 sm:p-3 flex items-center justify-between shadow-sm">
+                        <div class="bg-[#f8f9fa] border border-gray-200 rounded-xl p-2.5 sm:p-3 flex items-center justify-between shadow-sm">
                             <span id="display-link-tienda-inicio" class="text-[#2d7d9a] text-sm sm:text-base font-medium truncate px-2 w-[60%] sm:w-auto">cargando...</span>
                             <button onclick="copiarEnlaceTiendaBtn()" class="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-4 py-2.5 rounded-lg shadow-sm text-sm font-bold transition-colors flex items-center gap-2 active:scale-95 flex-shrink-0">
                                 <svg class="w-4 h-4 text-[#2d7d9a]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
@@ -382,6 +384,38 @@
                         </button>
                     </div>
                     
+                    <!-- NUEVO ACORDEÓN: CÓDIGOS QR -->
+                    <details class="group bg-white rounded-2xl shadow-sm border border-gray-100 mb-4 [&_summary::-webkit-details-marker]:hidden">
+                        <summary class="flex items-center justify-between p-5 sm:p-6 cursor-pointer font-black text-lg text-gray-900 select-none">
+                            <div class="flex items-center gap-3">
+                                <div class="p-2 bg-purple-50 text-purple-600 rounded-xl">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+                                </div>
+                                Códigos QR para Tienda
+                            </div>
+                            <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </summary>
+                        <div class="p-5 sm:p-6 border-t border-gray-100 space-y-6 bg-gray-50/30 rounded-b-2xl">
+                            <p class="text-sm text-gray-500 mb-4">Descarga tus códigos QR listos para imprimir y pegar en tu establecimiento. Tienen un diseño elegante e incluyen automáticamente el logotipo y nombre de tu marca.</p>
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <button onclick="descargarQRGeneral('Menu_Digital', 'MENÚ DIGITAL', 'ESCANEA PARA VER EL MENÚ')" class="flex flex-col items-center justify-center bg-orange-50 hover:bg-orange-100 text-orange-700 border border-orange-200 p-4 rounded-xl transition-transform active:scale-95 text-center gap-2 shadow-sm">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+                                    <span class="font-bold text-sm">Menú Digital</span>
+                                </button>
+                                <button onclick="descargarQRGeneral('Tienda_Online', 'TIENDA ONLINE', 'ESCANEA PARA COMPRAR')" class="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 p-4 rounded-xl transition-transform active:scale-95 text-center gap-2 shadow-sm">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                                    <span class="font-bold text-sm">Tienda Online</span>
+                                </button>
+                                <button onclick="descargarQRGeneral('Domicilio_Recoja', 'ORDENA AQUÍ', 'DOMICILIO Y RECOJA')" class="flex flex-col items-center justify-center bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 p-4 rounded-xl transition-transform active:scale-95 text-center gap-2 shadow-sm">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                                    <span class="font-bold text-sm">Servicio a Domicilio</span>
+                                </button>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Acordeón Identidad y Apariencia -->
                     <details class="group bg-white rounded-2xl shadow-sm border border-gray-100 mb-4 [&_summary::-webkit-details-marker]:hidden" open>
                         <summary class="flex items-center justify-between p-5 sm:p-6 cursor-pointer font-black text-lg text-gray-900 select-none">
                             <div class="flex items-center gap-3">
@@ -543,11 +577,137 @@
         };
         let currentApariencia = { logo: '', portada: '' };
 
-        // Función modificada para crear el nuevo display de mesa con el Logo incluido
+        async function descargarQRGeneral(nombreAccion, titulo, subtitulo) {
+            const url = `https://mimenudigitalmx.com/${miTiendaId}`;
+            const nombreTienda = document.getElementById('conf-nombre-tienda').value.trim() || 'MI TIENDA';
+            
+            const canvasQR = document.createElement('canvas');
+            const qrSize = 480; 
+            const qr = new QRious({
+                element: canvasQR,
+                value: url,
+                size: qrSize,
+                level: 'H'
+            });
+
+            const finalCanvas = document.createElement('canvas');
+            finalCanvas.width = 800;
+            finalCanvas.height = 1100;
+            const ctx = finalCanvas.getContext('2d');
+            
+            ctx.fillStyle = '#f2f2f7';
+            ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+            
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
+            ctx.shadowBlur = 40;
+            ctx.shadowOffsetY = 20;
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            if (ctx.roundRect) {
+                ctx.roundRect(50, 50, 700, 1000, 40);
+            } else {
+                ctx.fillRect(50, 50, 700, 1000);
+            }
+            ctx.fill();
+            ctx.shadowColor = 'transparent';
+
+            ctx.fillStyle = '#ea580c';
+            ctx.beginPath();
+            if (ctx.roundRect) {
+                ctx.roundRect(50, 50, 700, 220, {tl: 40, tr: 40, bl: 0, br: 0});
+            } else {
+                ctx.fillRect(50, 50, 700, 220);
+            }
+            ctx.fill();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '900 80px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(titulo, 400, 140);
+            
+            ctx.font = '600 28px Inter, sans-serif';
+            ctx.fillText(subtitulo, 400, 210);
+
+            const qrX = (800 - qrSize) / 2;
+            const qrY = 300; 
+            
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = '#f3f4f6';
+            ctx.strokeRect(qrX - 10, qrY - 10, qrSize + 20, qrSize + 20);
+
+            ctx.drawImage(canvasQR, qrX, qrY);
+
+            ctx.fillStyle = '#111827';
+            ctx.font = '900 50px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(nombreTienda.toUpperCase(), 400, 870, 650);
+
+            ctx.beginPath();
+            ctx.moveTo(150, 930);
+            ctx.lineTo(650, 930);
+            ctx.strokeStyle = '#e5e7eb';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            ctx.fillStyle = '#6b7280';
+            ctx.font = '700 24px Inter, sans-serif';
+            ctx.fillText('¡GRACIAS POR SU PREFERENCIA!', 400, 1000);
+
+            // Modificación: Descargar como PDF usando jsPDF
+            const descargarCanvas = () => {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'px',
+                    format: [finalCanvas.width, finalCanvas.height]
+                });
+                pdf.addImage(finalCanvas.toDataURL('image/png', 1.0), 'PNG', 0, 0, finalCanvas.width, finalCanvas.height);
+                pdf.save(`QR_${nombreAccion}_MiMenuDigital.pdf`);
+            };
+
+            if (currentApariencia && currentApariencia.logo) {
+                const logoImg = new Image();
+                logoImg.crossOrigin = "Anonymous";
+                
+                logoImg.onload = () => {
+                    const logoSize = qrSize * 0.25; 
+                    const logoX = qrX + (qrSize - logoSize) / 2;
+                    const logoY = qrY + (qrSize - logoSize) / 2;
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.beginPath();
+                    ctx.arc(qrX + qrSize / 2, qrY + qrSize / 2, logoSize / 2 + 10, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.arc(qrX + qrSize / 2, qrY + qrSize / 2, logoSize / 2, 0, Math.PI * 2);
+                    ctx.clip();
+                    ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
+                    ctx.restore();
+
+                    ctx.beginPath();
+                    ctx.arc(qrX + qrSize / 2, qrY + qrSize / 2, logoSize / 2, 0, Math.PI * 2);
+                    ctx.lineWidth = 3;
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.stroke();
+
+                    descargarCanvas();
+                };
+                
+                logoImg.onerror = () => {
+                    descargarCanvas();
+                };
+                
+                logoImg.src = currentApariencia.logo;
+            } else {
+                descargarCanvas();
+            }
+        }
+
         async function descargarQRMesa(event, url, numeroMesa) {
             event.stopPropagation();
             
-            // 1. Generar el código QR base
             const canvasQR = document.createElement('canvas');
             const qrSize = 500;
             const qr = new QRious({
@@ -557,7 +717,6 @@
                 level: 'H'
             });
 
-            // 2. Crear un canvas final (Estilo Display de Mesa / Tent Card)
             const finalCanvas = document.createElement('canvas');
             finalCanvas.width = 800;
             finalCanvas.height = 1100;
@@ -603,7 +762,6 @@
             ctx.strokeStyle = '#f3f4f6';
             ctx.strokeRect(qrX - 10, qrY - 10, qrSize + 20, qrSize + 20);
 
-            // Dibujar QR base
             ctx.drawImage(canvasQR, qrX, qrY);
 
             ctx.beginPath();
@@ -617,32 +775,32 @@
             ctx.font = '900 70px Inter, sans-serif';
             ctx.fillText('MESA ' + numeroMesa, 400, 990);
 
-            // Función para finalizar y descargar
+            // Modificación: Descargar como PDF usando jsPDF
             const descargarCanvas = () => {
-                const link = document.createElement('a');
-                link.download = `Display_Mesa_${numeroMesa}_MiMenuDigital.png`;
-                link.href = finalCanvas.toDataURL('image/png');
-                link.click();
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'px',
+                    format: [finalCanvas.width, finalCanvas.height]
+                });
+                pdf.addImage(finalCanvas.toDataURL('image/png', 1.0), 'PNG', 0, 0, finalCanvas.width, finalCanvas.height);
+                pdf.save(`Display_Mesa_${numeroMesa}_MiMenuDigital.pdf`);
             };
 
-            // Lógica para añadir el Logo si existe
             if (currentApariencia && currentApariencia.logo) {
                 const logoImg = new Image();
-                logoImg.crossOrigin = "Anonymous"; // Necesario para imágenes de ImgBB/Firebase
+                logoImg.crossOrigin = "Anonymous"; 
                 
                 logoImg.onload = () => {
-                    // Tamaño del logo: 25% del QR para mantenerlo legible
                     const logoSize = qrSize * 0.25; 
                     const logoX = qrX + (qrSize - logoSize) / 2;
                     const logoY = qrY + (qrSize - logoSize) / 2;
 
-                    // Dibujar círculo blanco de fondo para dar contraste
                     ctx.fillStyle = '#ffffff';
                     ctx.beginPath();
                     ctx.arc(qrX + qrSize / 2, qrY + qrSize / 2, logoSize / 2 + 10, 0, Math.PI * 2);
                     ctx.fill();
 
-                    // Dibujar el logo de la tienda recortado en círculo
                     ctx.save();
                     ctx.beginPath();
                     ctx.arc(qrX + qrSize / 2, qrY + qrSize / 2, logoSize / 2, 0, Math.PI * 2);
@@ -650,7 +808,6 @@
                     ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
                     ctx.restore();
 
-                    // Dibujar borde sutil alrededor del logo
                     ctx.beginPath();
                     ctx.arc(qrX + qrSize / 2, qrY + qrSize / 2, logoSize / 2, 0, Math.PI * 2);
                     ctx.lineWidth = 3;
@@ -661,13 +818,12 @@
                 };
                 
                 logoImg.onerror = () => {
-                    console.warn("No se pudo cargar el logo, descargando el QR sin él.");
                     descargarCanvas();
                 };
                 
                 logoImg.src = currentApariencia.logo;
             } else {
-                descargarCanvas(); // Si no hay logo configurado, descarga normal
+                descargarCanvas(); 
             }
         }
 
@@ -738,7 +894,16 @@
                     
                     dbLocal.categorias = data.categorias || [];
                     dbLocal.sucursales = data.sucursales || [];
-                    dbLocal.metodosPago = data.metodosPago || ['Efectivo'];
+                    
+                    // Modificación: Validar que Efectivo siempre esté presente
+                    let metodosData = data.metodosPago || [];
+                    const tieneEfectivo = metodosData.some(m => m.toLowerCase() === 'efectivo');
+                    
+                    if (!tieneEfectivo) {
+                        metodosData.unshift('Efectivo');
+                        dbFirestore.collection('tiendas').doc(miTiendaId).update({ metodosPago: metodosData }).catch(e => console.log("Error restaurando efectivo", e));
+                    }
+                    dbLocal.metodosPago = metodosData;
                     
                     document.getElementById('conf-nombre-tienda').value = data.nombreTienda || '';
 
@@ -1049,10 +1214,16 @@
                 lista.innerHTML = `<li class="p-4 text-center text-gray-400 text-sm font-medium">Sin métodos registrados. Agrega uno.</li>`;
             } else {
                 dbLocal.metodosPago.forEach((metodo, index) => {
+                    // Modificación: Deshabilitar eliminación si es Efectivo
+                    const isEfectivo = metodo.toLowerCase() === 'efectivo';
+                    const actionBtn = isEfectivo 
+                        ? `<span class="text-gray-400 bg-gray-100 px-3 py-1.5 rounded-lg text-xs font-bold cursor-not-allowed">Fijo</span>` 
+                        : `<button onclick="eliminarMetodoPago(${index})" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors active:scale-95">Eliminar</button>`;
+                    
                     lista.innerHTML += `
                     <li class="flex justify-between items-center p-3 hover:bg-white transition-colors rounded-lg">
                         <span class="font-bold text-gray-800 text-sm pl-2">${metodo}</span>
-                        <button onclick="eliminarMetodoPago(${index})" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors active:scale-95">Eliminar</button>
+                        ${actionBtn}
                     </li>`;
                 });
             }
@@ -1061,7 +1232,11 @@
         function agregarMetodoPago() {
             const input = document.getElementById('nuevo-metodo-pago');
             const valor = input.value.trim();
-            if(valor && !dbLocal.metodosPago.includes(valor)) {
+            
+            // Validar para que no agregue "efectivo" dos veces si lo escribe con otra capitalización
+            const yaExiste = dbLocal.metodosPago.some(m => m.toLowerCase() === valor.toLowerCase());
+            
+            if(valor && !yaExiste) {
                 dbLocal.metodosPago.push(valor);
                 input.value = '';
                 dbFirestore.collection('tiendas').doc(miTiendaId).update({ metodosPago: dbLocal.metodosPago });
@@ -1070,6 +1245,11 @@
         }
 
         function eliminarMetodoPago(index) {
+            // Modificación extra de seguridad: Evitar que lo borre incluso desde la consola
+            if(dbLocal.metodosPago[index].toLowerCase() === 'efectivo') {
+                alert('No puedes eliminar el método de pago Efectivo.');
+                return;
+            }
             if(confirm('¿Seguro que deseas eliminar este método de pago?')) {
                 dbLocal.metodosPago.splice(index, 1);
                 dbFirestore.collection('tiendas').doc(miTiendaId).update({ metodosPago: dbLocal.metodosPago });
@@ -1331,7 +1511,6 @@
                 
                 const onClickFunc = isOcupado ? `abrirDetalleMesa('${mesaActiva.id}')` : `alert('Mesa libre. Los usuarios pueden solicitarla desde el menú.')`;
 
-                // Añadimos el botón de descargar QR en la esquina inferior derecha
                 grid.innerHTML += `
                     <div onclick="${onClickFunc}" class="${bgClass} text-white p-5 rounded-2xl shadow-lg cursor-pointer transition-all active:scale-95 flex flex-col items-center justify-center h-32 relative overflow-hidden group">
                         <div class="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
