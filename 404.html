@@ -452,7 +452,12 @@
                             document.getElementById('home-store-desc').innerText = tiendaDataActual.mensajeBienvenida;
                         }
 
-                        metodosPagoTienda = tiendaDataActual.metodosPago || ['Efectivo'];
+                        metodosPagoTienda = tiendaDataActual.metodosPago || [{ tipo: 'Efectivo' }];
+                        metodosPagoTienda = metodosPagoTienda.map(m => typeof m === 'string' ? { tipo: m } : m);
+                        if(!metodosPagoTienda.some(m => m.tipo === 'Efectivo')) {
+                            metodosPagoTienda.unshift({ tipo: 'Efectivo' });
+                        }
+
                         categoriasOrdenadas = tiendaDataActual.categorias || [];
                         
                         const sucursalesDb = tiendaDataActual.sucursales || [];
@@ -577,9 +582,6 @@
             fab.classList.add('scale-out');
             setTimeout(() => { fab.classList.add('hidden'); }, 300);
         }
-
-        // --- MANEJO DE TIPOS DE ORDEN ---
-        let currentModalContext = null; 
 
         function setOrderType(type) {
             orderType = type;
@@ -1116,12 +1118,32 @@
 
         function checkPaymentMethod() {
             const select = document.getElementById('payment-method-select');
-            const container = document.getElementById('cash-change-container');
-            if(select && container) {
-                if(select.value.toLowerCase().includes('efectivo')) {
-                    container.classList.remove('hidden');
-                } else {
-                    container.classList.add('hidden');
+            const cashContainer = document.getElementById('cash-change-container');
+            const transferContainer = document.getElementById('transfer-details-container');
+            
+            if(cashContainer) cashContainer.classList.add('hidden');
+            if(transferContainer) transferContainer.classList.add('hidden');
+
+            if(select && select.value !== '') {
+                const index = parseInt(select.value);
+                const metodo = metodosPagoTienda[index];
+                const tipoStr = metodo.tipo.toLowerCase();
+                
+                if(tipoStr.includes('efectivo')) {
+                    if(cashContainer) cashContainer.classList.remove('hidden');
+                } else if(tipoStr.includes('transferencia') || metodo.banco) {
+                    document.getElementById('td-banco').innerText = metodo.banco || '';
+                    document.getElementById('td-cuenta').innerText = metodo.cuenta || '';
+                    document.getElementById('td-beneficiario').innerText = metodo.beneficiario || '';
+                    
+                    if(metodo.concepto) {
+                        document.getElementById('td-concepto-wrap').classList.remove('hidden');
+                        document.getElementById('td-concepto').innerText = metodo.concepto;
+                    } else {
+                        document.getElementById('td-concepto-wrap').classList.add('hidden');
+                    }
+                    
+                    if(transferContainer) transferContainer.classList.remove('hidden');
                 }
             }
         }
@@ -1145,8 +1167,8 @@
                     textExtra = `<span class="text-[11px] opacity-90 block mt-0.5">Suc. ${selectedStore.name} | Mesa: ${tableNumber}</span>`;
                 } else if (orderType === 'domicilio') {
                     let optionsHtml = '<option value="">Selecciona...</option>';
-                    (metodosPagoTienda.length > 0 ? metodosPagoTienda : ['Efectivo']).forEach(m => {
-                        optionsHtml += `<option value="${m}">${m}</option>`;
+                    metodosPagoTienda.forEach((m, idx) => {
+                        optionsHtml += `<option value="${idx}">${m.tipo}</option>`;
                     });
                     
                     extraUI = `
@@ -1155,9 +1177,20 @@
                         <select id="payment-method-select" onchange="checkPaymentMethod()" class="w-full bg-white border border-gray-200 focus:border-orange-500 rounded-lg px-3 py-2.5 text-[14px] outline-none mb-2 transition-all">
                             ${optionsHtml}
                         </select>
+                        
                         <div id="cash-change-container" class="hidden transition-all mt-2">
                             <label class="block text-[12px] font-bold text-gray-600 mb-1">¿Con cuánto vas a pagar? ($)</label>
                             <input type="number" id="cash-change-input" placeholder="Ej. 500" class="w-full bg-white border border-gray-200 focus:border-orange-500 rounded-lg px-3 py-2 text-[14px] outline-none transition-all">
+                        </div>
+
+                        <div id="transfer-details-container" class="hidden mt-3 p-3 bg-blue-50 border border-blue-100 rounded-xl text-[12px] text-gray-700">
+                            <p class="font-bold text-[#2d7d9a] mb-2 border-b border-blue-200 pb-1">Datos para transferencia:</p>
+                            <div class="space-y-1">
+                                <p><b>Banco:</b> <span id="td-banco"></span></p>
+                                <p><b>Cuenta/CLABE:</b> <span id="td-cuenta"></span></p>
+                                <p><b>Beneficiario:</b> <span id="td-beneficiario"></span></p>
+                                <p id="td-concepto-wrap"><b>Concepto:</b> <span id="td-concepto"></span></p>
+                            </div>
                         </div>
                     </div>
                     `;
@@ -1211,17 +1244,20 @@
                 return openComedorModal();
             }
 
-            let metodoPagoSeleccionado = '';
+            let metodoPagoTexto = '';
             let cambioPara = '';
+            
             if (orderType === 'domicilio') {
                 const pmSelect = document.getElementById('payment-method-select');
-                if (pmSelect && !pmSelect.value) {
+                if (pmSelect && pmSelect.value === '') {
                     showCustomAlert("Por favor selecciona un método de pago.");
                     return;
                 }
-                metodoPagoSeleccionado = pmSelect.value;
                 
-                if (metodoPagoSeleccionado.toLowerCase().includes('efectivo')) {
+                const metodoObj = metodosPagoTienda[parseInt(pmSelect.value)];
+                metodoPagoTexto = metodoObj.tipo;
+                
+                if (metodoObj.tipo.toLowerCase().includes('efectivo')) {
                     const cashInput = document.getElementById('cash-change-input');
                     if (cashInput && !cashInput.value) {
                         showCustomAlert("Por favor indica con cuánto vas a pagar para llevar el cambio exacto.");
@@ -1315,7 +1351,7 @@
                     mensaje += `🗺️ *Ubicación GPS:* https://maps.google.com/?q=${userCoords.lat},${userCoords.lng}\n`;
                 }
 
-                mensaje += `\n💳 *Método de pago:* ${metodoPagoSeleccionado}\n`;
+                mensaje += `\n💳 *Método de pago:* ${metodoPagoTexto}\n`;
                 if(cambioPara) {
                     mensaje += `💵 Paga con: $${cambioPara}\n`;
                 }
