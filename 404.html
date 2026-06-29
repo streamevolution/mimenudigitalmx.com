@@ -20,11 +20,19 @@
         
         .ios-shadow { box-shadow: 0 4px 24px rgba(0,0,0,0.04); }
         .ios-shadow-lg { box-shadow: 0 8px 32px rgba(0,0,0,0.08); }
+
+        /* Ajustes para el escáner QR */
+        #reader button { background-color: #f2f2f7; color: #1f2937; padding: 8px 16px; border-radius: 12px; font-weight: bold; margin: 5px; border: 1px solid #e5e7eb; cursor: pointer; }
+        #reader button:hover { background-color: #e5e7eb; }
+        #reader select { padding: 8px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #e5e7eb; width: 100%; }
+        #reader a { display: none !important; }
     </style>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <!-- Librería para escanear Códigos QR -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 </head>
 <body class="bg-[#F2F2F7] text-gray-900 transition-colors antialiased">
 
@@ -97,7 +105,7 @@
             </div>
 
             <footer class="mt-8 text-center text-[11px] font-semibold text-gray-400 tracking-wide">
-                © 2026 Creado por Juan Zamora. Todos los derechos reservados.
+                © 2026 Creado por Zamora Ramos Juan Manuel. Todos los derechos reservados.
             </footer>
         </div>
 
@@ -144,7 +152,7 @@
             <main class="max-w-7xl mx-auto px-4 md:px-8 py-6" id="menu-container"></main>
 
             <footer class="max-w-7xl mx-auto text-center pt-4 pb-8 text-[11px] md:text-[13px] font-semibold text-gray-400 tracking-wide">
-                © 2026 Creado por Juan Zamora. Todos los derechos reservados.
+                © 2026 Creado por Zamora Ramos Juan Manuel. Todos los derechos reservados.
             </footer>
         </div>
         
@@ -261,7 +269,7 @@
         </div>
     </div>
 
-    <!-- Modal Sucursales Recoja y Comedor -->
+    <!-- Modal Sucursales Recoja -->
     <div id="store-modal" class="fixed inset-0 z-[55] hidden opacity-0 transition-opacity duration-300">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeStoreModal()"></div>
         <div id="store-modal-content" class="absolute bottom-0 w-full bg-[#F2F2F7] rounded-t-[32px] md:max-w-md md:left-1/2 md:-translate-x-1/2 md:top-1/2 md:bottom-auto md:rounded-3xl overflow-hidden ios-shadow-lg transform slide-down transition-transform duration-300 flex flex-col max-h-[90vh]">
@@ -310,30 +318,22 @@
         </div>
     </div>
 
-    <!-- Modal Comedor -->
-    <div id="comedor-modal" class="fixed inset-0 z-[55] hidden opacity-0 transition-opacity duration-300">
-        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeComedorModal()"></div>
-        <div id="comedor-modal-content" class="absolute bottom-0 w-full bg-[#F2F2F7] rounded-t-[32px] md:max-w-md md:left-1/2 md:-translate-x-1/2 md:top-1/2 md:bottom-auto md:rounded-3xl overflow-hidden ios-shadow-lg transform slide-down transition-transform duration-300 flex flex-col max-h-[90vh]">
+    <!-- Modal Lector QR de Mesa -->
+    <div id="qr-modal" class="fixed inset-0 z-[60] hidden opacity-0 transition-opacity duration-300">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeQrModal()"></div>
+        <div id="qr-modal-content" class="absolute bottom-0 w-full bg-[#F2F2F7] rounded-t-[32px] md:max-w-md md:left-1/2 md:-translate-x-1/2 md:top-1/2 md:bottom-auto md:rounded-3xl overflow-hidden ios-shadow-lg transform slide-down transition-transform duration-300 flex flex-col">
             <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mt-3 absolute left-0 right-0 z-20 md:hidden"></div>
             
             <div class="pt-8 pb-4 px-6 border-b border-gray-200/60 flex justify-between items-center bg-white">
-                <h2 class="text-[20px] font-black tracking-tight text-gray-900">Número de Mesa</h2>
-                <button onclick="closeComedorModal()" class="text-gray-500 bg-[#F2F2F7] p-2 rounded-full active:scale-95 transition-transform">
+                <h2 class="text-[20px] font-black tracking-tight text-gray-900">Escanear Mesa</h2>
+                <button onclick="closeQrModal()" class="text-gray-500 bg-[#F2F2F7] p-2 rounded-full active:scale-95 transition-transform">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>
                 </button>
             </div>
             
-            <div class="p-6 overflow-y-auto flex-grow space-y-4 bg-white">
-                <div>
-                    <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Selecciona tu mesa</label>
-                    <select id="comedor-table-number" class="w-full bg-[#F2F2F7] border border-transparent focus:border-orange-500 focus:bg-white rounded-xl px-4 py-3 text-[15px] outline-none transition-all">
-                        <option value="">Seleccione...</option>
-                    </select>
-                </div>
-
-                <button onclick="saveComedorDetails()" class="w-full mt-4 bg-orange-600 hover:bg-orange-700 text-white font-bold py-3.5 rounded-[14px] shadow-md transition-colors active:scale-95">
-                    Confirmar
-                </button>
+            <div class="p-6 bg-white flex flex-col items-center">
+                <p class="text-[13px] text-gray-500 mb-4 text-center">Apunta la cámara al código QR que está en tu mesa para poder ordenar.</p>
+                <div id="reader" class="w-full max-w-sm rounded-2xl overflow-hidden shadow-inner border border-gray-200 bg-black"></div>
             </div>
         </div>
     </div>
@@ -370,10 +370,12 @@
 
     <script>
         let metodosPagoTienda = [];
+        let alertAction = null;
 
-        function showCustomAlert(message, title = "mimenudigitalmx.com dice") {
+        function showCustomAlert(message, title = "mimenudigitalmx.com dice", action = null) {
             document.getElementById('custom-alert-title').innerText = title;
             document.getElementById('custom-alert-message').innerText = message;
+            alertAction = action;
             
             const modal = document.getElementById('custom-alert');
             const bg = document.getElementById('custom-alert-bg');
@@ -396,7 +398,13 @@
             content.classList.remove('scale-100', 'opacity-100');
             content.classList.add('scale-90', 'opacity-0');
             
-            setTimeout(() => { modal.classList.add('hidden'); }, 200);
+            setTimeout(() => { 
+                modal.classList.add('hidden'); 
+                if(alertAction) {
+                    alertAction();
+                    alertAction = null;
+                }
+            }, 200);
         }
 
         const firebaseConfig = {
@@ -432,6 +440,11 @@
         let pickupInfo = JSON.parse(localStorage.getItem('cevichePickupData')) || { name: '', phone: '' };
 
         let selectedStore = null;
+
+        // Variables globales para la detección del código QR
+        let html5QrcodeScanner = null;
+        let qrSucursalId = null;
+        let qrMesaNumber = null;
 
         async function inicializarTienda() {
             if (!slugTienda) {
@@ -469,6 +482,19 @@
                             cantidadMesas: s.cantidadMesas || 15,
                             logo: (tiendaDataActual.apariencia && tiendaDataActual.apariencia.logo) ? tiendaDataActual.apariencia.logo : 'https://i.postimg.cc/TwyVXDVr/1782665038599.png'
                         }));
+
+                        // MAGIA 2: Verificar si el usuario escaneó el QR desde la cámara nativa de su celular
+                        const params = new URLSearchParams(window.location.search);
+                        let urlSucursal = params.get('sucursal');
+                        let urlMesa = params.get('mesa');
+                        if (urlSucursal && urlMesa) {
+                            qrSucursalId = urlSucursal;
+                            qrMesaNumber = urlMesa;
+                            selectedStore = storesData.find(s => String(s.id) === String(urlSucursal));
+                            tableNumber = urlMesa;
+                            orderType = 'comedor';
+                            applyOrderTypeUI('comedor');
+                        }
 
                         if(tiendaDataActual.apariencia) {
                             if(tiendaDataActual.apariencia.logo) {
@@ -586,21 +612,111 @@
         function setOrderType(type) {
             orderType = type;
             currentModalContext = type;
-            selectedStore = null; 
-            applyOrderTypeUI(type);
-
+            
             if (type === 'domicilio') {
+                selectedStore = null; 
+                applyOrderTypeUI(type);
                 openDeliveryModal();
-            } else if (type === 'comedor' || type === 'recoja') {
+            } else if (type === 'recoja') {
+                selectedStore = null; 
+                applyOrderTypeUI(type);
                 openStoreModal(); 
                 userCoords = null; 
+            } else if (type === 'comedor') {
+                userCoords = null; 
+                
+                // MAGIA 1: Si ya tenemos los datos (por lectura de cámara o lectura previa) no preguntamos nada
+                const params = new URLSearchParams(window.location.search);
+                let urlSucursal = params.get('sucursal');
+                let urlMesa = params.get('mesa');
+
+                if (urlSucursal && urlMesa) {
+                    selectedStore = storesData.find(s => String(s.id) === String(urlSucursal));
+                    tableNumber = urlMesa;
+                    applyOrderTypeUI(type);
+                    if (!document.getElementById('cart-modal').classList.contains('hidden')) {
+                        renderCartAction();
+                    }
+                } else if (qrSucursalId && qrMesaNumber) {
+                     selectedStore = storesData.find(s => String(s.id) === String(qrSucursalId));
+                     tableNumber = qrMesaNumber;
+                     applyOrderTypeUI(type);
+                     if (!document.getElementById('cart-modal').classList.contains('hidden')) {
+                         renderCartAction();
+                     }
+                } else {
+                    // Si no tenemos los datos de la mesa, lanzamos la alerta para escanear
+                    showCustomAlert("Para ordenar en el restaurante, necesitas habilitar tu cámara para escanear el código QR de tu mesa.", "Servicio en Comedor", () => {
+                        applyOrderTypeUI(type);
+                        startQrScanner();
+                    });
+                }
             } else {
                 userCoords = null; 
+                applyOrderTypeUI(type);
             }
 
             if (!document.getElementById('cart-modal').classList.contains('hidden')) {
                 renderCartAction();
             }
+        }
+
+        function startQrScanner() {
+            const modal = document.getElementById('qr-modal');
+            const content = document.getElementById('qr-modal-content');
+            modal.classList.remove('hidden');
+            void modal.offsetWidth; 
+            modal.classList.remove('opacity-0'); 
+            content.classList.remove('slide-down'); 
+            content.classList.add('slide-up');
+
+            if (!html5QrcodeScanner) {
+                html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
+            }
+            
+            html5QrcodeScanner.render((decodedText) => {
+                try {
+                    let url = new URL(decodedText);
+                    let params = new URLSearchParams(url.search);
+                    let suc = params.get('sucursal');
+                    let mesa = params.get('mesa');
+
+                    if (suc && mesa) {
+                        qrSucursalId = suc;
+                        qrMesaNumber = mesa;
+                        
+                        selectedStore = storesData.find(s => String(s.id) === String(suc));
+                        tableNumber = mesa;
+
+                        closeQrModal();
+                        showCustomAlert("¡Mesa " + mesa + " detectada con éxito! Ya puedes realizar tu orden directo a cocina.", "¡Listo!");
+                        
+                        if (!document.getElementById('cart-modal').classList.contains('hidden')) {
+                            renderCartAction();
+                        }
+                    } else {
+                        showCustomAlert("El código QR escaneado no pertenece a una mesa válida.", "Error");
+                    }
+                } catch(e) {
+                    showCustomAlert("El código no es un enlace válido.", "Error");
+                }
+            }, (error) => {
+                // ignorar errores de escaneo constante de la librería
+            });
+        }
+
+        function closeQrModal() {
+            if(html5QrcodeScanner) {
+                html5QrcodeScanner.clear().catch(error => {
+                    console.error("Fallo al limpiar html5QrcodeScanner. ", error);
+                });
+            }
+            const modal = document.getElementById('qr-modal');
+            const content = document.getElementById('qr-modal-content');
+            modal.classList.add('opacity-0'); 
+            content.classList.remove('slide-up'); 
+            content.classList.add('slide-down');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
         }
 
         function applyOrderTypeUI(type) {
@@ -671,64 +787,8 @@
             userCoords = null;
             
             setTimeout(() => { 
-                if(currentModalContext === 'comedor') {
-                    openComedorModal();
-                } else {
-                    openPickupModal(); 
-                }
+                openPickupModal(); 
             }, 350);
-        }
-
-        function openComedorModal() {
-            const select = document.getElementById('comedor-table-number');
-            select.innerHTML = '<option value="">Seleccione...</option>';
-            let count = selectedStore ? selectedStore.cantidadMesas : 15;
-            for(let i=1; i<=count; i++) {
-                select.innerHTML += `<option value="${i}">Mesa ${i}</option>`;
-            }
-
-            let activeTableInfo = JSON.parse(localStorage.getItem('mesaActiva_v1'));
-            if (activeTableInfo && String(activeTableInfo.sucursalId) === String(selectedStore.id)) {
-                tableNumber = activeTableInfo.tableNumber;
-            }
-
-            select.value = tableNumber || '';
-
-            const modal = document.getElementById('comedor-modal');
-            const content = document.getElementById('comedor-modal-content');
-            modal.classList.remove('hidden');
-            void modal.offsetWidth; 
-            modal.classList.remove('opacity-0'); 
-            content.classList.remove('slide-down'); 
-            content.classList.add('slide-up');
-        }
-
-        function closeComedorModal() {
-            const modal = document.getElementById('comedor-modal');
-            const content = document.getElementById('comedor-modal-content');
-            modal.classList.add('opacity-0'); 
-            content.classList.remove('slide-up'); 
-            content.classList.add('slide-down');
-            setTimeout(() => { modal.classList.add('hidden'); }, 300);
-        }
-
-        function saveComedorDetails() {
-            const val = document.getElementById('comedor-table-number').value;
-            if(!val) {
-                showCustomAlert("Por favor selecciona una mesa.");
-                return;
-            }
-            tableNumber = val;
-            
-            localStorage.setItem('mesaActiva_v1', JSON.stringify({
-                sucursalId: selectedStore.id,
-                tableNumber: tableNumber
-            }));
-
-            closeComedorModal();
-            if (!document.getElementById('cart-modal').classList.contains('hidden')) {
-                renderCartAction();
-            }
         }
 
         function openPickupModal() {
@@ -1120,11 +1180,9 @@
             const select = document.getElementById('payment-method-select');
             const cashContainer = document.getElementById('cash-change-container');
             const transferContainer = document.getElementById('transfer-details-container');
-            const cardContainer = document.getElementById('card-details-container');
             
             if(cashContainer) cashContainer.classList.add('hidden');
             if(transferContainer) transferContainer.classList.add('hidden');
-            if(cardContainer) cardContainer.classList.add('hidden');
 
             if(select && select.value !== '') {
                 const index = parseInt(select.value);
@@ -1146,8 +1204,6 @@
                     }
                     
                     if(transferContainer) transferContainer.classList.remove('hidden');
-                } else if(tipoStr.includes('tarjeta') || tipoStr.includes('terminal')) {
-                    if(cardContainer) cardContainer.classList.remove('hidden');
                 }
             }
         }
@@ -1195,13 +1251,6 @@
                                 <p><b>Beneficiario:</b> <span id="td-beneficiario"></span></p>
                                 <p id="td-concepto-wrap"><b>Concepto:</b> <span id="td-concepto"></span></p>
                             </div>
-                            <div class="mt-2 bg-blue-100 text-blue-800 p-2 rounded-lg text-[11px] font-medium leading-tight">
-                                💡 Por seguridad de la tienda, te pedimos amablemente realizar el pago mediante transferencia antes de enviar la orden. (Podrás adjuntar el comprobante por WhatsApp).
-                            </div>
-                        </div>
-
-                        <div id="card-details-container" class="hidden mt-3 p-3 bg-orange-50 border border-orange-100 rounded-xl text-[12px] text-orange-800 font-medium leading-tight">
-                            💳 <b>Pago contra entrega:</b> No necesitas ingresar ningún dato de tu tarjeta aquí. El repartidor llevará una terminal física. Por tu seguridad, recuerda nunca exponer tu NIP al momento de pagar.
                         </div>
                     </div>
                     `;
@@ -1251,8 +1300,8 @@
                 return openPickupModal();
             }
             if (orderType === 'comedor' && !tableNumber) {
-                showCustomAlert("Por favor, selecciona tu mesa.");
-                return openComedorModal();
+                showCustomAlert("Falta escanear la mesa. Por favor, selecciona el servicio en comedor nuevamente para activar la cámara.");
+                return;
             }
 
             let metodoPagoTexto = '';
