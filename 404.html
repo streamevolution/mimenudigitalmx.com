@@ -101,6 +101,7 @@
             </footer>
         </div>
 
+
         <div id="menu-view" class="hidden pb-20">
             
             <div id="menu-cover" class="relative h-60 bg-cover bg-center" style="background-image: url('https://i.postimg.cc/VvQCQHLt/1782664887113.png');">
@@ -207,6 +208,7 @@
         </div>
     </div>
 
+    <!-- Modal Domicilio -->
     <div id="delivery-modal" class="fixed inset-0 z-[55] hidden opacity-0 transition-opacity duration-300">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeDeliveryModal()"></div>
         <div id="delivery-modal-content" class="absolute bottom-0 w-full bg-[#F2F2F7] rounded-t-[32px] md:max-w-md md:left-1/2 md:-translate-x-1/2 md:top-1/2 md:bottom-auto md:rounded-3xl overflow-hidden ios-shadow-lg transform slide-down transition-transform duration-300 flex flex-col max-h-[90vh]">
@@ -253,6 +255,7 @@
         </div>
     </div>
 
+    <!-- Modal Sucursales Recoja -->
     <div id="store-modal" class="fixed inset-0 z-[55] hidden opacity-0 transition-opacity duration-300">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeStoreModal()"></div>
         <div id="store-modal-content" class="absolute bottom-0 w-full bg-[#F2F2F7] rounded-t-[32px] md:max-w-md md:left-1/2 md:-translate-x-1/2 md:top-1/2 md:bottom-auto md:rounded-3xl overflow-hidden ios-shadow-lg transform slide-down transition-transform duration-300 flex flex-col max-h-[90vh]">
@@ -270,6 +273,7 @@
         </div>
     </div>
 
+    <!-- Modal Recoja -->
     <div id="pickup-modal" class="fixed inset-0 z-[55] hidden opacity-0 transition-opacity duration-300">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closePickupModal()"></div>
         <div id="pickup-modal-content" class="absolute bottom-0 w-full bg-[#F2F2F7] rounded-t-[32px] md:max-w-md md:left-1/2 md:-translate-x-1/2 md:top-1/2 md:bottom-auto md:rounded-3xl overflow-hidden ios-shadow-lg transform slide-down transition-transform duration-300 flex flex-col max-h-[90vh]">
@@ -300,6 +304,7 @@
         </div>
     </div>
 
+    <!-- Modal Comedor -->
     <div id="comedor-modal" class="fixed inset-0 z-[55] hidden opacity-0 transition-opacity duration-300">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeComedorModal()"></div>
         <div id="comedor-modal-content" class="absolute bottom-0 w-full bg-[#F2F2F7] rounded-t-[32px] md:max-w-md md:left-1/2 md:-translate-x-1/2 md:top-1/2 md:bottom-auto md:rounded-3xl overflow-hidden ios-shadow-lg transform slide-down transition-transform duration-300 flex flex-col max-h-[90vh]">
@@ -316,7 +321,22 @@
                 <div>
                     <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Selecciona tu mesa</label>
                     <select id="comedor-table-number" class="w-full bg-[#F2F2F7] border border-transparent focus:border-orange-500 focus:bg-white rounded-xl px-4 py-3 text-[15px] outline-none transition-all">
-                        <option value="">Cargando mesas...</option>
+                        <option value="">Seleccione...</option>
+                        <option value="1">Mesa 1</option>
+                        <option value="2">Mesa 2</option>
+                        <option value="3">Mesa 3</option>
+                        <option value="4">Mesa 4</option>
+                        <option value="5">Mesa 5</option>
+                        <option value="6">Mesa 6</option>
+                        <option value="7">Mesa 7</option>
+                        <option value="8">Mesa 8</option>
+                        <option value="9">Mesa 9</option>
+                        <option value="10">Mesa 10</option>
+                        <option value="11">Mesa 11</option>
+                        <option value="12">Mesa 12</option>
+                        <option value="13">Mesa 13</option>
+                        <option value="14">Mesa 14</option>
+                        <option value="15">Mesa 15</option>
                     </select>
                 </div>
 
@@ -327,6 +347,7 @@
         </div>
     </div>
 
+    <!-- Modal Localización -->
     <div id="location-modal" class="fixed inset-0 z-[60] hidden opacity-0 transition-opacity duration-300">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeLocationModal()"></div>
         <div id="location-modal-content" class="absolute bottom-0 w-full bg-white rounded-t-[32px] md:max-w-md md:left-1/2 md:-translate-x-1/2 md:top-1/2 md:bottom-auto md:rounded-3xl overflow-hidden ios-shadow-lg transform slide-down transition-transform duration-300 flex flex-col">
@@ -361,7 +382,6 @@
         let menuData = [];
         let categoriasOrdenadas = [];
         let storesData = []; 
-        let mesasData = []; // NUEVO: Para guardar las mesas de Firestore
         let cart = {};
         let orderType = null; 
         let currentModalItemId = null;
@@ -480,27 +500,6 @@
                         menuData.push(p);
                     });
                     initMenu();
-                });
-
-                // NUEVO: Escuchar colección de mesas dinámicamente
-                dbFirestore.collection('mesas').where('tiendaId', '==', slugTienda).onSnapshot(snapshot => {
-                    mesasData = [];
-                    snapshot.forEach(doc => mesasData.push(doc.data()));
-                    mesasData.sort((a, b) => a.numero - b.numero); // Ordenar numéricamente
-                    
-                    const selectMesa = document.getElementById('comedor-table-number');
-                    if(selectMesa) {
-                        const valorAnterior = selectMesa.value;
-                        selectMesa.innerHTML = '<option value="">Seleccione...</option>';
-                        if(mesasData.length === 0) {
-                            selectMesa.innerHTML += '<option value="" disabled>No hay mesas registradas</option>';
-                        } else {
-                            mesasData.forEach(m => {
-                                selectMesa.innerHTML += `<option value="${m.numero}">Mesa ${m.numero}</option>`;
-                            });
-                        }
-                        selectMesa.value = valorAnterior;
-                    }
                 });
 
             } catch (error) {
@@ -845,12 +844,11 @@
             }
             
             let html = ''; 
-            // MODIFICACIÓN: Removida la clase hover:text-orange-600 para evitar que se quede "pegada" en móviles.
             let navHtml = `<a href="#menu-view" id="nav-pill-todo" class="whitespace-nowrap px-[18px] py-[7px] bg-orange-600 text-white rounded-full text-[14px] font-semibold transition-colors ios-shadow border border-orange-600 cat-pill active-pill">Todo</a>`;
             
             categories.forEach((category, index) => {
                 const categoryId = `cat-${index}`;
-                navHtml += `<a href="#${categoryId}" id="nav-pill-${categoryId}" class="whitespace-nowrap px-[18px] py-[7px] bg-white text-gray-600 rounded-full text-[14px] font-semibold transition-colors ios-shadow border border-gray-100 cat-pill">${category}</a>`;
+                navHtml += `<a href="#${categoryId}" id="nav-pill-${categoryId}" class="whitespace-nowrap px-[18px] py-[7px] bg-white text-gray-600 hover:text-orange-600 rounded-full text-[14px] font-semibold transition-colors ios-shadow border border-gray-100 cat-pill">${category}</a>`;
                 
                 html += `<div id="${categoryId}" class="pt-5 scroll-mt-36">`;
                 html += `<h2 class="text-[22px] font-black tracking-tight text-gray-900 mb-4 ml-1">${category}</h2>`;
@@ -904,8 +902,7 @@
                 const intersectingEntries = entries.filter(e => e.isIntersecting);
                 if (intersectingEntries.length > 0) {
                     pills.forEach(pill => {
-                        // Modificación: Sin hover:text-orange-600
-                        pill.className = "whitespace-nowrap px-[18px] py-[7px] bg-white text-gray-600 rounded-full text-[14px] font-semibold transition-colors ios-shadow border border-gray-100 cat-pill";
+                        pill.className = "whitespace-nowrap px-[18px] py-[7px] bg-white text-gray-600 hover:text-orange-600 rounded-full text-[14px] font-semibold transition-colors ios-shadow border border-gray-100 cat-pill";
                     });
                     
                     const activeId = `nav-pill-${intersectingEntries[0].target.id}`;
@@ -922,8 +919,7 @@
             window.addEventListener('scroll', () => {
                 if(window.scrollY < 150) {
                     pills.forEach(pill => {
-                        // Modificación: Sin hover:text-orange-600
-                        pill.className = "whitespace-nowrap px-[18px] py-[7px] bg-white text-gray-600 rounded-full text-[14px] font-semibold transition-colors ios-shadow border border-gray-100 cat-pill";
+                        pill.className = "whitespace-nowrap px-[18px] py-[7px] bg-white text-gray-600 hover:text-orange-600 rounded-full text-[14px] font-semibold transition-colors ios-shadow border border-gray-100 cat-pill";
                     });
                     const todoPill = document.getElementById('nav-pill-todo');
                     if(todoPill) {
@@ -1125,16 +1121,6 @@
                 return openComedorModal();
             }
 
-            // NUEVA LÓGICA: Si es comedor, actualizar la mesa en Firestore a "ocupado"
-            if (orderType === 'comedor' && tableNumber) {
-                dbFirestore.collection('mesas').doc(slugTienda + '_mesa_' + tableNumber).set({
-                    tiendaId: slugTienda,
-                    numero: parseInt(tableNumber),
-                    estado: 'ocupado',
-                    ultimaOrden: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true }).catch(err => console.error("Error al actualizar mesa:", err));
-            }
-
             const tipoServicioText = {
                 'domicilio': '🛵 *Servicio a domicilio*',
                 'comedor': '🍽️ *Servicio en comedor*',
@@ -1187,8 +1173,6 @@
             }
 
             mensaje += `\n💰 *Total a pagar:* $${total.toFixed(2)}\n\nQuedo a la espera de confirmación. ¡Gracias!`;
-            
-            // Enviamos el mensaje de WhatsApp oculto en el botón original
             window.open(`https://wa.me/${telefonoTienda}?text=${encodeURIComponent(mensaje)}`, '_blank');
             
             cart = {};
