@@ -360,6 +360,7 @@
 
     <script>
         let metodosPagoTienda = [];
+        let metodosPagoTiendaActivos = [];
         let alertAction = null;
 
         function showCustomAlert(message, title = "mimenudigitalmx.com dice", action = null) {
@@ -431,7 +432,6 @@
 
         let selectedStore = null;
 
-        // Variables globales para la detección del código QR directo (Html5Qrcode)
         let html5Qrcode = null;
         let qrSucursalId = null;
         let qrMesaNumber = null;
@@ -455,11 +455,15 @@
                             document.getElementById('home-store-desc').innerText = tiendaDataActual.mensajeBienvenida;
                         }
 
-                        metodosPagoTienda = tiendaDataActual.metodosPago || [{ tipo: 'Efectivo' }];
-                        metodosPagoTienda = metodosPagoTienda.map(m => typeof m === 'string' ? { tipo: m } : m);
-                        if(!metodosPagoTienda.some(m => m.tipo === 'Efectivo')) {
-                            metodosPagoTienda.unshift({ tipo: 'Efectivo' });
+                        // Configuración y filtro de métodos de pago
+                        metodosPagoTienda = tiendaDataActual.metodosPago || [{ tipo: 'Efectivo', activo: true }];
+                        metodosPagoTienda = metodosPagoTienda.map(m => typeof m === 'string' ? { tipo: m, activo: true } : m);
+                        if(!metodosPagoTienda.some(m => m.tipo.toLowerCase() === 'efectivo')) {
+                            metodosPagoTienda.unshift({ tipo: 'Efectivo', activo: true });
                         }
+                        
+                        // Solo conservamos para el select los que el administrador haya activado
+                        metodosPagoTiendaActivos = metodosPagoTienda.filter(m => m.activo !== false);
 
                         categoriasOrdenadas = tiendaDataActual.categorias || [];
                         
@@ -600,7 +604,6 @@
 
         function setOrderType(type) {
             orderType = type;
-            currentModalContext = type;
             
             if (type === 'domicilio') {
                 selectedStore = null; 
@@ -648,7 +651,6 @@
             }
         }
 
-        // LÓGICA DE ESCÁNER MEJORADA
         function startQrScanner() {
             const modal = document.getElementById('qr-modal');
             const content = document.getElementById('qr-modal-content');
@@ -669,10 +671,8 @@
                     let suc = params.get('sucursal');
                     let mesa = params.get('mesa');
                     
-                    // Extraemos el slug escaneado, ignorando si tiene o no slash inicial/final
                     let scannedSlug = url.pathname.replace(/^\/|\/$/g, '');
 
-                    // Validamos explícitamente que corresponda a esta misma tienda
                     if (scannedSlug === slugTienda && suc && mesa) {
                         qrSucursalId = suc;
                         qrMesaNumber = mesa;
@@ -687,7 +687,6 @@
                             renderCartAction();
                         }
                     } else {
-                        // QR válido pero no pertenece a este restaurante o no tiene los parámetros correctos
                         html5Qrcode.pause();
                         showCustomAlert("El código QR escaneado no pertenece a este restaurante o no es válido para mesas.", "Código Inválido", () => {
                             html5Qrcode.resume();
@@ -703,7 +702,6 @@
 
             const config = { fps: 10, qrbox: { width: 250, height: 250 } };
 
-            // Iniciar directamente con la cámara trasera ('environment') sin preguntar.
             html5Qrcode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback)
             .catch((err) => {
                 console.error("Error iniciando cámara:", err);
@@ -715,7 +713,7 @@
         function closeQrModal() {
             if(html5Qrcode) {
                 try {
-                    html5Qrcode.stop().catch(e => { /* ignorar si ya estaba detenido */ });
+                    html5Qrcode.stop().catch(e => { });
                 } catch(e) {}
             }
             const modal = document.getElementById('qr-modal');
@@ -1187,17 +1185,21 @@
             const select = document.getElementById('payment-method-select');
             const cashContainer = document.getElementById('cash-change-container');
             const transferContainer = document.getElementById('transfer-details-container');
+            const cardContainer = document.getElementById('card-details-container');
             
             if(cashContainer) cashContainer.classList.add('hidden');
             if(transferContainer) transferContainer.classList.add('hidden');
+            if(cardContainer) cardContainer.classList.add('hidden');
 
             if(select && select.value !== '') {
                 const index = parseInt(select.value);
-                const metodo = metodosPagoTienda[index];
+                const metodo = metodosPagoTiendaActivos[index];
                 const tipoStr = metodo.tipo.toLowerCase();
                 
                 if(tipoStr.includes('efectivo')) {
                     if(cashContainer) cashContainer.classList.remove('hidden');
+                } else if(tipoStr.includes('tarjeta') || tipoStr.includes('terminal')) {
+                    if(cardContainer) cardContainer.classList.remove('hidden');
                 } else if(tipoStr.includes('transferencia') || metodo.banco) {
                     document.getElementById('td-banco').innerText = metodo.banco || '';
                     document.getElementById('td-cuenta').innerText = metodo.cuenta || '';
@@ -1234,7 +1236,7 @@
                     textExtra = `<span class="text-[11px] opacity-90 block mt-0.5">Suc. ${selectedStore.name} | Mesa: ${tableNumber}</span>`;
                 } else if (orderType === 'domicilio') {
                     let optionsHtml = '<option value="">Selecciona...</option>';
-                    metodosPagoTienda.forEach((m, idx) => {
+                    metodosPagoTiendaActivos.forEach((m, idx) => {
                         optionsHtml += `<option value="${idx}">${m.tipo}</option>`;
                     });
                     
@@ -1248,6 +1250,12 @@
                         <div id="cash-change-container" class="hidden transition-all mt-2">
                             <label class="block text-[12px] font-bold text-gray-600 mb-1">¿Con cuánto vas a pagar? ($)</label>
                             <input type="number" id="cash-change-input" placeholder="Ej. 500" class="w-full bg-white border border-gray-200 focus:border-orange-500 rounded-lg px-3 py-2 text-[14px] outline-none transition-all">
+                        </div>
+
+                        <div id="card-details-container" class="hidden mt-3 p-3 bg-emerald-50 border border-emerald-100 rounded-xl text-[12px] text-gray-700">
+                            <p class="font-bold text-[#047857] mb-1">Pago con Tarjeta (Terminal)</p>
+                            <p class="mb-2">El repartidor llevará una terminal bancaria para cobrarte al momento de entregar tu pedido.</p>
+                            <p class="font-bold text-red-600 text-[11px]">⚠️ Por tu seguridad, nunca compartas el NIP de tu tarjeta con el repartidor ni por este medio.</p>
                         </div>
 
                         <div id="transfer-details-container" class="hidden mt-3 p-3 bg-blue-50 border border-blue-100 rounded-xl text-[12px] text-gray-700">
@@ -1321,7 +1329,7 @@
                     return;
                 }
                 
-                const metodoObj = metodosPagoTienda[parseInt(pmSelect.value)];
+                const metodoObj = metodosPagoTiendaActivos[parseInt(pmSelect.value)];
                 metodoPagoTexto = metodoObj.tipo;
                 
                 if (metodoObj.tipo.toLowerCase().includes('efectivo')) {
@@ -1331,6 +1339,8 @@
                         return;
                     }
                     cambioPara = cashInput.value;
+                } else if (metodoObj.tipo.toLowerCase().includes('tarjeta')) {
+                    metodoPagoTexto += " (Pago contra entrega con terminal)";
                 }
 
                 if (!deliveryInfo.address && !userCoords) {
