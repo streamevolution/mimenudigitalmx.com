@@ -18,6 +18,8 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <!-- Librería para generar Códigos QR -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 </head>
 <body class="text-gray-800 antialiased min-h-screen">
 
@@ -76,7 +78,10 @@
                 </button>
             </nav>
 
-            <div class="p-4 border-t border-gray-100">
+            <div class="p-4 border-t border-gray-100 flex flex-col gap-2">
+                <div class="text-[10px] text-gray-400 text-center uppercase tracking-widest font-bold">
+                    © 2026 Creado por Zamora Ramos Juan Manuel
+                </div>
                 <button onclick="cerrarSesion()" class="w-full text-left px-4 py-3 rounded-xl font-bold text-gray-500 hover:bg-red-50 hover:text-red-600 transition-colors flex items-center gap-3">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                     Cerrar Sesión
@@ -353,37 +358,13 @@
                     </div>
                     
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6 mb-4">
-                        <p class="text-sm text-gray-500 mb-4">Configura los métodos de pago que aceptarás en pedidos a domicilio. "Efectivo" viene por defecto y no se puede eliminar.</p>
+                        <p class="text-sm text-gray-500 mb-4">Configura los métodos de pago que aceptarás en pedidos a domicilio.</p>
                         
-                        <div class="flex flex-col sm:flex-row gap-2 mb-4">
-                            <select id="nuevo-metodo-tipo" onchange="checkTipoMetodoAdmin()" class="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 sm:py-2.5 text-sm focus:outline-none focus:border-[#2d7d9a] focus:bg-white transition-all">
-                                <option value="Tarjeta">Tarjeta (Terminal)</option>
-                                <option value="Transferencia">Transferencia Bancaria</option>
-                                <option value="Otro">Otro...</option>
-                            </select>
-                            <input type="text" id="nuevo-metodo-otro" placeholder="Ej. Pago contra entrega" class="hidden flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 sm:py-2.5 text-sm focus:outline-none focus:border-[#2d7d9a]">
+                        <div class="flex flex-col sm:flex-row gap-2 mb-6">
+                            <input type="text" id="nuevo-metodo-pago" placeholder="Ej. Transferencia, Tarjeta..." class="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 sm:py-2.5 text-sm focus:outline-none focus:border-[#2d7d9a] focus:bg-white transition-all">
                             <button onclick="agregarMetodoPago()" class="shrink-0 bg-[#2d7d9a] text-white font-bold py-3 sm:py-2.5 px-5 rounded-xl shadow-md hover:bg-[#23647a] transition-transform active:scale-95 text-sm">
                                 Agregar
                             </button>
-                        </div>
-                        
-                        <div id="campos-transferencia" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 bg-gray-50 p-4 rounded-xl border border-gray-100">
-                            <div>
-                                <label class="block text-[11px] font-bold text-gray-700 mb-1 uppercase tracking-wide">Banco</label>
-                                <input type="text" id="trans-banco" placeholder="Ej. BBVA" class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-[11px] font-bold text-gray-700 mb-1 uppercase tracking-wide">Cuenta / CLABE</label>
-                                <input type="text" id="trans-cuenta" placeholder="Ej. 012345678901234567" class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-[11px] font-bold text-gray-700 mb-1 uppercase tracking-wide">Beneficiario</label>
-                                <input type="text" id="trans-beneficiario" placeholder="Ej. Juan Pérez" class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-[11px] font-bold text-gray-700 mb-1 uppercase tracking-wide">Concepto</label>
-                                <input type="text" id="trans-concepto" placeholder="Ej. Pago pedido" class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none">
-                            </div>
                         </div>
 
                         <div class="bg-gray-50 rounded-xl border border-gray-100 p-2">
@@ -562,6 +543,134 @@
         };
         let currentApariencia = { logo: '', portada: '' };
 
+        // Función modificada para crear el nuevo display de mesa con el Logo incluido
+        async function descargarQRMesa(event, url, numeroMesa) {
+            event.stopPropagation();
+            
+            // 1. Generar el código QR base
+            const canvasQR = document.createElement('canvas');
+            const qrSize = 500;
+            const qr = new QRious({
+                element: canvasQR,
+                value: url,
+                size: qrSize,
+                level: 'H'
+            });
+
+            // 2. Crear un canvas final (Estilo Display de Mesa / Tent Card)
+            const finalCanvas = document.createElement('canvas');
+            finalCanvas.width = 800;
+            finalCanvas.height = 1100;
+            const ctx = finalCanvas.getContext('2d');
+            
+            ctx.fillStyle = '#f2f2f7';
+            ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+            
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
+            ctx.shadowBlur = 40;
+            ctx.shadowOffsetY = 20;
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            if (ctx.roundRect) {
+                ctx.roundRect(50, 50, 700, 1000, 40);
+            } else {
+                ctx.fillRect(50, 50, 700, 1000);
+            }
+            ctx.fill();
+            ctx.shadowColor = 'transparent';
+
+            ctx.fillStyle = '#ea580c';
+            ctx.beginPath();
+            if (ctx.roundRect) {
+                ctx.roundRect(50, 50, 700, 220, {tl: 40, tr: 40, bl: 0, br: 0});
+            } else {
+                ctx.fillRect(50, 50, 700, 220);
+            }
+            ctx.fill();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '900 80px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('ORDENA AQUÍ', 400, 150);
+            
+            ctx.font = '600 28px Inter, sans-serif';
+            ctx.fillText('ESCANEA EL CÓDIGO', 400, 215);
+
+            const qrX = (800 - qrSize) / 2;
+            const qrY = 320;
+            
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = '#f3f4f6';
+            ctx.strokeRect(qrX - 10, qrY - 10, qrSize + 20, qrSize + 20);
+
+            // Dibujar QR base
+            ctx.drawImage(canvasQR, qrX, qrY);
+
+            ctx.beginPath();
+            ctx.moveTo(150, 890);
+            ctx.lineTo(650, 890);
+            ctx.strokeStyle = '#e5e7eb';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            ctx.fillStyle = '#111827';
+            ctx.font = '900 70px Inter, sans-serif';
+            ctx.fillText('MESA ' + numeroMesa, 400, 990);
+
+            // Función para finalizar y descargar
+            const descargarCanvas = () => {
+                const link = document.createElement('a');
+                link.download = `Display_Mesa_${numeroMesa}_MiMenuDigital.png`;
+                link.href = finalCanvas.toDataURL('image/png');
+                link.click();
+            };
+
+            // Lógica para añadir el Logo si existe
+            if (currentApariencia && currentApariencia.logo) {
+                const logoImg = new Image();
+                logoImg.crossOrigin = "Anonymous"; // Necesario para imágenes de ImgBB/Firebase
+                
+                logoImg.onload = () => {
+                    // Tamaño del logo: 25% del QR para mantenerlo legible
+                    const logoSize = qrSize * 0.25; 
+                    const logoX = qrX + (qrSize - logoSize) / 2;
+                    const logoY = qrY + (qrSize - logoSize) / 2;
+
+                    // Dibujar círculo blanco de fondo para dar contraste
+                    ctx.fillStyle = '#ffffff';
+                    ctx.beginPath();
+                    ctx.arc(qrX + qrSize / 2, qrY + qrSize / 2, logoSize / 2 + 10, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Dibujar el logo de la tienda recortado en círculo
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.arc(qrX + qrSize / 2, qrY + qrSize / 2, logoSize / 2, 0, Math.PI * 2);
+                    ctx.clip();
+                    ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
+                    ctx.restore();
+
+                    // Dibujar borde sutil alrededor del logo
+                    ctx.beginPath();
+                    ctx.arc(qrX + qrSize / 2, qrY + qrSize / 2, logoSize / 2, 0, Math.PI * 2);
+                    ctx.lineWidth = 3;
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.stroke();
+
+                    descargarCanvas();
+                };
+                
+                logoImg.onerror = () => {
+                    console.warn("No se pudo cargar el logo, descargando el QR sin él.");
+                    descargarCanvas();
+                };
+                
+                logoImg.src = currentApariencia.logo;
+            } else {
+                descargarCanvas(); // Si no hay logo configurado, descarga normal
+            }
+        }
+
         auth.onAuthStateChanged(async (user) => {
             if (user) {
                 document.getElementById('sidebar-user-email').innerText = user.email;
@@ -629,12 +738,7 @@
                     
                     dbLocal.categorias = data.categorias || [];
                     dbLocal.sucursales = data.sucursales || [];
-                    
-                    dbLocal.metodosPago = data.metodosPago || [{ tipo: 'Efectivo' }];
-                    dbLocal.metodosPago = dbLocal.metodosPago.map(m => typeof m === 'string' ? { tipo: m } : m);
-                    if(!dbLocal.metodosPago.some(m => m.tipo === 'Efectivo')) {
-                        dbLocal.metodosPago.unshift({ tipo: 'Efectivo' });
-                    }
+                    dbLocal.metodosPago = data.metodosPago || ['Efectivo'];
                     
                     document.getElementById('conf-nombre-tienda').value = data.nombreTienda || '';
 
@@ -938,24 +1042,6 @@
             }
         }
 
-        function checkTipoMetodoAdmin() {
-            const select = document.getElementById('nuevo-metodo-tipo').value;
-            const inputOtro = document.getElementById('nuevo-metodo-otro');
-            const transferCampos = document.getElementById('campos-transferencia');
-            
-            if(select === 'Otro') {
-                inputOtro.classList.remove('hidden');
-            } else {
-                inputOtro.classList.add('hidden');
-            }
-            
-            if(select === 'Transferencia') {
-                transferCampos.classList.remove('hidden');
-            } else {
-                transferCampos.classList.add('hidden');
-            }
-        }
-
         function renderizarMetodosPago() {
             const lista = document.getElementById('lista-metodos-pago');
             lista.innerHTML = '';
@@ -963,67 +1049,23 @@
                 lista.innerHTML = `<li class="p-4 text-center text-gray-400 text-sm font-medium">Sin métodos registrados. Agrega uno.</li>`;
             } else {
                 dbLocal.metodosPago.forEach((metodo, index) => {
-                    const tipo = metodo.tipo || metodo;
-                    const isEfectivo = tipo.toLowerCase() === 'efectivo';
-                    const btnDelete = isEfectivo ? '' : `<button onclick="eliminarMetodoPago(${index})" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors active:scale-95">Eliminar</button>`;
-                    
-                    let detalles = '';
-                    if(tipo === 'Transferencia' && metodo.banco) {
-                        detalles = `<div class="text-[11px] text-gray-500 mt-1">Banco: ${metodo.banco} | Cuenta/CLABE: ${metodo.cuenta} | Beneficiario: ${metodo.beneficiario}</div>`;
-                    }
-                    
                     lista.innerHTML += `
                     <li class="flex justify-between items-center p-3 hover:bg-white transition-colors rounded-lg">
-                        <div>
-                            <span class="font-bold text-gray-800 text-sm pl-2">${tipo}</span>
-                            ${detalles}
-                        </div>
-                        ${btnDelete}
+                        <span class="font-bold text-gray-800 text-sm pl-2">${metodo}</span>
+                        <button onclick="eliminarMetodoPago(${index})" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors active:scale-95">Eliminar</button>
                     </li>`;
                 });
             }
         }
 
         function agregarMetodoPago() {
-            const select = document.getElementById('nuevo-metodo-tipo').value;
-            let tipo = select === 'Otro' ? document.getElementById('nuevo-metodo-otro').value.trim() : select;
-            
-            if(!tipo) {
-                alert('Por favor ingresa un nombre para el método de pago.');
-                return;
-            }
-
-            let nuevoMetodo = { tipo: tipo };
-
-            if(select === 'Transferencia') {
-                const banco = document.getElementById('trans-banco').value.trim();
-                const cuenta = document.getElementById('trans-cuenta').value.trim();
-                const beneficiario = document.getElementById('trans-beneficiario').value.trim();
-                const concepto = document.getElementById('trans-concepto').value.trim();
-                
-                if(!banco || !cuenta || !beneficiario) {
-                    alert('Por favor llena los datos de Banco, Cuenta y Beneficiario.');
-                    return;
-                }
-                
-                nuevoMetodo.banco = banco;
-                nuevoMetodo.cuenta = cuenta;
-                nuevoMetodo.beneficiario = beneficiario;
-                nuevoMetodo.concepto = concepto;
-            }
-
-            if(!dbLocal.metodosPago.some(m => (m.tipo || m) === tipo)) {
-                dbLocal.metodosPago.push(nuevoMetodo);
+            const input = document.getElementById('nuevo-metodo-pago');
+            const valor = input.value.trim();
+            if(valor && !dbLocal.metodosPago.includes(valor)) {
+                dbLocal.metodosPago.push(valor);
+                input.value = '';
                 dbFirestore.collection('tiendas').doc(miTiendaId).update({ metodosPago: dbLocal.metodosPago });
                 renderizarMetodosPago();
-                
-                document.getElementById('nuevo-metodo-otro').value = '';
-                document.getElementById('trans-banco').value = '';
-                document.getElementById('trans-cuenta').value = '';
-                document.getElementById('trans-beneficiario').value = '';
-                document.getElementById('trans-concepto').value = '';
-            } else {
-                alert('Este método de pago ya existe.');
             }
         }
 
@@ -1289,11 +1331,16 @@
                 
                 const onClickFunc = isOcupado ? `abrirDetalleMesa('${mesaActiva.id}')` : `alert('Mesa libre. Los usuarios pueden solicitarla desde el menú.')`;
 
+                // Añadimos el botón de descargar QR en la esquina inferior derecha
                 grid.innerHTML += `
                     <div onclick="${onClickFunc}" class="${bgClass} text-white p-5 rounded-2xl shadow-lg cursor-pointer transition-all active:scale-95 flex flex-col items-center justify-center h-32 relative overflow-hidden group">
                         <div class="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
                         <span class="text-3xl font-black mb-1 drop-shadow-md">${i}</span>
-                        <span class="text-[11px] font-bold uppercase tracking-wider bg-black/20 px-2 py-0.5 rounded-full">${estadoText}</span>
+                        <span class="text-[11px] font-bold uppercase tracking-wider bg-black/20 px-2 py-0.5 rounded-full mb-1">${estadoText}</span>
+                        
+                        <button onclick="descargarQRMesa(event, 'https://mimenudigitalmx.com/${miTiendaId}?sucursal=${sucursalId}&mesa=${i}', ${i})" class="absolute bottom-2 right-2 bg-black/20 hover:bg-black/40 p-2 rounded-lg backdrop-blur-sm transition-colors z-10" title="Descargar QR de esta mesa">
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        </button>
                     </div>
                 `;
             }
@@ -1395,12 +1442,6 @@
                         const dirLines = doc.splitTextToSize(sucursal.direccion || '', 70);
                         doc.text(dirLines, centerX, y, { align: "center" });
                         y += (dirLines.length * 4) + 2;
-                        
-                        // Modificación para el número telefónico en el ticket
-                        if (sucursal.telefono) {
-                            doc.text(`Tel: ${sucursal.telefono}`, centerX, y, { align: "center" });
-                            y += 5;
-                        }
                     }
                     
                     doc.setFont("helvetica", "bold");
