@@ -103,7 +103,7 @@
             </div>
 
             <footer class="mt-8 text-center text-[11px] font-semibold text-gray-400 tracking-wide">
-                © 2026 Creado por Zamora Ramos Juan Manuel. Todos los derechos reservados.
+                © 2026 Creado por <a href="https://mimenudigitalmx.com" target="_blank" class="hover:text-gray-600 underline">Mi MenuDigital MX</a>. Todos los derechos reservados.
             </footer>
         </div>
 
@@ -147,7 +147,7 @@
             <main class="max-w-7xl mx-auto px-4 md:px-8 py-6" id="menu-container"></main>
 
             <footer class="max-w-7xl mx-auto text-center pt-4 pb-8 text-[11px] md:text-[13px] font-semibold text-gray-400 tracking-wide">
-                © 2026 Creado por Zamora Ramos Juan Manuel. Todos los derechos reservados.
+                © 2026 Creado por <a href="https://mimenudigitalmx.com" target="_blank" class="hover:text-gray-600 underline">Mi MenuDigital MX</a>. Todos los derechos reservados.
             </footer>
         </div>
         
@@ -345,6 +345,7 @@
         </div>
     </div>
 
+    <!-- MODAL DE ALERTA MEJORADO (SOPORTA DOS BOTONES) -->
     <div id="custom-alert" class="fixed inset-0 z-[100] hidden flex items-center justify-center">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity opacity-0" id="custom-alert-bg" onclick="closeCustomAlert()"></div>
         <div id="custom-alert-content" class="bg-[#F2F2F7]/95 backdrop-blur-xl w-[270px] rounded-[14px] flex flex-col items-center overflow-hidden transform scale-90 opacity-0 transition-all duration-200 ios-shadow-lg relative z-10">
@@ -933,7 +934,8 @@
         function openDeliveryModal() {
             document.getElementById('dev-name').value = deliveryInfo.name || '';
             document.getElementById('dev-phone').value = deliveryInfo.phone || '';
-            document.getElementById('dev-address').value = deliveryInfo.address || '';
+            document.getElementById('dev-address').value = ''; 
+            userCoords = null; 
             document.getElementById('dev-street-number').value = deliveryInfo.streetNumber || '';
             document.getElementById('dev-ref').value = deliveryInfo.reference || '';
 
@@ -962,8 +964,8 @@
             deliveryInfo.streetNumber = document.getElementById('dev-street-number').value.trim();
             deliveryInfo.reference = document.getElementById('dev-ref').value.trim();
             
-            if (!deliveryInfo.address && !userCoords) {
-                showCustomAlert("Por favor usa el botón del mapa para ubicar tu dirección de entrega.");
+            if (!deliveryInfo.address || !userCoords) {
+                showCustomAlert("Por favor usa el botón del GPS (👉) para obtener y confirmar tu dirección de entrega obligatoriamente.");
                 return;
             }
 
@@ -1410,7 +1412,9 @@
                 return openPickupModal();
             }
             if (orderType === 'comedor' && !tableNumber) {
-                showCustomAlert("Falta escanear la mesa. Por favor, selecciona el servicio en comedor nuevamente para activar la cámara.");
+                showCustomAlert("Falta escanear la mesa. Por favor, selecciona el servicio en comedor nuevamente para activar la cámara.", "mimenudigitalmx.com dice", () => {
+                    startQrScanner();
+                });
                 return;
             }
 
@@ -1449,11 +1453,10 @@
                     // VALIDACIÓN JUST IN TIME ANTES DE GUARDAR
                     const estaLibre = await validarMesaLibre(selectedStore.id, tableNumber);
                     if (!estaLibre) {
-                        // LA MESA YA FUE TOMADA POR OTRO USUARIO O LIBERADA Y RE-TOMADA
                         showCustomAlert("Tu sesión finalizó o la mesa ya está ocupada por otro comensal. Por favor, selecciona otra mesa para continuar.", "Conflicto de Mesa", null, true);
                         limpiarSesionMesa();
                         closeCartModal();
-                        return; // SE DETIENE LA ORDEN
+                        return; 
                     }
 
                     const docId = `${slugTienda}_${selectedStore.id}_mesa_${tableNumber}`;
