@@ -117,6 +117,7 @@
                 </div>
             </div>
 
+            <!-- Botones de tipo de servicio responsivos -->
             <div class="max-w-4xl mx-auto px-4 md:px-8 -mt-5 relative z-10">
                 <div class="bg-white/80 backdrop-blur-xl rounded-2xl ios-shadow p-1.5 flex justify-between gap-1.5 border border-white">
                     <button onclick="setOrderType('domicilio')" id="btn-domicilio" class="flex-1 flex flex-col md:flex-row md:gap-3 items-center justify-center py-2.5 rounded-xl bg-transparent text-gray-400 hover:bg-gray-50 transition-all duration-200">
@@ -134,10 +135,12 @@
                 </div>
             </div>
 
+            <!-- Navegación pegajosa responsiva -->
             <div class="sticky top-0 z-30 bg-[#F2F2F7]/80 backdrop-blur-xl border-b border-gray-200/60 mt-3 transition-all">
                 <div class="max-w-7xl mx-auto px-4 py-3 flex overflow-x-auto no-scrollbar gap-2.5" id="category-nav"></div>
             </div>
 
+            <!-- Contenedor del Menú Responsivo -->
             <main class="max-w-7xl mx-auto px-4 md:px-8 py-6" id="menu-container"></main>
 
             <footer class="max-w-7xl mx-auto text-center pt-4 pb-8 text-[11px] md:text-[13px] font-semibold text-gray-400 tracking-wide">
@@ -147,6 +150,7 @@
         
     </div>
 
+    <!-- Modales -->
     <button onclick="openCartModal()" id="fab-cart" class="fixed bottom-6 right-5 md:bottom-10 md:right-10 z-40 bg-white p-4 md:p-5 rounded-full ios-shadow-lg text-gray-800 transition-transform duration-300 scale-out focus:outline-none active:scale-95 hidden">
         <span id="fab-badge" class="absolute -top-1.5 -right-1.5 md:-top-2 md:-right-2 bg-orange-600 text-white text-[11px] md:text-[13px] font-black w-[22px] h-[22px] md:w-[28px] md:h-[28px] flex items-center justify-center rounded-full border-2 border-white shadow-sm">0</span>
         <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" viewBox="0 0 16 16" class="md:w-8 md:h-8">
@@ -210,6 +214,7 @@
         </div>
     </div>
 
+    <!-- Modal Domicilio -->
     <div id="delivery-modal" class="fixed inset-0 z-[55] hidden opacity-0 transition-opacity duration-300">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeDeliveryModal()"></div>
         <div id="delivery-modal-content" class="absolute bottom-0 w-full bg-[#F2F2F7] rounded-t-[32px] md:max-w-md md:left-1/2 md:-translate-x-1/2 md:top-1/2 md:bottom-auto md:rounded-3xl overflow-hidden ios-shadow-lg transform slide-down transition-transform duration-300 flex flex-col max-h-[90vh]">
@@ -256,6 +261,7 @@
         </div>
     </div>
 
+    <!-- Modal Sucursales Recoja y Comedor -->
     <div id="store-modal" class="fixed inset-0 z-[55] hidden opacity-0 transition-opacity duration-300">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeStoreModal()"></div>
         <div id="store-modal-content" class="absolute bottom-0 w-full bg-[#F2F2F7] rounded-t-[32px] md:max-w-md md:left-1/2 md:-translate-x-1/2 md:top-1/2 md:bottom-auto md:rounded-3xl overflow-hidden ios-shadow-lg transform slide-down transition-transform duration-300 flex flex-col max-h-[90vh]">
@@ -273,6 +279,7 @@
         </div>
     </div>
 
+    <!-- Modal Recoja -->
     <div id="pickup-modal" class="fixed inset-0 z-[55] hidden opacity-0 transition-opacity duration-300">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closePickupModal()"></div>
         <div id="pickup-modal-content" class="absolute bottom-0 w-full bg-[#F2F2F7] rounded-t-[32px] md:max-w-md md:left-1/2 md:-translate-x-1/2 md:top-1/2 md:bottom-auto md:rounded-3xl overflow-hidden ios-shadow-lg transform slide-down transition-transform duration-300 flex flex-col max-h-[90vh]">
@@ -303,6 +310,7 @@
         </div>
     </div>
 
+    <!-- Modal Comedor -->
     <div id="comedor-modal" class="fixed inset-0 z-[55] hidden opacity-0 transition-opacity duration-300">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeComedorModal()"></div>
         <div id="comedor-modal-content" class="absolute bottom-0 w-full bg-[#F2F2F7] rounded-t-[32px] md:max-w-md md:left-1/2 md:-translate-x-1/2 md:top-1/2 md:bottom-auto md:rounded-3xl overflow-hidden ios-shadow-lg transform slide-down transition-transform duration-300 flex flex-col max-h-[90vh]">
@@ -330,6 +338,7 @@
         </div>
     </div>
 
+    <!-- Modal Localización -->
     <div id="location-modal" class="fixed inset-0 z-[60] hidden opacity-0 transition-opacity duration-300">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeLocationModal()"></div>
         <div id="location-modal-content" class="absolute bottom-0 w-full bg-white rounded-t-[32px] md:max-w-md md:left-1/2 md:-translate-x-1/2 md:top-1/2 md:bottom-auto md:rounded-3xl overflow-hidden ios-shadow-lg transform slide-down transition-transform duration-300 flex flex-col">
@@ -536,7 +545,7 @@
             if (type === 'domicilio') {
                 openDeliveryModal();
             } else if (type === 'comedor' || type === 'recoja') {
-                openStoreModal(); // Para ambos primero pedimos sucursal
+                openStoreModal(); 
                 userCoords = null; 
             } else {
                 userCoords = null; 
@@ -630,6 +639,13 @@
             for(let i=1; i<=count; i++) {
                 select.innerHTML += `<option value="${i}">Mesa ${i}</option>`;
             }
+
+            // Cargar de localStorage si existe
+            let activeTableInfo = JSON.parse(localStorage.getItem('mesaActiva_v1'));
+            if (activeTableInfo && String(activeTableInfo.sucursalId) === String(selectedStore.id)) {
+                tableNumber = activeTableInfo.tableNumber;
+            }
+
             select.value = tableNumber || '';
 
             const modal = document.getElementById('comedor-modal');
@@ -657,6 +673,12 @@
                 return;
             }
             tableNumber = val;
+            
+            localStorage.setItem('mesaActiva_v1', JSON.stringify({
+                sucursalId: selectedStore.id,
+                tableNumber: tableNumber
+            }));
+
             closeComedorModal();
             if (!document.getElementById('cart-modal').classList.contains('hidden')) {
                 renderCartAction();
@@ -1118,18 +1140,31 @@
                 return openComedorModal();
             }
 
-            // GUARDAR MESA EN FIREBASE SI ES SERVICIO EN COMEDOR
+            // GUARDAR O SUMAR MESA EN FIREBASE SI ES SERVICIO EN COMEDOR
             if (orderType === 'comedor' && tableNumber && selectedStore) {
                 try {
                     const docId = `${slugTienda}_${selectedStore.id}_mesa_${tableNumber}`;
-                    await dbFirestore.collection('mesas_activas').doc(docId).set({
+                    const docRef = dbFirestore.collection('mesas_activas').doc(docId);
+                    const docSnap = await docRef.get();
+                    
+                    let pedidoActual = {};
+                    if (docSnap.exists) {
+                        pedidoActual = docSnap.data().pedido || {};
+                    }
+                    
+                    // Sumamos el carrito al pedido existente (así se acumulan si piden varias veces)
+                    for (const [id, qty] of Object.entries(cart)) {
+                        pedidoActual[id] = (pedidoActual[id] || 0) + qty;
+                    }
+
+                    await docRef.set({
                         tiendaId: slugTienda,
                         sucursalId: selectedStore.id,
                         mesaId: tableNumber,
                         estado: 'Ocupado',
-                        pedido: cart,
+                        pedido: pedidoActual,
                         timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                    });
+                    }, { merge: true });
                 } catch (e) {
                     console.error("Error guardando mesa en sistema:", e);
                 }
