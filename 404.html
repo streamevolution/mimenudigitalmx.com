@@ -208,6 +208,7 @@
         </div>
     </div>
 
+    <!-- Modal Domicilio -->
     <div id="delivery-modal" class="fixed inset-0 z-[55] hidden opacity-0 transition-opacity duration-300">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeDeliveryModal()"></div>
         <div id="delivery-modal-content" class="absolute bottom-0 w-full bg-[#F2F2F7] rounded-t-[32px] md:max-w-md md:left-1/2 md:-translate-x-1/2 md:top-1/2 md:bottom-auto md:rounded-3xl overflow-hidden ios-shadow-lg transform slide-down transition-transform duration-300 flex flex-col max-h-[90vh]">
@@ -254,6 +255,7 @@
         </div>
     </div>
 
+    <!-- Modal Sucursales Recoja -->
     <div id="store-modal" class="fixed inset-0 z-[55] hidden opacity-0 transition-opacity duration-300">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeStoreModal()"></div>
         <div id="store-modal-content" class="absolute bottom-0 w-full bg-[#F2F2F7] rounded-t-[32px] md:max-w-md md:left-1/2 md:-translate-x-1/2 md:top-1/2 md:bottom-auto md:rounded-3xl overflow-hidden ios-shadow-lg transform slide-down transition-transform duration-300 flex flex-col max-h-[90vh]">
@@ -271,6 +273,7 @@
         </div>
     </div>
 
+    <!-- Modal Recoja -->
     <div id="pickup-modal" class="fixed inset-0 z-[55] hidden opacity-0 transition-opacity duration-300">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closePickupModal()"></div>
         <div id="pickup-modal-content" class="absolute bottom-0 w-full bg-[#F2F2F7] rounded-t-[32px] md:max-w-md md:left-1/2 md:-translate-x-1/2 md:top-1/2 md:bottom-auto md:rounded-3xl overflow-hidden ios-shadow-lg transform slide-down transition-transform duration-300 flex flex-col max-h-[90vh]">
@@ -301,6 +304,7 @@
         </div>
     </div>
 
+    <!-- Modal Comedor -->
     <div id="comedor-modal" class="fixed inset-0 z-[55] hidden opacity-0 transition-opacity duration-300">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeComedorModal()"></div>
         <div id="comedor-modal-content" class="absolute bottom-0 w-full bg-[#F2F2F7] rounded-t-[32px] md:max-w-md md:left-1/2 md:-translate-x-1/2 md:top-1/2 md:bottom-auto md:rounded-3xl overflow-hidden ios-shadow-lg transform slide-down transition-transform duration-300 flex flex-col max-h-[90vh]">
@@ -343,6 +347,7 @@
         </div>
     </div>
 
+    <!-- Modal Localización -->
     <div id="location-modal" class="fixed inset-0 z-[60] hidden opacity-0 transition-opacity duration-300">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeLocationModal()"></div>
         <div id="location-modal-content" class="absolute bottom-0 w-full bg-white rounded-t-[32px] md:max-w-md md:left-1/2 md:-translate-x-1/2 md:top-1/2 md:bottom-auto md:rounded-3xl overflow-hidden ios-shadow-lg transform slide-down transition-transform duration-300 flex flex-col">
@@ -892,33 +897,33 @@
             };
 
             const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        pills.forEach(pill => {
-                            pill.className = "whitespace-nowrap px-[18px] py-[7px] bg-white text-gray-600 hover:text-orange-600 rounded-full text-[14px] font-semibold transition-colors ios-shadow border border-gray-100 cat-pill";
-                        });
+                if (window.scrollY < 150) return; 
 
-                        const activeId = `nav-pill-${entry.target.id}`;
-                        const activePill = document.getElementById(activeId);
-                        if (activePill) {
-                            activePill.className = "whitespace-nowrap px-[18px] py-[7px] bg-orange-600 text-white rounded-full text-[14px] font-semibold transition-colors ios-shadow border border-orange-600 cat-pill active-pill";
-                            activePill.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-                        }
+                const intersectingEntries = entries.filter(e => e.isIntersecting);
+                if (intersectingEntries.length > 0) {
+                    pills.forEach(pill => {
+                        pill.className = "whitespace-nowrap px-[18px] py-[7px] bg-white text-gray-600 hover:text-orange-600 rounded-full text-[14px] font-semibold transition-colors ios-shadow border border-gray-100 cat-pill";
+                    });
+                    
+                    const activeId = `nav-pill-${intersectingEntries[0].target.id}`;
+                    const activePill = document.getElementById(activeId);
+                    if (activePill) {
+                        activePill.className = "whitespace-nowrap px-[18px] py-[7px] bg-orange-600 text-white rounded-full text-[14px] font-semibold transition-colors ios-shadow border border-orange-600 cat-pill active-pill";
+                        activePill.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
                     }
-                });
+                }
             }, observerOptions);
 
             sections.forEach(sec => observer.observe(sec));
             
             window.addEventListener('scroll', () => {
-                if(window.scrollY < 200) {
+                if(window.scrollY < 150) {
                     pills.forEach(pill => {
                         pill.className = "whitespace-nowrap px-[18px] py-[7px] bg-white text-gray-600 hover:text-orange-600 rounded-full text-[14px] font-semibold transition-colors ios-shadow border border-gray-100 cat-pill";
                     });
                     const todoPill = document.getElementById('nav-pill-todo');
                     if(todoPill) {
                         todoPill.className = "whitespace-nowrap px-[18px] py-[7px] bg-orange-600 text-white rounded-full text-[14px] font-semibold transition-colors ios-shadow border border-orange-600 cat-pill active-pill";
-                        todoPill.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
                     }
                 }
             });
@@ -1116,7 +1121,60 @@
                 return openComedorModal();
             }
 
-            alert("¡Orden realizada con éxito!");
+            const tipoServicioText = {
+                'domicilio': '🛵 *Servicio a domicilio*',
+                'comedor': '🍽️ *Servicio en comedor*',
+                'recoja': '🛍️ *Pasaré a recogerlo*'
+            };
+
+            let telefonoTienda = WHATSAPP_NUMBER;
+            let tiendaDetalle = '';
+
+            if (orderType === 'recoja' && selectedStore) {
+                telefonoTienda = selectedStore.phone;
+                tiendaDetalle = `\n🏪 *Tienda:* ${selectedStore.name}\n📍 *Dirección:* ${selectedStore.address}\n`;
+                if(pickupInfo.name) tiendaDetalle += `👤 *A nombre de:* ${pickupInfo.name}\n`;
+                if(pickupInfo.phone) tiendaDetalle += `📞 *Teléfono:* ${pickupInfo.phone}\n`;
+            }
+
+            if (orderType === 'comedor' && tableNumber) {
+                tiendaDetalle = `\n🪑 *Mesa:* ${tableNumber}\n`;
+            }
+
+            let mensaje = `¡Hola! Me gustaría hacer un pedido para *${tiendaDataActual ? tiendaDataActual.nombreTienda : 'la tienda'}*:\n\n${tipoServicioText[orderType]}\n${tiendaDetalle}\n`;
+            let total = 0;
+
+            for (const [id, qty] of Object.entries(cart)) {
+                const item = menuData.find(i => i.id == id);
+                const precio = Number(item.precio || item.price);
+                const subtotal = precio * qty; total += subtotal;
+                mensaje += `▪️ *${qty}x* ${item.nombre || item.name} - $${subtotal}\n`;
+            }
+
+            if (orderType === 'domicilio') {
+                mensaje += `\n📦 *Datos de Entrega:*\n`;
+                if (deliveryInfo.name) mensaje += `👤 Recibe: ${deliveryInfo.name}\n`;
+                if (deliveryInfo.phone) mensaje += `📞 Teléfono: ${deliveryInfo.phone}\n`;
+
+                let direccionFinal = deliveryInfo.address;
+                if (deliveryInfo.address && deliveryInfo.streetNumber) {
+                    let partes = deliveryInfo.address.split(','); 
+                    if (partes.length > 0) {
+                        partes[0] = partes[0] + " " + deliveryInfo.streetNumber;
+                        direccionFinal = partes.join(',');
+                    }
+                }
+
+                if (direccionFinal) mensaje += `🏠 Dirección: ${direccionFinal}\n`;
+                if (deliveryInfo.reference) mensaje += `📍 Referencia: ${deliveryInfo.reference}\n`;
+                if (userCoords) {
+                    mensaje += `🗺️ *Ubicación GPS:* https://maps.google.com/?q=${userCoords.lat},${userCoords.lng}\n`;
+                }
+            }
+
+            mensaje += `\n💰 *Total a pagar:* $${total.toFixed(2)}\n\nQuedo a la espera de confirmación. ¡Gracias!`;
+            window.open(`https://wa.me/${telefonoTienda}?text=${encodeURIComponent(mensaje)}`, '_blank');
+            
             cart = {};
             updateCartFAB();
             renderCartItems();
