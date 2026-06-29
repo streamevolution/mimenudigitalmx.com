@@ -353,13 +353,37 @@
                     </div>
                     
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6 mb-4">
-                        <p class="text-sm text-gray-500 mb-4">Configura los métodos de pago que aceptarás en pedidos a domicilio.</p>
+                        <p class="text-sm text-gray-500 mb-4">Configura los métodos de pago que aceptarás en pedidos a domicilio. "Efectivo" viene por defecto y no se puede eliminar.</p>
                         
-                        <div class="flex flex-col sm:flex-row gap-2 mb-6">
-                            <input type="text" id="nuevo-metodo-pago" placeholder="Ej. Transferencia, Tarjeta..." class="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 sm:py-2.5 text-sm focus:outline-none focus:border-[#2d7d9a] focus:bg-white transition-all">
+                        <div class="flex flex-col sm:flex-row gap-2 mb-4">
+                            <select id="nuevo-metodo-tipo" onchange="checkTipoMetodoAdmin()" class="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 sm:py-2.5 text-sm focus:outline-none focus:border-[#2d7d9a] focus:bg-white transition-all">
+                                <option value="Tarjeta">Tarjeta (Terminal)</option>
+                                <option value="Transferencia">Transferencia Bancaria</option>
+                                <option value="Otro">Otro...</option>
+                            </select>
+                            <input type="text" id="nuevo-metodo-otro" placeholder="Ej. Pago contra entrega" class="hidden flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 sm:py-2.5 text-sm focus:outline-none focus:border-[#2d7d9a]">
                             <button onclick="agregarMetodoPago()" class="shrink-0 bg-[#2d7d9a] text-white font-bold py-3 sm:py-2.5 px-5 rounded-xl shadow-md hover:bg-[#23647a] transition-transform active:scale-95 text-sm">
                                 Agregar
                             </button>
+                        </div>
+                        
+                        <div id="campos-transferencia" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-700 mb-1 uppercase tracking-wide">Banco</label>
+                                <input type="text" id="trans-banco" placeholder="Ej. BBVA" class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-700 mb-1 uppercase tracking-wide">Cuenta / CLABE</label>
+                                <input type="text" id="trans-cuenta" placeholder="Ej. 012345678901234567" class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-700 mb-1 uppercase tracking-wide">Beneficiario</label>
+                                <input type="text" id="trans-beneficiario" placeholder="Ej. Juan Pérez" class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-700 mb-1 uppercase tracking-wide">Concepto</label>
+                                <input type="text" id="trans-concepto" placeholder="Ej. Pago pedido" class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none">
+                            </div>
                         </div>
 
                         <div class="bg-gray-50 rounded-xl border border-gray-100 p-2">
@@ -605,7 +629,12 @@
                     
                     dbLocal.categorias = data.categorias || [];
                     dbLocal.sucursales = data.sucursales || [];
-                    dbLocal.metodosPago = data.metodosPago || ['Efectivo'];
+                    
+                    dbLocal.metodosPago = data.metodosPago || [{ tipo: 'Efectivo' }];
+                    dbLocal.metodosPago = dbLocal.metodosPago.map(m => typeof m === 'string' ? { tipo: m } : m);
+                    if(!dbLocal.metodosPago.some(m => m.tipo === 'Efectivo')) {
+                        dbLocal.metodosPago.unshift({ tipo: 'Efectivo' });
+                    }
                     
                     document.getElementById('conf-nombre-tienda').value = data.nombreTienda || '';
 
@@ -909,6 +938,24 @@
             }
         }
 
+        function checkTipoMetodoAdmin() {
+            const select = document.getElementById('nuevo-metodo-tipo').value;
+            const inputOtro = document.getElementById('nuevo-metodo-otro');
+            const transferCampos = document.getElementById('campos-transferencia');
+            
+            if(select === 'Otro') {
+                inputOtro.classList.remove('hidden');
+            } else {
+                inputOtro.classList.add('hidden');
+            }
+            
+            if(select === 'Transferencia') {
+                transferCampos.classList.remove('hidden');
+            } else {
+                transferCampos.classList.add('hidden');
+            }
+        }
+
         function renderizarMetodosPago() {
             const lista = document.getElementById('lista-metodos-pago');
             lista.innerHTML = '';
@@ -916,23 +963,67 @@
                 lista.innerHTML = `<li class="p-4 text-center text-gray-400 text-sm font-medium">Sin métodos registrados. Agrega uno.</li>`;
             } else {
                 dbLocal.metodosPago.forEach((metodo, index) => {
+                    const tipo = metodo.tipo || metodo;
+                    const isEfectivo = tipo.toLowerCase() === 'efectivo';
+                    const btnDelete = isEfectivo ? '' : `<button onclick="eliminarMetodoPago(${index})" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors active:scale-95">Eliminar</button>`;
+                    
+                    let detalles = '';
+                    if(tipo === 'Transferencia' && metodo.banco) {
+                        detalles = `<div class="text-[11px] text-gray-500 mt-1">Banco: ${metodo.banco} | Cuenta/CLABE: ${metodo.cuenta} | Beneficiario: ${metodo.beneficiario}</div>`;
+                    }
+                    
                     lista.innerHTML += `
                     <li class="flex justify-between items-center p-3 hover:bg-white transition-colors rounded-lg">
-                        <span class="font-bold text-gray-800 text-sm pl-2">${metodo}</span>
-                        <button onclick="eliminarMetodoPago(${index})" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors active:scale-95">Eliminar</button>
+                        <div>
+                            <span class="font-bold text-gray-800 text-sm pl-2">${tipo}</span>
+                            ${detalles}
+                        </div>
+                        ${btnDelete}
                     </li>`;
                 });
             }
         }
 
         function agregarMetodoPago() {
-            const input = document.getElementById('nuevo-metodo-pago');
-            const valor = input.value.trim();
-            if(valor && !dbLocal.metodosPago.includes(valor)) {
-                dbLocal.metodosPago.push(valor);
-                input.value = '';
+            const select = document.getElementById('nuevo-metodo-tipo').value;
+            let tipo = select === 'Otro' ? document.getElementById('nuevo-metodo-otro').value.trim() : select;
+            
+            if(!tipo) {
+                alert('Por favor ingresa un nombre para el método de pago.');
+                return;
+            }
+
+            let nuevoMetodo = { tipo: tipo };
+
+            if(select === 'Transferencia') {
+                const banco = document.getElementById('trans-banco').value.trim();
+                const cuenta = document.getElementById('trans-cuenta').value.trim();
+                const beneficiario = document.getElementById('trans-beneficiario').value.trim();
+                const concepto = document.getElementById('trans-concepto').value.trim();
+                
+                if(!banco || !cuenta || !beneficiario) {
+                    alert('Por favor llena los datos de Banco, Cuenta y Beneficiario.');
+                    return;
+                }
+                
+                nuevoMetodo.banco = banco;
+                nuevoMetodo.cuenta = cuenta;
+                nuevoMetodo.beneficiario = beneficiario;
+                nuevoMetodo.concepto = concepto;
+            }
+
+            if(!dbLocal.metodosPago.some(m => (m.tipo || m) === tipo)) {
+                dbLocal.metodosPago.push(nuevoMetodo);
                 dbFirestore.collection('tiendas').doc(miTiendaId).update({ metodosPago: dbLocal.metodosPago });
                 renderizarMetodosPago();
+                
+                document.getElementById('nuevo-metodo-otro').value = '';
+                document.getElementById('trans-banco').value = '';
+                document.getElementById('trans-cuenta').value = '';
+                document.getElementById('trans-beneficiario').value = '';
+                document.getElementById('trans-concepto').value = '';
+            } else {
+                alert('Este método de pago ya existe.');
             }
         }
 
@@ -1304,6 +1395,12 @@
                         const dirLines = doc.splitTextToSize(sucursal.direccion || '', 70);
                         doc.text(dirLines, centerX, y, { align: "center" });
                         y += (dirLines.length * 4) + 2;
+                        
+                        // Modificación para el número telefónico en el ticket
+                        if (sucursal.telefono) {
+                            doc.text(`Tel: ${sucursal.telefono}`, centerX, y, { align: "center" });
+                            y += 5;
+                        }
                     }
                     
                     doc.setFont("helvetica", "bold");
