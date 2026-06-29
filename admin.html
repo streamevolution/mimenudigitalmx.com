@@ -360,18 +360,51 @@
                     </div>
                     
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6 mb-4">
-                        <p class="text-sm text-gray-500 mb-4">Configura los métodos de pago que aceptarás en pedidos a domicilio.</p>
+                        <p class="text-sm text-gray-500 mb-4">Activa, desactiva o agrega los métodos de pago que aceptarás en pedidos a domicilio.</p>
                         
                         <div class="flex flex-col sm:flex-row gap-2 mb-6">
-                            <input type="text" id="nuevo-metodo-pago" placeholder="Ej. Transferencia, Tarjeta..." class="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 sm:py-2.5 text-sm focus:outline-none focus:border-[#2d7d9a] focus:bg-white transition-all">
+                            <input type="text" id="nuevo-metodo-pago" placeholder="Ej. Cheque, Oxxo..." class="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 sm:py-2.5 text-sm focus:outline-none focus:border-[#2d7d9a] focus:bg-white transition-all">
                             <button onclick="agregarMetodoPago()" class="shrink-0 bg-[#2d7d9a] text-white font-bold py-3 sm:py-2.5 px-5 rounded-xl shadow-md hover:bg-[#23647a] transition-transform active:scale-95 text-sm">
-                                Agregar
+                                Agregar Método
                             </button>
                         </div>
 
                         <div class="bg-gray-50 rounded-xl border border-gray-100 p-2">
                             <ul id="lista-metodos-pago" class="divide-y divide-gray-100">
+                                <!-- Lista de métodos se inyectará aquí -->
                             </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Editar Método Pago (Transferencia / Nuevo) -->
+                <div id="modal-metodo-pago" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-[60] hidden flex items-center justify-center p-4">
+                    <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-xl w-full max-w-md">
+                        <div class="flex justify-between items-center mb-4 border-b pb-2">
+                            <h4 class="font-bold text-gray-900">Editar Datos de Pago</h4>
+                            <button onclick="cerrarModalMetodoPago()" class="text-gray-400 hover:text-gray-700 text-2xl font-bold leading-none">&times;</button>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Banco / Institución</label>
+                                <input type="text" id="mp-banco" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#2d7d9a]">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Cuenta / CLABE / Tarjeta</label>
+                                <input type="text" id="mp-cuenta" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#2d7d9a]">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Nombre del Beneficiario</label>
+                                <input type="text" id="mp-beneficiario" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#2d7d9a]">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Concepto (Opcional)</label>
+                                <input type="text" id="mp-concepto" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#2d7d9a]">
+                            </div>
+                        </div>
+                        <div class="flex justify-end gap-3 mt-6">
+                            <button onclick="cerrarModalMetodoPago()" class="bg-gray-100 text-gray-700 font-bold py-2.5 px-5 rounded-xl text-sm">Cancelar</button>
+                            <button onclick="guardarDatosMetodoPago()" class="bg-[#2d7d9a] text-white font-bold py-2.5 px-6 rounded-xl text-sm shadow-md">Guardar</button>
                         </div>
                     </div>
                 </div>
@@ -567,6 +600,7 @@
         let miTiendaId = null; 
         let idProductoEdicion = null; 
         let indexSucursalEdicion = null; 
+        let indexMetodoEdicion = null;
         
         let dbLocal = {
             categorias: [],
@@ -653,7 +687,6 @@
             ctx.font = '700 24px Inter, sans-serif';
             ctx.fillText('¡GRACIAS POR SU PREFERENCIA!', 400, 1000);
 
-            // Modificación: Descargar como PDF usando jsPDF
             const descargarCanvas = () => {
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF({
@@ -775,7 +808,6 @@
             ctx.font = '900 70px Inter, sans-serif';
             ctx.fillText('MESA ' + numeroMesa, 400, 990);
 
-            // Modificación: Descargar como PDF usando jsPDF
             const descargarCanvas = () => {
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF({
@@ -895,13 +927,21 @@
                     dbLocal.categorias = data.categorias || [];
                     dbLocal.sucursales = data.sucursales || [];
                     
-                    // Modificación: Validar que Efectivo siempre esté presente
                     let metodosData = data.metodosPago || [];
-                    const tieneEfectivo = metodosData.some(m => m.toLowerCase() === 'efectivo');
                     
-                    if (!tieneEfectivo) {
-                        metodosData.unshift('Efectivo');
-                        dbFirestore.collection('tiendas').doc(miTiendaId).update({ metodosPago: metodosData }).catch(e => console.log("Error restaurando efectivo", e));
+                    metodosData = metodosData.map(m => typeof m === 'string' ? { tipo: m, activo: true } : m);
+                    
+                    const fijos = ['Efectivo', 'Transferencia', 'Tarjeta'];
+                    let requiereActualizacion = false;
+                    fijos.forEach(f => {
+                        if (!metodosData.some(m => m.tipo.toLowerCase() === f.toLowerCase())) {
+                            metodosData.push({ tipo: f, activo: true });
+                            requiereActualizacion = true;
+                        }
+                    });
+
+                    if (requiereActualizacion) {
+                        dbFirestore.collection('tiendas').doc(miTiendaId).update({ metodosPago: metodosData }).catch(e => console.log("Error restaurando métodos", e));
                     }
                     dbLocal.metodosPago = metodosData;
                     
@@ -1210,34 +1250,56 @@
         function renderizarMetodosPago() {
             const lista = document.getElementById('lista-metodos-pago');
             lista.innerHTML = '';
-            if(!dbLocal.metodosPago || dbLocal.metodosPago.length === 0) {
-                lista.innerHTML = `<li class="p-4 text-center text-gray-400 text-sm font-medium">Sin métodos registrados. Agrega uno.</li>`;
-            } else {
-                dbLocal.metodosPago.forEach((metodo, index) => {
-                    // Modificación: Deshabilitar eliminación si es Efectivo
-                    const isEfectivo = metodo.toLowerCase() === 'efectivo';
-                    const actionBtn = isEfectivo 
-                        ? `<span class="text-gray-400 bg-gray-100 px-3 py-1.5 rounded-lg text-xs font-bold cursor-not-allowed">Fijo</span>` 
-                        : `<button onclick="eliminarMetodoPago(${index})" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors active:scale-95">Eliminar</button>`;
-                    
-                    lista.innerHTML += `
-                    <li class="flex justify-between items-center p-3 hover:bg-white transition-colors rounded-lg">
-                        <span class="font-bold text-gray-800 text-sm pl-2">${metodo}</span>
-                        ${actionBtn}
-                    </li>`;
-                });
-            }
+            
+            dbLocal.metodosPago.forEach((metodo, index) => {
+                const tipoStr = metodo.tipo.toLowerCase();
+                const isFijo = tipoStr === 'efectivo' || tipoStr === 'transferencia' || tipoStr === 'tarjeta';
+                const canEdit = tipoStr === 'transferencia' || !isFijo; 
+                const canDelete = !isFijo;
+                
+                const toggleHtml = `
+                    <label class="relative inline-flex items-center cursor-pointer mr-3">
+                        <input type="checkbox" class="sr-only peer" ${metodo.activo !== false ? 'checked' : ''} onchange="toggleMetodoPago(${index})">
+                        <div class="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#2d7d9a]"></div>
+                    </label>
+                `;
+                
+                let btns = '';
+                if (canEdit) {
+                    btns += `<button onclick="editarMetodoPago(${index})" class="text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg text-xs font-bold mr-2 transition-colors">Editar</button>`;
+                }
+                if (canDelete) {
+                    btns += `<button onclick="eliminarMetodoPago(${index})" class="text-red-500 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">Eliminar</button>`;
+                } else if (!canEdit) {
+                    btns += `<span class="text-gray-400 bg-gray-100 px-3 py-1.5 rounded-lg text-xs font-bold cursor-not-allowed">Fijo</span>`;
+                }
+                
+                lista.innerHTML += `
+                <li class="flex justify-between items-center p-3 hover:bg-white transition-colors rounded-lg border-b border-gray-50 last:border-0">
+                    <div class="flex items-center">
+                        ${toggleHtml}
+                        <span class="font-bold text-gray-800 text-sm ${metodo.activo !== false ? '' : 'line-through text-gray-400'}">${metodo.tipo}</span>
+                    </div>
+                    <div class="flex items-center">
+                        ${btns}
+                    </div>
+                </li>`;
+            });
+        }
+
+        function toggleMetodoPago(index) {
+            dbLocal.metodosPago[index].activo = dbLocal.metodosPago[index].activo === false ? true : false;
+            dbFirestore.collection('tiendas').doc(miTiendaId).update({ metodosPago: dbLocal.metodosPago });
+            renderizarMetodosPago();
         }
 
         function agregarMetodoPago() {
             const input = document.getElementById('nuevo-metodo-pago');
             const valor = input.value.trim();
-            
-            // Validar para que no agregue "efectivo" dos veces si lo escribe con otra capitalización
-            const yaExiste = dbLocal.metodosPago.some(m => m.toLowerCase() === valor.toLowerCase());
+            const yaExiste = dbLocal.metodosPago.some(m => m.tipo.toLowerCase() === valor.toLowerCase());
             
             if(valor && !yaExiste) {
-                dbLocal.metodosPago.push(valor);
+                dbLocal.metodosPago.push({ tipo: valor, activo: true });
                 input.value = '';
                 dbFirestore.collection('tiendas').doc(miTiendaId).update({ metodosPago: dbLocal.metodosPago });
                 renderizarMetodosPago();
@@ -1245,15 +1307,42 @@
         }
 
         function eliminarMetodoPago(index) {
-            // Modificación extra de seguridad: Evitar que lo borre incluso desde la consola
-            if(dbLocal.metodosPago[index].toLowerCase() === 'efectivo') {
-                alert('No puedes eliminar el método de pago Efectivo.');
+            const tipoStr = dbLocal.metodosPago[index].tipo.toLowerCase();
+            if(tipoStr === 'efectivo' || tipoStr === 'transferencia' || tipoStr === 'tarjeta') {
+                alert('No puedes eliminar métodos de pago fijos.');
                 return;
             }
             if(confirm('¿Seguro que deseas eliminar este método de pago?')) {
                 dbLocal.metodosPago.splice(index, 1);
                 dbFirestore.collection('tiendas').doc(miTiendaId).update({ metodosPago: dbLocal.metodosPago });
                 renderizarMetodosPago();
+            }
+        }
+
+        function editarMetodoPago(index) {
+            indexMetodoEdicion = index;
+            const met = dbLocal.metodosPago[index];
+            document.getElementById('mp-banco').value = met.banco || '';
+            document.getElementById('mp-cuenta').value = met.cuenta || '';
+            document.getElementById('mp-beneficiario').value = met.beneficiario || '';
+            document.getElementById('mp-concepto').value = met.concepto || '';
+            document.getElementById('modal-metodo-pago').classList.remove('hidden');
+        }
+
+        function cerrarModalMetodoPago() {
+            document.getElementById('modal-metodo-pago').classList.add('hidden');
+            indexMetodoEdicion = null;
+        }
+
+        function guardarDatosMetodoPago() {
+            if(indexMetodoEdicion !== null) {
+                dbLocal.metodosPago[indexMetodoEdicion].banco = document.getElementById('mp-banco').value.trim();
+                dbLocal.metodosPago[indexMetodoEdicion].cuenta = document.getElementById('mp-cuenta').value.trim();
+                dbLocal.metodosPago[indexMetodoEdicion].beneficiario = document.getElementById('mp-beneficiario').value.trim();
+                dbLocal.metodosPago[indexMetodoEdicion].concepto = document.getElementById('mp-concepto').value.trim();
+                
+                dbFirestore.collection('tiendas').doc(miTiendaId).update({ metodosPago: dbLocal.metodosPago });
+                cerrarModalMetodoPago();
             }
         }
 
