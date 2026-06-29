@@ -18,7 +18,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-    <!-- Librería para generar Códigos QR -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 </head>
 <body class="text-gray-800 antialiased min-h-screen">
@@ -80,9 +79,9 @@
 
             <div class="p-4 border-t border-gray-100 flex flex-col gap-2">
                 <div class="text-[10px] text-gray-400 text-center uppercase tracking-widest font-bold">
-                    © 2026 Creado por Zamora Ramos Juan Manuel
+                    © 2026 Creado por <a href="https://mimenudigitalmx.com" target="_blank" class="hover:text-gray-600 underline">Mi MenuDigital MX</a>
                 </div>
-                <button onclick="cerrarSesion()" class="w-full text-left px-4 py-3 rounded-xl font-bold text-gray-500 hover:bg-red-50 hover:text-red-600 transition-colors flex items-center gap-3">
+                <button onclick="cerrarSesion()" class="w-full text-left px-4 py-3 rounded-xl font-bold text-gray-500 hover:bg-red-50 hover:text-red-600 transition-colors flex items-center gap-3 mt-1">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                     Cerrar Sesión
                 </button>
@@ -100,81 +99,101 @@
                 </div>
             </header>
             
-            <main class="flex-1 overflow-y-auto p-4 sm:p-8 w-full relative bg-[#f8f9fa]">
+            <main class="flex-1 overflow-y-auto w-full relative bg-[#f8f9fa]">
                 
-                <div id="seccion-inicio" class="max-w-4xl mx-auto w-full pt-2 sm:pt-6">
-                    <div class="text-center px-2 mb-10">
-                        <h1 class="text-3xl sm:text-4xl font-normal text-gray-700 tracking-tight mb-3 leading-tight">Bienvenido a tu menú digital <br><strong id="welcome-store-name" class="text-gray-900 font-black"></strong></h1>
-                        <p class="text-gray-500 text-sm sm:text-base max-w-md mx-auto">Completa la siguiente información para tener tu menú listo al 100%.</p>
+                <div id="seccion-inicio" class="max-w-5xl mx-auto w-full pt-6 sm:pt-10 pb-10">
+                    <div class="mb-10 px-6 sm:px-10">
+                        <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-800 tracking-tight mb-2 leading-tight">
+                            Bienvenido a <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-700" id="welcome-store-name"></span>
+                        </h1>
+                        <p class="text-gray-500 text-sm sm:text-base max-w-xl">Completa la siguiente información para tener tu menú en línea al 100% y comenzar a recibir pedidos hoy mismo.</p>
                     </div>
 
-                    <div class="mb-10 bg-white p-6 sm:p-8 rounded-[24px] shadow-sm border border-gray-100 relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-1.5 h-full bg-[#2d7d9a]"></div>
-                        
-                        <label class="block text-sm font-bold text-gray-700 mb-2 ml-1">Enlace de tu menú digital:</label>
-                        <div class="bg-[#f8f9fa] border border-gray-200 rounded-xl p-2.5 sm:p-3 flex items-center justify-between shadow-sm">
-                            <span id="display-link-tienda-inicio" class="text-[#2d7d9a] text-sm sm:text-base font-medium truncate px-2 w-[60%] sm:w-auto">cargando...</span>
-                            <button onclick="copiarEnlaceTiendaBtn()" class="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-4 py-2.5 rounded-lg shadow-sm text-sm font-bold transition-colors flex items-center gap-2 active:scale-95 flex-shrink-0">
-                                <svg class="w-4 h-4 text-[#2d7d9a]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                                Copiar
+                    <div class="mb-10 mx-4 sm:mx-8 bg-gradient-to-r from-[#2d7d9a] to-[#1a5b75] p-1 rounded-3xl shadow-lg">
+                        <div class="bg-white rounded-[22px] p-5 sm:p-7 flex flex-col md:flex-row md:items-center justify-between gap-5">
+                            <div class="overflow-hidden">
+                                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Enlace de tu menú digital</h3>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse flex-shrink-0"></div>
+                                    <span id="display-link-tienda-inicio" class="text-[#2d7d9a] text-[15px] sm:text-xl font-bold truncate">cargando...</span>
+                                </div>
+                            </div>
+                            <button onclick="copiarEnlaceTiendaBtn()" class="bg-[#2d7d9a] hover:bg-[#1a5b75] text-white px-6 py-3.5 rounded-xl shadow-md font-bold transition-all flex items-center justify-center gap-2 active:scale-95 flex-shrink-0">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                Copiar Enlace
                             </button>
                         </div>
                     </div>
 
-                    <div>
-                        <div class="space-y-4">
-                            <div onclick="switchTab('sucursales')" class="bg-white rounded-2xl p-5 sm:p-6 border border-gray-100 shadow-sm cursor-pointer hover:shadow-md transition-all active:scale-[0.99] relative overflow-hidden group">
-                                <div class="flex justify-between items-start mb-2">
-                                    <h3 class="font-bold text-gray-800 text-lg group-hover:text-[#2d7d9a] transition-colors">Dirección de sucursales</h3>
-                                    <div class="w-6 h-6 rounded-full border-2 border-gray-200 flex items-center justify-center text-white transition-colors" id="check-sucursales"></div>
+                    <div class="px-4 sm:px-8">
+                        <h2 class="text-xl font-black text-gray-800 mb-5 tracking-tight">Pasos para arrancar</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            
+                            <div onclick="switchTab('sucursales')" class="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm cursor-pointer hover:shadow-md hover:border-orange-200 transition-all active:scale-[0.99] group flex flex-col h-full">
+                                <div class="flex justify-between items-start mb-5">
+                                    <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform shadow-sm">
+                                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                                    </div>
+                                    <div class="w-7 h-7 rounded-full border-2 border-gray-200 flex items-center justify-center text-white transition-colors" id="check-sucursales"></div>
                                 </div>
-                                <p class="text-gray-500 text-sm mb-5 pr-8">Agrega al menos una sucursal con dirección y teléfono.</p>
-                                <div class="flex justify-between items-center border-t border-gray-50 pt-4">
-                                    <span class="text-xs text-gray-400 font-medium flex items-center gap-1">⏱️ 2 min</span>
-                                    <span class="text-[#2d7d9a] font-bold text-sm">Configurar</span>
-                                </div>
-                            </div>
-
-                            <div onclick="switchTab('configuracion')" class="bg-white rounded-2xl p-5 sm:p-6 border border-gray-100 shadow-sm cursor-pointer hover:shadow-md transition-all active:scale-[0.99] relative overflow-hidden group">
-                                <div class="flex justify-between items-start mb-2">
-                                    <h3 class="font-bold text-gray-800 text-lg group-hover:text-[#2d7d9a] transition-colors">Configurar Tienda</h3>
-                                    <div class="w-6 h-6 rounded-full border-2 border-gray-200 flex items-center justify-center text-white transition-colors" id="check-info"></div>
-                                </div>
-                                <p class="text-gray-500 text-sm mb-5 pr-8">Agrega logotipo, portada, bienvenida y al menos tu número de WhatsApp.</p>
-                                <div class="flex justify-between items-center border-t border-gray-50 pt-4">
-                                    <span class="text-xs text-gray-400 font-medium flex items-center gap-1">⏱️ 5 min</span>
-                                    <span class="text-[#2d7d9a] font-bold text-sm">Configurar</span>
+                                <h3 class="font-bold text-gray-900 text-[19px] mb-2 group-hover:text-orange-600 transition-colors">Dirección de sucursales</h3>
+                                <p class="text-gray-500 text-[15px] flex-grow leading-relaxed">Agrega al menos una sucursal con su dirección y número de teléfono.</p>
+                                <div class="mt-5 pt-4 border-t border-gray-50 flex items-center justify-between">
+                                    <span class="text-xs font-bold text-gray-500 bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200">⏱️ 2 min</span>
+                                    <span class="text-orange-600 font-bold text-sm flex items-center gap-1 group-hover:translate-x-1 transition-transform">Configurar <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
                                 </div>
                             </div>
 
-                            <div onclick="switchTab('productos')" class="bg-white rounded-2xl p-5 sm:p-6 border border-gray-100 shadow-sm cursor-pointer hover:shadow-md transition-all active:scale-[0.99] relative overflow-hidden group">
-                                <div class="flex justify-between items-start mb-2">
-                                    <h3 class="font-bold text-gray-800 text-lg group-hover:text-[#2d7d9a] transition-colors">Platillos</h3>
-                                    <div class="w-6 h-6 rounded-full border-2 border-gray-200 flex items-center justify-center text-white transition-colors" id="check-prod"></div>
+                            <div onclick="switchTab('configuracion')" class="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm cursor-pointer hover:shadow-md hover:border-orange-200 transition-all active:scale-[0.99] group flex flex-col h-full">
+                                <div class="flex justify-between items-start mb-5">
+                                    <div class="w-14 h-14 rounded-2xl bg-purple-50 text-purple-500 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform shadow-sm">
+                                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                    </div>
+                                    <div class="w-7 h-7 rounded-full border-2 border-gray-200 flex items-center justify-center text-white transition-colors" id="check-info"></div>
                                 </div>
-                                <p class="text-gray-500 text-sm mb-5 pr-8">Agrega al menos un platillo al menú de tu restaurante.</p>
-                                <div class="flex justify-between items-center border-t border-gray-50 pt-4">
-                                    <span class="text-xs text-gray-400 font-medium flex items-center gap-1">⏱️ 10 min</span>
-                                    <span class="text-[#2d7d9a] font-bold text-sm">Configurar</span>
+                                <h3 class="font-bold text-gray-900 text-[19px] mb-2 group-hover:text-orange-600 transition-colors">Configurar Tienda</h3>
+                                <p class="text-gray-500 text-[15px] flex-grow leading-relaxed">Añade logotipo, portada, mensaje de bienvenida y tu número de WhatsApp.</p>
+                                <div class="mt-5 pt-4 border-t border-gray-50 flex items-center justify-between">
+                                    <span class="text-xs font-bold text-gray-500 bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200">⏱️ 5 min</span>
+                                    <span class="text-orange-600 font-bold text-sm flex items-center gap-1 group-hover:translate-x-1 transition-transform">Configurar <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
                                 </div>
                             </div>
 
-                            <div onclick="switchTab('pagos')" class="bg-white rounded-2xl p-5 sm:p-6 border border-gray-100 shadow-sm cursor-pointer hover:shadow-md transition-all active:scale-[0.99] relative overflow-hidden group">
-                                <div class="flex justify-between items-start mb-2">
-                                    <h3 class="font-bold text-gray-800 text-lg group-hover:text-[#2d7d9a] transition-colors">Métodos de Pago</h3>
-                                    <div class="w-6 h-6 rounded-full border-2 border-gray-200 flex items-center justify-center text-white transition-colors" id="check-pagos"></div>
+                            <div onclick="switchTab('productos')" class="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm cursor-pointer hover:shadow-md hover:border-orange-200 transition-all active:scale-[0.99] group flex flex-col h-full">
+                                <div class="flex justify-between items-start mb-5">
+                                    <div class="w-14 h-14 rounded-2xl bg-orange-50 text-orange-500 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform shadow-sm">
+                                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                                    </div>
+                                    <div class="w-7 h-7 rounded-full border-2 border-gray-200 flex items-center justify-center text-white transition-colors" id="check-prod"></div>
                                 </div>
-                                <p class="text-gray-500 text-sm mb-5 pr-8">Define cómo te pueden pagar tus clientes a domicilio.</p>
-                                <div class="flex justify-between items-center border-t border-gray-50 pt-4">
-                                    <span class="text-xs text-gray-400 font-medium flex items-center gap-1">⏱️ 1 min</span>
-                                    <span class="text-[#2d7d9a] font-bold text-sm">Configurar</span>
+                                <h3 class="font-bold text-gray-900 text-[19px] mb-2 group-hover:text-orange-600 transition-colors">Platillos y Bebidas</h3>
+                                <p class="text-gray-500 text-[15px] flex-grow leading-relaxed">Crea tus categorías y agrega al menos un platillo al menú de tu restaurante.</p>
+                                <div class="mt-5 pt-4 border-t border-gray-50 flex items-center justify-between">
+                                    <span class="text-xs font-bold text-gray-500 bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200">⏱️ 10 min</span>
+                                    <span class="text-orange-600 font-bold text-sm flex items-center gap-1 group-hover:translate-x-1 transition-transform">Configurar <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
                                 </div>
                             </div>
+
+                            <div onclick="switchTab('pagos')" class="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm cursor-pointer hover:shadow-md hover:border-orange-200 transition-all active:scale-[0.99] group flex flex-col h-full">
+                                <div class="flex justify-between items-start mb-5">
+                                    <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform shadow-sm">
+                                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                                    </div>
+                                    <div class="w-7 h-7 rounded-full border-2 border-gray-200 flex items-center justify-center text-white transition-colors" id="check-pagos"></div>
+                                </div>
+                                <h3 class="font-bold text-gray-900 text-[19px] mb-2 group-hover:text-orange-600 transition-colors">Métodos de Pago</h3>
+                                <p class="text-gray-500 text-[15px] flex-grow leading-relaxed">Define y activa cómo te pueden pagar tus clientes en pedidos a domicilio.</p>
+                                <div class="mt-5 pt-4 border-t border-gray-50 flex items-center justify-between">
+                                    <span class="text-xs font-bold text-gray-500 bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200">⏱️ 1 min</span>
+                                    <span class="text-orange-600 font-bold text-sm flex items-center gap-1 group-hover:translate-x-1 transition-transform">Configurar <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>
 
-                <div id="seccion-productos" class="hidden max-w-5xl mx-auto pb-10">
+                <div id="seccion-productos" class="hidden p-4 sm:p-8 max-w-5xl mx-auto pb-10">
                     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
                         <h3 class="text-2xl font-black text-gray-800 tracking-tight">Catálogo de Platillos</h3>
                         <div class="flex gap-2 w-full sm:w-auto">
@@ -263,7 +282,7 @@
                     </div>
                 </div>
 
-                <div id="seccion-sucursales" class="hidden max-w-5xl mx-auto pb-10">
+                <div id="seccion-sucursales" class="hidden p-4 sm:p-8 max-w-5xl mx-auto pb-10">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-2xl font-black text-gray-800 tracking-tight">Mis Sucursales</h3>
                         <button onclick="abrirModalSucursal()" class="bg-[#2d7d9a] hover:bg-[#23647a] text-white font-bold py-2 sm:py-2.5 px-4 sm:px-5 rounded-xl shadow-md transition-transform active:scale-95 text-sm flex items-center gap-2">
@@ -321,8 +340,7 @@
                     <div id="grid-sucursales" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
                 </div>
 
-                <!-- SECCIÓN MESAS -->
-                <div id="seccion-mesas" class="hidden max-w-7xl mx-auto pb-10">
+                <div id="seccion-mesas" class="hidden p-4 sm:p-8 max-w-7xl mx-auto pb-10">
                     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
                         <h3 class="text-2xl font-black text-gray-800 tracking-tight">Gestión de Mesas</h3>
                         <div class="w-full sm:w-auto">
@@ -333,11 +351,9 @@
                     </div>
                     
                     <div id="grid-mesas" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                        <!-- Las mesas se generarán aquí -->
                     </div>
                 </div>
 
-                <!-- Modal Detalle Mesa -->
                 <div id="modal-detalle-mesa" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-[60] hidden flex items-center justify-center p-4">
                     <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] flex flex-col">
                         <div class="flex justify-between items-center mb-4 border-b pb-2">
@@ -354,7 +370,7 @@
                     </div>
                 </div>
 
-                <div id="seccion-pagos" class="hidden max-w-4xl mx-auto pb-10">
+                <div id="seccion-pagos" class="hidden p-4 sm:p-8 max-w-4xl mx-auto pb-10">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-2xl font-black text-gray-800 tracking-tight">Métodos de Pago</h3>
                     </div>
@@ -371,13 +387,11 @@
 
                         <div class="bg-gray-50 rounded-xl border border-gray-100 p-2">
                             <ul id="lista-metodos-pago" class="divide-y divide-gray-100">
-                                <!-- Lista de métodos se inyectará aquí -->
                             </ul>
                         </div>
                     </div>
                 </div>
 
-                <!-- Modal Editar Método Pago (Transferencia / Nuevo) -->
                 <div id="modal-metodo-pago" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-[60] hidden flex items-center justify-center p-4">
                     <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-xl w-full max-w-md">
                         <div class="flex justify-between items-center mb-4 border-b pb-2">
@@ -409,7 +423,7 @@
                     </div>
                 </div>
 
-                <div id="seccion-configuracion" class="hidden max-w-4xl mx-auto pb-10">
+                <div id="seccion-configuracion" class="hidden p-4 sm:p-8 max-w-4xl mx-auto pb-10">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-2xl font-black text-gray-800 tracking-tight">Configurar Tienda</h3>
                         <button id="btn-guardar-configuracion" onclick="guardarConfiguracion()" class="bg-[#2d7d9a] text-white font-bold py-2.5 px-6 rounded-xl shadow-md hover:bg-[#23647a] transition-transform active:scale-95 text-sm flex items-center gap-2">
@@ -417,7 +431,6 @@
                         </button>
                     </div>
                     
-                    <!-- NUEVO ACORDEÓN: CÓDIGOS QR -->
                     <details class="group bg-white rounded-2xl shadow-sm border border-gray-100 mb-4 [&_summary::-webkit-details-marker]:hidden">
                         <summary class="flex items-center justify-between p-5 sm:p-6 cursor-pointer font-black text-lg text-gray-900 select-none">
                             <div class="flex items-center gap-3">
@@ -448,7 +461,6 @@
                         </div>
                     </details>
 
-                    <!-- Acordeón Identidad y Apariencia -->
                     <details class="group bg-white rounded-2xl shadow-sm border border-gray-100 mb-4 [&_summary::-webkit-details-marker]:hidden" open>
                         <summary class="flex items-center justify-between p-5 sm:p-6 cursor-pointer font-black text-lg text-gray-900 select-none">
                             <div class="flex items-center gap-3">
@@ -1009,8 +1021,8 @@
         }
 
         function actualizarChecklist(data) {
-            const successClass = "w-6 h-6 rounded-full border-2 border-green-500 flex items-center justify-center text-green-500 bg-green-50 transition-colors font-bold";
-            const emptyClass = "w-6 h-6 rounded-full border-2 border-gray-200 flex items-center justify-center text-white transition-colors";
+            const successClass = "w-7 h-7 rounded-full border-2 border-green-500 flex items-center justify-center text-green-500 bg-green-50 transition-colors font-bold";
+            const emptyClass = "w-7 h-7 rounded-full border-2 border-gray-200 flex items-center justify-center text-white transition-colors";
             
             const hasLogo = !!(data.apariencia && data.apariencia.logo);
             const hasPortada = !!(data.apariencia && data.apariencia.portada);
@@ -1044,8 +1056,8 @@
 
         function actualizarChecklistProd() {
             const checkProd = document.getElementById('check-prod');
-            const successClass = "w-6 h-6 rounded-full border-2 border-green-500 flex items-center justify-center text-green-500 bg-green-50 transition-colors font-bold";
-            const emptyClass = "w-6 h-6 rounded-full border-2 border-gray-200 flex items-center justify-center text-white transition-colors";
+            const successClass = "w-7 h-7 rounded-full border-2 border-green-500 flex items-center justify-center text-green-500 bg-green-50 transition-colors font-bold";
+            const emptyClass = "w-7 h-7 rounded-full border-2 border-gray-200 flex items-center justify-center text-white transition-colors";
             
             if (dbLocal.productos && dbLocal.productos.length > 0) {
                 checkProd.innerHTML = '✓';
