@@ -359,6 +359,13 @@
     </div>
 
     <script>
+        // GENERACIÓN DE TOKEN ÚNICO PARA SEGURIDAD EN MESAS
+        let miTokenSesion = localStorage.getItem('miMenuTokenSesion');
+        if (!miTokenSesion) {
+            miTokenSesion = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+            localStorage.setItem('miMenuTokenSesion', miTokenSesion);
+        }
+
         let metodosPagoTienda = [];
         let metodosPagoTiendaActivos = [];
         let alertAction = null;
@@ -436,6 +443,31 @@
         let qrSucursalId = null;
         let qrMesaNumber = null;
 
+        // FUNCIÓN DE SEGURIDAD PARA VALIDAR MESA
+        async function validarMesaLibre(sucId, numMesa) {
+            try {
+                const docId = `${slugTienda}_${sucId}_mesa_${numMesa}`;
+                const docRef = dbFirestore.collection('mesas_activas').doc(docId);
+                const docSnap = await docRef.get();
+                
+                if (docSnap.exists) {
+                    const data = docSnap.data();
+                    if (data.estado === 'Ocupado') {
+                        // Si está ocupada, verificamos si es MI propia sesión
+                        if (data.sessionToken === miTokenSesion) {
+                            return true; // Es mi propia mesa, puedo seguir pidiendo
+                        } else {
+                            return false; // Alguien más la tiene ocupada
+                        }
+                    }
+                }
+                return true; // No existe o no está ocupada
+            } catch(e) {
+                console.error("Error validando mesa:", e);
+                return true; 
+            }
+        }
+
         async function inicializarTienda() {
             if (!slugTienda) {
                 window.location.href = "registro.html";
@@ -455,14 +487,12 @@
                             document.getElementById('home-store-desc').innerText = tiendaDataActual.mensajeBienvenida;
                         }
 
-                        // Configuración y filtro de métodos de pago
                         metodosPagoTienda = tiendaDataActual.metodosPago || [{ tipo: 'Efectivo', activo: true }];
                         metodosPagoTienda = metodosPagoTienda.map(m => typeof m === 'string' ? { tipo: m, activo: true } : m);
                         if(!metodosPagoTienda.some(m => m.tipo.toLowerCase() === 'efectivo')) {
                             metodosPagoTienda.unshift({ tipo: 'Efectivo', activo: true });
                         }
                         
-                        // Solo conservamos para el select los que el administrador haya activado
                         metodosPagoTiendaActivos = metodosPagoTienda.filter(m => m.activo !== false);
 
                         categoriasOrdenadas = tiendaDataActual.categorias || [];
@@ -480,13 +510,23 @@
                         const params = new URLSearchParams(window.location.search);
                         let urlSucursal = params.get('sucursal');
                         let urlMesa = params.get('mesa');
+                        
+                        // VALIDACIÓN AL ABRIR EL ENLACE DIRECTO (CÓDIGO O GUARDADO)
                         if (urlSucursal && urlMesa) {
-                            qrSucursalId = urlSucursal;
-                            qrMesaNumber = urlMesa;
-                            selectedStore = storesData.find(s => String(s.id) === String(urlSucursal));
-                            tableNumber = urlMesa;
-                            orderType = 'comedor';
-                            applyOrderTypeUI('comedor');
+                            validarMesaLibre(urlSucursal, urlMesa).then(estaLibre => {
+                                if (estaLibre) {
+                                    qrSucursalId = urlSucursal;
+                                    qrMesaNumber = urlMesa;
+                                    selectedStore = storesData.find(s => String(s.id) === String(urlSucursal));
+                                    tableNumber = urlMesa;
+                                    orderType = 'comedor';
+                                    applyOrderTypeUI('comedor');
+                                } else {
+                                    showCustomAlert("Atención: Esta mesa ya está registrada como ocupada por otro comensal. Por seguridad no podrás enviar pedidos a esta mesa. Si crees que es un error, avisa al personal.", "Mesa Ocupada");
+                                    // Removemos los parámetros de la URL para que no pueda usarla
+                                    window.history.replaceState({}, document.title, window.location.pathname);
+                                }
+                            });
                         }
 
                         if(tiendaDataActual.apariencia) {
@@ -622,19 +662,31 @@
                 let urlMesa = params.get('mesa');
 
                 if (urlSucursal && urlMesa) {
-                    selectedStore = storesData.find(s => String(s.id) === String(urlSucursal));
-                    tableNumber = urlMesa;
-                    applyOrderTypeUI(type);
-                    if (!document.getElementById('cart-modal').classList.contains('hidden')) {
-                        renderCartAction();
-                    }
+                    validarMesaLibre(urlSucursal, urlMesa).then(estaLibre => {
+                        if (estaLibre) {
+                            selectedStore = storesData.find(s => String(s.id) === String(urlSucursal));
+                            tableNumber = urlMesa;
+                            applyOrderTypeUI(type);
+                            if (!document.getElementById('cart-modal').classList.contains('hidden')) {
+                                renderCartAction();
+                            }
+                        } else {
+                            showCustomAlert("Esta mesa se encuentra ocupada por otro comensal. Si crees que es un error, por favor avisa al personal.", "Mesa Ocupada");
+                        }
+                    });
                 } else if (qrSucursalId && qrMesaNumber) {
-                     selectedStore = storesData.find(s => String(s.id) === String(qrSucursalId));
-                     tableNumber = qrMesaNumber;
-                     applyOrderTypeUI(type);
-                     if (!document.getElementById('cart-modal').classList.contains('hidden')) {
-                         renderCartAction();
-                     }
+                     validarMesaLibre(qrSucursalId, qrMesaNumber).then(estaLibre => {
+                         if (estaLibre) {
+                             selectedStore = storesData.find(s => String(s.id) === String(qrSucursalId));
+                             tableNumber = qrMesaNumber;
+                             applyOrderTypeUI(type);
+                             if (!document.getElementById('cart-modal').classList.contains('hidden')) {
+                                 renderCartAction();
+                             }
+                         } else {
+                             showCustomAlert("Esta mesa se encuentra ocupada por otro comensal.", "Mesa Ocupada");
+                         }
+                     });
                 } else {
                     showCustomAlert("Para ordenar en el restaurante, necesitas habilitar tu cámara para escanear el código QR de tu mesa.", "Servicio en Comedor", () => {
                         applyOrderTypeUI(type);
@@ -646,7 +698,7 @@
                 applyOrderTypeUI(type);
             }
 
-            if (!document.getElementById('cart-modal').classList.contains('hidden')) {
+            if (type !== 'comedor' && !document.getElementById('cart-modal').classList.contains('hidden')) {
                 renderCartAction();
             }
         }
@@ -674,18 +726,27 @@
                     let scannedSlug = url.pathname.replace(/^\/|\/$/g, '');
 
                     if (scannedSlug === slugTienda && suc && mesa) {
-                        qrSucursalId = suc;
-                        qrMesaNumber = mesa;
-                        
-                        selectedStore = storesData.find(s => String(s.id) === String(suc));
-                        tableNumber = mesa;
+                        html5Qrcode.pause(); 
+                        validarMesaLibre(suc, mesa).then(estaLibre => {
+                            if (estaLibre) {
+                                qrSucursalId = suc;
+                                qrMesaNumber = mesa;
+                                
+                                selectedStore = storesData.find(s => String(s.id) === String(suc));
+                                tableNumber = mesa;
 
-                        closeQrModal();
-                        showCustomAlert("¡Mesa " + mesa + " detectada con éxito! Ya puedes realizar tu orden directo a cocina.", "¡Listo!");
-                        
-                        if (!document.getElementById('cart-modal').classList.contains('hidden')) {
-                            renderCartAction();
-                        }
+                                closeQrModal();
+                                showCustomAlert("¡Mesa " + mesa + " detectada con éxito! Ya puedes realizar tu orden directo a cocina.", "¡Listo!");
+                                
+                                if (!document.getElementById('cart-modal').classList.contains('hidden')) {
+                                    renderCartAction();
+                                }
+                            } else {
+                                showCustomAlert("Esta mesa ya se encuentra ocupada por otro comensal. Si es un error, avisa al personal.", "Mesa Ocupada", () => {
+                                    html5Qrcode.resume();
+                                });
+                            }
+                        });
                     } else {
                         html5Qrcode.pause();
                         showCustomAlert("El código QR escaneado no pertenece a este restaurante o no es válido para mesas.", "Código Inválido", () => {
@@ -1364,12 +1425,14 @@
                         pedidoActual[id] = (pedidoActual[id] || 0) + qty;
                     }
 
+                    // AQUI SE GUARDA EL TOKEN DE SEGURIDAD EN LA BASE DE DATOS
                     await docRef.set({
                         tiendaId: slugTienda,
                         sucursalId: selectedStore.id,
                         mesaId: tableNumber,
                         estado: 'Ocupado',
                         pedido: pedidoActual,
+                        sessionToken: miTokenSesion, 
                         timestamp: firebase.firestore.FieldValue.serverTimestamp()
                     }, { merge: true });
                 } catch (e) {
