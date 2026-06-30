@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Addministración - MiMenú Digital</title>
+    <title>Panel de Administración - MiMenú Digital</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
@@ -680,7 +680,7 @@
             dbLocal.mesasActivas.forEach(mesa => {
                 const orderHash = JSON.stringify(mesa.pedido || {});
                 const dbVistoHash = mesa.adminVistoHash || "";
-                if (orderHash !== dbVistoHash) {
+                if (dbVistoHash !== orderHash) {
                     pedidosNuevos++;
                 }
             });
@@ -1706,8 +1706,8 @@
 
                 if (isOcupado) {
                     const orderHash = JSON.stringify(mesaActiva.pedido || {});
-                    const adminVistoHash = mesaActiva.adminVistoHash || "";
-                    if (orderHash !== adminVistoHash) {
+                    const dbVistoHash = mesaActiva.adminVistoHash || "";
+                    if (dbVistoHash !== orderHash) {
                         isNuevoPedido = true;
                     }
                 }
@@ -1745,17 +1745,17 @@
             const mesaActiva = dbLocal.mesasActivas.find(m => m.id === docId);
             if(!mesaActiva) return;
 
-            // Marcamos como "leído" de forma global en Firestore. 
-            // Así todos los administradores verán que la mesa ya fue abierta y quitará la notificación globalmente
+            // Marcamos como "leído" de forma global en Firestore
             const orderHash = JSON.stringify(mesaActiva.pedido || {});
             if (mesaActiva.adminVistoHash !== orderHash) {
                 dbFirestore.collection('mesas_activas').doc(docId).update({
                     adminVistoHash: orderHash
                 }).catch(e => console.error("Error sincronizando estado visto:", e));
+                
+                // Actualizamos la interfaz visual de inmediato en este dispositivo
+                mesaActiva.adminVistoHash = orderHash; 
             }
             
-            // Actualizamos la interfaz visual de inmediato en este dispositivo
-            mesaActiva.adminVistoHash = orderHash; 
             actualizarBadgeSidebar();
             if(!document.getElementById('seccion-mesas').classList.contains('hidden')){
                 renderizarMesas();
