@@ -641,6 +641,14 @@
             } catch(e) {}
         }
 
+        // ¡CLAVE DE LA SOLUCIÓN! Esta función evita que diferentes celulares generen hashes distintos
+        function generarHashPedido(pedidoObj) {
+            if (!pedidoObj) return "";
+            // Convierte el objeto en un array, lo ordena alfabéticamente por llave y lo hace string.
+            // Esto asegura que sin importar el celular (Android, iOS) el hash sea EXACTAMENTE igual.
+            return JSON.stringify(Object.entries(pedidoObj).sort((a, b) => a[0].localeCompare(b[0])));
+        }
+
         function mostrarNotificacionToast(mensaje, mesaId) {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -678,7 +686,7 @@
             let pedidosNuevos = 0;
             
             dbLocal.mesasActivas.forEach(mesa => {
-                const orderHash = JSON.stringify(mesa.pedido || {});
+                const orderHash = generarHashPedido(mesa.pedido);
                 const dbVistoHash = mesa.adminVistoHash || "";
                 if (dbVistoHash !== orderHash) {
                     pedidosNuevos++;
@@ -1090,8 +1098,8 @@
                     let docId = doc.id;
                     dbLocal.mesasActivas.push({ id: docId, ...docData });
 
-                    // Verificamos si el pedido es nuevo comparando con la base de datos (Global, no localStorage)
-                    const orderHash = JSON.stringify(docData.pedido || {});
+                    // Usamos el hash determinista para comparar
+                    const orderHash = generarHashPedido(docData.pedido);
                     const adminVistoHash = docData.adminVistoHash || "";
                     
                     if (adminVistoHash !== orderHash) {
@@ -1705,7 +1713,7 @@
                 let isNuevoPedido = false;
 
                 if (isOcupado) {
-                    const orderHash = JSON.stringify(mesaActiva.pedido || {});
+                    const orderHash = generarHashPedido(mesaActiva.pedido);
                     const dbVistoHash = mesaActiva.adminVistoHash || "";
                     if (dbVistoHash !== orderHash) {
                         isNuevoPedido = true;
@@ -1745,8 +1753,8 @@
             const mesaActiva = dbLocal.mesasActivas.find(m => m.id === docId);
             if(!mesaActiva) return;
 
-            // Marcamos como "leído" de forma global en Firestore
-            const orderHash = JSON.stringify(mesaActiva.pedido || {});
+            // Marcamos como "leído" de forma global en Firestore con nuestro hash infalible
+            const orderHash = generarHashPedido(mesaActiva.pedido);
             if (mesaActiva.adminVistoHash !== orderHash) {
                 dbFirestore.collection('mesas_activas').doc(docId).update({
                     adminVistoHash: orderHash
