@@ -455,10 +455,13 @@
         let html5Qrcode = null;
         let qrSucursalId = null;
         let qrMesaNumber = null;
+        let mesaSessionExpira = null; 
 
         // GESTIÓN DE SESIÓN LOCAL (JUST-IN-TIME)
+        // RECOMENDACIÓN: 30 MINUTOS. Se renueva automáticamente cada vez que hacen una orden.
         function guardarSesionMesa(sucId, numMesa) {
-            const expiracion = Date.now() + (12 * 60 * 60 * 1000); 
+            const expiracion = Date.now() + (30 * 60 * 1000); // 30 MINUTOS
+            mesaSessionExpira = expiracion;
             localStorage.setItem('miMenuMesaActiva', JSON.stringify({
                 sucursalId: sucId,
                 mesa: numMesa,
@@ -471,6 +474,7 @@
             qrSucursalId = null;
             qrMesaNumber = null;
             tableNumber = null;
+            mesaSessionExpira = null;
             if (orderType === 'comedor') {
                 orderType = null;
                 applyOrderTypeUI(null);
@@ -480,7 +484,7 @@
             }
         }
 
-        function establecerMesaLocal(sucId, numMesa) {
+        function establecerMesaLocal(sucId, numMesa, expiraTime = null) {
             qrSucursalId = sucId;
             qrMesaNumber = numMesa;
             if (storesData && storesData.length > 0) {
@@ -490,7 +494,12 @@
             }
             tableNumber = numMesa;
             orderType = 'comedor';
-            guardarSesionMesa(sucId, numMesa);
+            
+            if (expiraTime) {
+                mesaSessionExpira = expiraTime;
+            } else {
+                guardarSesionMesa(sucId, numMesa);
+            }
             applyOrderTypeUI('comedor');
         }
 
@@ -500,7 +509,7 @@
                 try {
                     const datos = JSON.parse(guardada);
                     if (Date.now() < datos.expira) {
-                        establecerMesaLocal(datos.sucursalId, datos.mesa);
+                        establecerMesaLocal(datos.sucursalId, datos.mesa, datos.expira);
                     } else {
                         limpiarSesionMesa(); 
                     }
@@ -721,9 +730,17 @@
                 userCoords = null; 
                 
                 if (qrSucursalId && qrMesaNumber) {
-                     applyOrderTypeUI(type);
-                     if (!document.getElementById('cart-modal').classList.contains('hidden')) {
-                         renderCartAction();
+                     if (mesaSessionExpira && Date.now() > mesaSessionExpira) {
+                         showCustomAlert("Tu sesión en la mesa ha caducado por inactividad (30 min). Por favor, vuelve a escanear el código QR de la mesa.", "⏳ Sesión Caducada", () => {
+                             limpiarSesionMesa();
+                             applyOrderTypeUI(type);
+                             startQrScanner();
+                         });
+                     } else {
+                         applyOrderTypeUI(type);
+                         if (!document.getElementById('cart-modal').classList.contains('hidden')) {
+                             renderCartAction();
+                         }
                      }
                 } else {
                     showCustomAlert("Para ordenar en el restaurante, necesitas habilitar tu cámara para escanear el código QR de tu mesa.", "Servicio en Comedor", () => {
@@ -1448,6 +1465,16 @@
             }
 
             if (orderType === 'comedor' && tableNumber && selectedStore) {
+                if (mesaSessionExpira && Date.now() > mesaSessionExpira) {
+                    showCustomAlert("Por tu seguridad, la sesión de la mesa ha caducado tras 30 minutos de inactividad. Vuelve a escanear el código QR para enviar tu pedido.", "⏳ Sesión Caducada", () => {
+                        limpiarSesionMesa();
+                        closeCartModal();
+                        applyOrderTypeUI('comedor');
+                        startQrScanner();
+                    });
+                    return;
+                }
+
                 try {
                     // VALIDACIÓN JUST IN TIME ANTES DE GUARDAR
                     const estaLibre = await validarMesaLibre(selectedStore.id, tableNumber);
@@ -1481,6 +1508,10 @@
                         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                         lastUpdated: firebase.firestore.FieldValue.serverTimestamp() // ESTE CAMPO ES VITAL PARA LA NOTIFICACIÓN EN ADMIN
                     }, { merge: true });
+
+                    // RENOVAR EL TIEMPO DESPUÉS DE ORDENAR EXITOSAMENTE
+                    guardarSesionMesa(selectedStore.id, tableNumber);
+
                 } catch (e) {
                     console.error("Error guardando mesa en sistema:", e);
                 }
