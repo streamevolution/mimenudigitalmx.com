@@ -345,7 +345,6 @@
         </div>
     </div>
 
-    <!-- MODAL DE ALERTA MEJORADO (SOPORTA DOS BOTONES) -->
     <div id="custom-alert" class="fixed inset-0 z-[100] hidden flex items-center justify-center">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity opacity-0" id="custom-alert-bg" onclick="closeCustomAlert()"></div>
         <div id="custom-alert-content" class="bg-[#F2F2F7]/95 backdrop-blur-xl w-[270px] rounded-[14px] flex flex-col items-center overflow-hidden transform scale-90 opacity-0 transition-all duration-200 ios-shadow-lg relative z-10">
@@ -1479,7 +1478,8 @@
                         estado: 'Ocupado',
                         pedido: pedidoActual,
                         sessionToken: miTokenSesion, 
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                        lastUpdated: firebase.firestore.FieldValue.serverTimestamp() // ESTE CAMPO ES VITAL PARA LA NOTIFICACIÓN EN ADMIN
                     }, { merge: true });
                 } catch (e) {
                     console.error("Error guardando mesa en sistema:", e);
