@@ -631,7 +631,6 @@
         let currentApariencia = { logo: '', portada: '' };
         
         // --- SISTEMA DE NOTIFICACIONES PARA PEDIDOS NUEVOS ---
-        let pedidosVistosAdmin = JSON.parse(localStorage.getItem('pedidosVistosAdmin')) || {};
         let initialLoadMesas = true;
 
         function reproducirSonidoAlerta() {
@@ -680,7 +679,8 @@
             
             dbLocal.mesasActivas.forEach(mesa => {
                 const orderHash = JSON.stringify(mesa.pedido || {});
-                if (pedidosVistosAdmin[mesa.id] !== orderHash) {
+                const dbVistoHash = mesa.adminVistoHash || "";
+                if (orderHash !== dbVistoHash) {
                     pedidosNuevos++;
                 }
             });
@@ -1080,7 +1080,7 @@
                 renderizarListas();
             });
 
-            // ESCUCHADOR DE MESAS - Lógica de Notificaciones de Nuevos Pedidos
+            // ESCUCHADOR DE MESAS - Lógica de Notificaciones de Nuevos Pedidos Global
             dbFirestore.collection('mesas_activas').where('tiendaId', '==', miTiendaId).onSnapshot(snapshot => {
                 dbLocal.mesasActivas = [];
                 let haHabidoNuevos = false;
@@ -1090,9 +1090,11 @@
                     let docId = doc.id;
                     dbLocal.mesasActivas.push({ id: docId, ...docData });
 
-                    // Verificamos si el pedido es nuevo o se modificó comparándolo con lo local
+                    // Verificamos si el pedido es nuevo comparando con la base de datos (Global, no localStorage)
                     const orderHash = JSON.stringify(docData.pedido || {});
-                    if (pedidosVistosAdmin[docId] !== orderHash) {
+                    const adminVistoHash = docData.adminVistoHash || "";
+                    
+                    if (adminVistoHash !== orderHash) {
                         if (!initialLoadMesas) {
                             mostrarNotificacionToast(`Tienes una actualización en la Mesa ${docData.mesaId}`, docData.mesaId);
                             haHabidoNuevos = true;
@@ -1704,7 +1706,8 @@
 
                 if (isOcupado) {
                     const orderHash = JSON.stringify(mesaActiva.pedido || {});
-                    if (pedidosVistosAdmin[mesaActiva.id] !== orderHash) {
+                    const adminVistoHash = mesaActiva.adminVistoHash || "";
+                    if (orderHash !== adminVistoHash) {
                         isNuevoPedido = true;
                     }
                 }
@@ -1742,11 +1745,17 @@
             const mesaActiva = dbLocal.mesasActivas.find(m => m.id === docId);
             if(!mesaActiva) return;
 
-            // Marcamos como "leído" de inmediato guardando su hash
-            pedidosVistosAdmin[docId] = JSON.stringify(mesaActiva.pedido || {});
-            localStorage.setItem('pedidosVistosAdmin', JSON.stringify(pedidosVistosAdmin));
+            // Marcamos como "leído" de forma global en Firestore. 
+            // Así todos los administradores verán que la mesa ya fue abierta y quitará la notificación globalmente
+            const orderHash = JSON.stringify(mesaActiva.pedido || {});
+            if (mesaActiva.adminVistoHash !== orderHash) {
+                dbFirestore.collection('mesas_activas').doc(docId).update({
+                    adminVistoHash: orderHash
+                }).catch(e => console.error("Error sincronizando estado visto:", e));
+            }
             
-            // Actualizamos la interfaz visual si las mesas estaban abiertas
+            // Actualizamos la interfaz visual de inmediato en este dispositivo
+            mesaActiva.adminVistoHash = orderHash; 
             actualizarBadgeSidebar();
             if(!document.getElementById('seccion-mesas').classList.contains('hidden')){
                 renderizarMesas();
@@ -1809,10 +1818,6 @@
                 
                 dbFirestore.collection('mesas_activas').doc(docId).delete()
                     .then(() => {
-                        // Limpiar de localStorage al liberar la mesa para ahorrar espacio
-                        delete pedidosVistosAdmin[docId];
-                        localStorage.setItem('pedidosVistosAdmin', JSON.stringify(pedidosVistosAdmin));
-
                         cerrarModalDetalleMesa();
                     })
                     .catch(e => console.error("Error al liberar mesa:", e));
