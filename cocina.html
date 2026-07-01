@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recepción de Pedidos - Cocina/Caja</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f8f9fa; }
+        
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        html { scroll-behavior: smooth; }
+        .modal-open { overflow: hidden; }
+        .slide-up { transform: translateY(0%); }
+        .slide-down { transform: translateY(100%); }
+        
+        .ios-shadow { box-shadow: 0 4px 24px rgba(0,0,0,0.04); }
+        .ios-shadow-lg { box-shadow: 0 8px 32px rgba(0,0,0,0.08); }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+</head>
+<body class="text-gray-900 transition-colors antialiased min-h-screen flex flex-col relative">
+
+    <!-- PANTALLA DE LOGIN DE COCINA / CAJA -->
+    <div id="login-view" class="fixed inset-0 z-[100] bg-white flex flex-col justify-center items-center p-6 transition-opacity duration-300">
+        <div class="w-full max-w-sm flex flex-col items-center">
+            <div id="login-step-1" class="w-full flex flex-col items-center animate-[slide-up_0.3s_ease-out]">
+                <div class="w-20 h-20 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-6 shadow-sm">
+                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                </div>
+                <h2 class="text-2xl font-black text-gray-900 tracking-tight text-center">Panel de Pedidos</h2>
+                <p class="text-sm text-gray-500 text-center mt-2 mb-8">Ingresa tus credenciales asignadas por el administrador.</p>
+                
+                <div class="w-full space-y-3 mb-6">
+                    <input type="text" id="input-tienda-id" placeholder="ID del Restaurante (Ej. mitienda)" class="w-full bg-[#F2F2F7] border border-transparent focus:border-blue-500 focus:bg-white rounded-2xl px-5 py-4 text-[15px] font-semibold text-gray-800 outline-none transition-all placeholder-gray-400">
+                    <input type="email" id="input-email" placeholder="Correo electrónico" class="w-full bg-[#F2F2F7] border border-transparent focus:border-blue-500 focus:bg-white rounded-2xl px-5 py-4 text-[15px] font-semibold text-gray-800 outline-none transition-all placeholder-gray-400">
+                    <input type="password" id="input-password" placeholder="Contraseña" class="w-full bg-[#F2F2F7] border border-transparent focus:border-blue-500 focus:bg-white rounded-2xl px-5 py-4 text-[15px] font-semibold text-gray-800 outline-none transition-all placeholder-gray-400">
+                </div>
+                
+                <button onclick="iniciarSesionCocina()" id="btn-login" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl shadow-md transition-transform active:scale-95 text-[16px]">
+                    Entrar a Cocina / Caja
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANTALLA DE CARGA -->
+    <div id="loading-screen" class="fixed inset-0 z-[90] bg-[#f8f9fa] flex flex-col items-center justify-center hidden">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-600 mb-4"></div>
+        <p class="text-gray-500 font-bold tracking-wide">Conectando con el sistema...</p>
+    </div>
+
+    <!-- CONTENEDOR PRINCIPAL DE LA APLICACIÓN -->
+    <div id="main-app-view" class="hidden flex-col w-full min-h-screen pb-10">
+        
+        <!-- HEADER -->
+        <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-xl border-b border-gray-200/60 ios-shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-8 h-[76px] flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <img id="header-logo" src="https://via.placeholder.com/150" class="w-11 h-11 rounded-full object-cover border border-gray-200 shadow-sm bg-white">
+                    <div class="flex flex-col">
+                        <h1 class="text-[17px] sm:text-[19px] font-black text-gray-900 leading-tight truncate max-w-[180px] sm:max-w-xs" id="header-store-name">Restaurante</h1>
+                        <p class="text-[11px] sm:text-[12px] font-bold text-blue-600 uppercase tracking-wider truncate" id="header-sucursal-name">Sucursal</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <div class="hidden sm:flex flex-col items-end mr-2">
+                        <span class="text-[12px] text-gray-500 font-medium leading-none">Sesión activa</span>
+                        <span class="text-[14px] font-bold text-gray-800 leading-tight" id="header-user-name">Personal</span>
+                    </div>
+                    <button onclick="cerrarSesionCocina()" class="p-2.5 text-gray-500 hover:text-red-500 bg-gray-100 hover:bg-red-50 rounded-full transition-colors active:scale-95" title="Cerrar Sesión">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- GRID DE MESAS -->
+        <main class="max-w-7xl mx-auto w-full px-4 md:px-8 py-8 flex-grow">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-black text-gray-800 tracking-tight">Monitor de Mesas</h2>
+                <div class="flex gap-4 items-center">
+                    <div class="flex items-center gap-2 text-sm font-medium text-gray-600">
+                        <span class="w-3 h-3 rounded-full bg-green-500"></span> Libre
+                    </div>
+                    <div class="flex items-center gap-2 text-sm font-medium text-gray-600">
+                        <span class="w-3 h-3 rounded-full bg-red-500"></span> Ocupada
+                    </div>
+                </div>
+            </div>
+
+            <div id="grid-mesas" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5">
+                <!-- Se inyectan las mesas dinámicamente -->
+            </div>
+        </main>
+    </div>
+
+    <!-- TOAST NOTIFICACIONES -->
+    <div id="toast-container" class="fixed top-20 sm:top-5 right-5 z-[100] flex flex-col gap-3 overflow-visible pointer-events-none p-2"></div>
+
+    <!-- MODAL DETALLE DE MESA / CUENTA COMPLETA -->
+    <div id="modal-detalle-mesa" class="fixed inset-0 bg-gray-900 bg-opacity-60 z-[60] hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300">
+        <div class="bg-white p-5 sm:p-6 rounded-[24px] shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col relative overflow-hidden transform transition-transform duration-300 scale-95 opacity-0" id="modal-detalle-content">
+            
+            <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
+                <h4 id="titulo-modal-mesa" class="font-black text-gray-900 text-xl tracking-tight">Mesa X</h4>
+                <button onclick="cerrarModalDetalleMesa()" class="text-gray-400 hover:text-gray-700 bg-gray-50 p-2 rounded-full transition-colors active:scale-95">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>
+                </button>
+            </div>
+            
+            <div id="contenido-pedido-mesa" class="overflow-y-auto flex-grow text-sm text-gray-700 mb-4 bg-gray-50 p-4 rounded-xl border border-gray-100 no-scrollbar relative z-10">
+                <!-- Contenido inyectado -->
+            </div>
+            
+            <div class="flex justify-between items-center w-full gap-2 mt-auto border-t border-gray-100 pt-4 relative z-10">
+                <button onclick="cerrarModalDetalleMesa()" class="bg-gray-100 text-gray-700 font-bold py-3 px-4 rounded-xl hover:bg-gray-200 transition-colors text-sm flex-1 active:scale-95">
+                    Cerrar
+                </button>
+                <button id="btn-liberar-sin-ticket" class="bg-red-50 hover:bg-red-100 text-red-600 font-bold py-3 px-3 rounded-xl transition-colors active:scale-95 text-[12px] sm:text-sm flex-1 text-center shadow-sm">
+                    Liberar (Sin ticket)
+                </button>
+                <button id="btn-liberar-con-ticket" class="bg-[#2d7d9a] hover:bg-[#23647a] text-white font-bold py-3 px-3 rounded-xl transition-colors active:scale-95 text-[12px] sm:text-sm flex-1 text-center shadow-md">
+                    Liberar e Imprimir
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL NUEVOS PEDIDOS (ALERTA DE COCINA) -->
+    <div id="modal-nuevos-pedidos" class="fixed inset-0 bg-gray-900 bg-opacity-60 z-[70] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white p-5 sm:p-6 rounded-[24px] shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col relative overflow-hidden ring-4 ring-orange-500 transform transition-transform duration-300 scale-95 opacity-0" id="modal-nuevos-content">
+            <div class="flex justify-between items-center mb-4 border-b border-orange-100 pb-3">
+                <div class="flex items-center gap-3">
+                    <span class="bg-orange-600 text-white text-[11px] font-black px-2.5 py-1 rounded-md animate-pulse uppercase tracking-wider">Nuevo Pedido</span>
+                    <h4 id="titulo-modal-nuevos" class="font-black text-gray-900 text-xl tracking-tight">Mesa X</h4>
+                </div>
+                <button onclick="cerrarModalNuevos()" class="text-gray-400 hover:text-gray-700 bg-gray-50 p-2 rounded-full transition-colors active:scale-95">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>
+                </button>
+            </div>
+            
+            <p class="text-sm text-gray-600 mb-3 font-medium">Se acaban de ordenar los siguientes artículos:</p>
+            
+            <div id="contenido-nuevos-pedidos" class="overflow-y-auto flex-grow text-sm text-gray-700 mb-4 bg-orange-50/50 p-4 rounded-xl border border-orange-100 no-scrollbar relative z-10">
+                <!-- Inyectado -->
+            </div>
+            
+            <div class="grid grid-cols-2 w-full gap-3 mt-auto border-t border-gray-100 pt-4 relative z-10">
+                <button onclick="cerrarModalNuevos()" class="bg-gray-100 text-gray-700 font-bold py-3.5 px-2 rounded-xl hover:bg-gray-200 transition-colors text-[13px] sm:text-sm active:scale-95 text-center">
+                    Cerrar y ver después
+                </button>
+                <button id="btn-entregar-pedido" onclick="marcarPedidoEntregado()" class="bg-orange-600 text-white font-bold py-3.5 px-2 rounded-xl hover:bg-orange-700 transition-colors text-[13px] sm:text-sm shadow-md active:scale-95 text-center flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    ¡Preparado / Visto!
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ALERTA GLOBAL -->
+    <div id="custom-alert" class="fixed inset-0 z-[200] hidden flex items-center justify-center">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity opacity-0" id="custom-alert-bg" onclick="closeCustomAlert()"></div>
+        <div id="custom-alert-content" class="bg-[#F2F2F7]/95 backdrop-blur-xl w-[270px] rounded-[14px] flex flex-col items-center overflow-hidden transform scale-90 opacity-0 transition-all duration-200 ios-shadow-lg relative z-10">
+            <div class="p-4 pt-5 pb-4 text-center w-full">
+                <h3 id="custom-alert-title" class="text-[17px] font-semibold text-black leading-tight mb-1">Aviso</h3>
+                <p id="custom-alert-message" class="text-[13px] text-black/80 leading-tight mt-2"></p>
+            </div>
+            <div class="w-full border-t border-gray-300/50 flex">
+                <button onclick="closeCustomAlert()" class="flex-1 py-2.5 text-[17px] text-[#007AFF] font-semibold hover:bg-black/5 transition-colors">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCg3yObk6x5NDkbc5w0N2oPU1V0mmvQs9w", 
+            authDomain: "mimenu-digital.firebaseapp.com",
+            projectId: "mimenu-digital",
+            storageBucket: "mimenu-digital.firebasestorage.app",
+            messagingSenderId: "129063923724",
+            appId: "1:129063923724:web:6297dda94753bea2a53e29"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const dbFirestore = firebase.firestore();
+
+        // Variables Globales
+        let slugTiendaGlobal = localStorage.getItem('cocinaSlug') || '';
+        let sucursalActivaGlobal = localStorage.getItem('cocinaSucursal') || '';
+        let correoCocinaActual = localStorage.getItem('cocinaCorreo') || '';
+        let passwordCocinaActual = localStorage.getItem('cocinaPassword') || '';
+        let nombreCocinaActual = localStorage.getItem('cocinaNombre') || '';
+        
+        let tiendaData = null;
+        let menuData = [];
+        let mesasActivasGlobales = [];
+        let initialLoadMesas = true;
+        
+        let idMesaActivaAbierta = null;
+        let hashPendienteEntregar = null; 
+
+        // ==========================================
+        // LOGIN (CERO LECTURAS EXTRA)
+        // ==========================================
+
+        function checkInitialState() {
+            if (slugTiendaGlobal && sucursalActivaGlobal && correoCocinaActual && passwordCocinaActual) {
+                document.getElementById('login-view').classList.add('hidden');
+                forceRefreshData();
+            } else {
+                document.getElementById('login-view').classList.remove('hidden');
+            }
+        }
+
+        async function iniciarSesionCocina() {
+            const inputSlug = document.getElementById('input-tienda-id').value.trim();
+            const inputEmail = document.getElementById('input-email').value.trim().toLowerCase();
+            const inputPassword = document.getElementById('input-password').value.trim();
+            const btn = document.getElementById('btn-login');
+            
+            if (!inputSlug || !inputEmail || !inputPassword) {
+                showCustomAlert("Por favor, llena todos los campos para ingresar.");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "Verificando...";
+
+            try {
+                const docTienda = await dbFirestore.collection('tiendas').doc(inputSlug).get();
+                
+                if (docTienda.exists) {
+                    const data = docTienda.data();
+                    const listaCocina = data.cocineros || [];
+                    
+                    const cocineroValido = listaCocina.find(c => c.email.toLowerCase() === inputEmail && c.password === inputPassword);
+                    
+                    if (cocineroValido) {
+                        slugTiendaGlobal = inputSlug;
+                        sucursalActivaGlobal = cocineroValido.sucursalId;
+                        correoCocinaActual = cocineroValido.email;
+                        passwordCocinaActual = cocineroValido.password;
+                        nombreCocinaActual = cocineroValido.nombre;
+
+                        localStorage.setItem('cocinaSlug', slugTiendaGlobal);
+                        localStorage.setItem('cocinaSucursal', sucursalActivaGlobal);
+                        localStorage.setItem('cocinaCorreo', correoCocinaActual);
+                        localStorage.setItem('cocinaPassword', passwordCocinaActual);
+                        localStorage.setItem('cocinaNombre', nombreCocinaActual);
+
+                        tiendaData = data;
+                        document.getElementById('login-view').classList.add('hidden');
+                        
+                        const snapshotProductos = await dbFirestore.collection('productos').where('tiendaId', '==', slugTiendaGlobal).get();
+                        menuData = [];
+                        snapshotProductos.forEach(doc => {
+                            menuData.push({ id: doc.id, ...doc.data() });
+                        });
+                        
+                        procesarDatosDeTienda();
+                        
+                    } else {
+                        showCustomAlert("Correo o contraseña incorrectos. Verifica con el administrador.");
+                    }
+                } else {
+                    showCustomAlert(`No encontramos el restaurante "${inputSlug}".`);
+                }
+            } catch (error) {
+                console.error("Error", error);
+                showCustomAlert("Error de conexión. Intenta de nuevo.");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Entrar a Cocina / Caja";
+            }
+        }
+
+        function cerrarSesionCocina(expulsado = false) {
+            const mensaje = expulsado ? 
+                "Tu acceso ha sido revocado por el administrador. Serás desconectado." : 
+                "¿Seguro que deseas salir del panel de cocina?";
+                
+            if(expulsado || confirm(mensaje)) {
+                localStorage.removeItem('cocinaSlug');
+                localStorage.removeItem('cocinaSucursal');
+                localStorage.removeItem('cocinaCorreo');
+                localStorage.removeItem('cocinaPassword');
+                localStorage.removeItem('cocinaNombre');
+                location.reload();
+            }
+        }
+
+        // ==========================================
+        // CARGA DE DATOS Y LISTENERS
+        // ==========================================
+
+        async function forceRefreshData() {
+            const loadingScreen = document.getElementById('loading-screen');
+            const mainApp = document.getElementById('main-app-view');
+            
+            loadingScreen.classList.remove('hidden');
+            mainApp.classList.add('hidden');
+
+            try {
+                const docTienda = await dbFirestore.collection('tiendas').doc(slugTiendaGlobal).get();
+                if (docTienda.exists) {
+                    const data = docTienda.data();
+                    
+                    const listaCocina = data.cocineros || [];
+                    const sigueActivo = listaCocina.some(c => c.email.toLowerCase() === correoCocinaActual && c.password === passwordCocinaActual);
+                    
+                    if(!sigueActivo) {
+                        cerrarSesionCocina(true); 
+                        return;
+                    }
+                    tiendaData = data;
+                } else {
+                    cerrarSesionCocina(true);
+                    return;
+                }
+
+                const snapshotProductos = await dbFirestore.collection('productos').where('tiendaId', '==', slugTiendaGlobal).get();
+                menuData = [];
+                snapshotProductos.forEach(doc => {
+                    menuData.push({ id: doc.id, ...doc.data() });
+                });
+
+                procesarDatosDeTienda();
+
+            } catch (error) {
+                console.error("Error sincronizando:", error);
+                showCustomAlert("Hubo un error de conexión al sincronizar.");
+            } finally {
+                loadingScreen.classList.add('hidden');
+            }
+        }
+
+        function procesarDatosDeTienda() {
+            document.getElementById('header-store-name').innerText = tiendaData.nombreTienda || 'Restaurante';
+            if (tiendaData.apariencia && tiendaData.apariencia.logo) {
+                document.getElementById('header-logo').src = tiendaData.apariencia.logo;
+            }
+            document.getElementById('header-user-name').innerText = nombreCocinaActual;
+
+            const sucursales = tiendaData.sucursales || [];
+            const sucActual = sucursales.find(s => String(s.id) === String(sucursalActivaGlobal));
+            
+            if (sucActual) {
+                document.getElementById('header-sucursal-name').innerText = sucActual.nombre;
+            } else {
+                showCustomAlert("La sucursal a la que fuiste asignado ya no existe.");
+                cerrarSesionCocina(true);
+                return;
+            }
+
+            document.getElementById('main-app-view').classList.remove('hidden');
+            document.getElementById('main-app-view').classList.add('flex');
+            
+            iniciarListenerMesas(sucActual.cantidadMesas || 0);
+        }
+
+        // ==========================================
+        // GESTIÓN Y RENDERIZADO DE MESAS
+        // ==========================================
+
+        function reproducirSonidoAlerta() {
+            try {
+                const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+                audio.play().catch(e => console.log('Sonido bloqueado', e));
+            } catch(e) {}
+        }
+
+        function generarHashPedido(pedidoObj) {
+            if (!pedidoObj) return "";
+            return JSON.stringify(Object.entries(pedidoObj).sort((a, b) => a[0].localeCompare(b[0])));
+        }
+
+        function mostrarNotificacionToast(mensaje) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = "bg-white border-l-4 border-orange-500 shadow-2xl rounded-2xl p-4 flex items-start gap-4 transform translate-x-full transition-transform duration-300 w-[300px] mb-3";
+            
+            toast.innerHTML = `
+                <div class="p-2 bg-orange-50 rounded-full text-orange-600 shrink-0">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                </div>
+                <div class="flex-1 cursor-pointer">
+                    <h4 class="text-[15px] font-black text-gray-900 tracking-tight">¡Atención Cocina!</h4>
+                    <p class="text-[13px] font-medium text-gray-600 mt-0.5 leading-tight">${mensaje}</p>
+                </div>
+                <button class="text-gray-400 hover:text-gray-800 focus:outline-none shrink-0" onclick="this.parentElement.remove()">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            `;
+            
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.remove('translate-x-full'), 10);
+            setTimeout(() => {
+                if(toast.parentElement) {
+                    toast.classList.add('translate-x-full');
+                    setTimeout(() => toast.remove(), 300);
+                }
+            }, 8000);
+        }
+
+        function iniciarListenerMesas(cantidadMesasTotales) {
+            dbFirestore.collection('mesas_activas')
+                .where('tiendaId', '==', slugTiendaGlobal)
+                .where('sucursalId', '==', sucursalActivaGlobal)
+                .onSnapshot(snapshot => {
+                    mesasActivasGlobales = [];
+                    let haHabidoNuevos = false;
+
+                    snapshot.forEach(doc => {
+                        let docData = doc.data();
+                        mesasActivasGlobales.push({ id: doc.id, ...docData });
+
+                        const orderHash = generarHashPedido(docData.pedido);
+                        const adminVistoHash = docData.adminVistoHash || "";
+                        
+                        if (adminVistoHash !== orderHash) {
+                            if (!initialLoadMesas) {
+                                mostrarNotificacionToast(`Nueva comanda recibida en la Mesa ${docData.mesaId}`);
+                                haHabidoNuevos = true;
+                            }
+                        }
+                    });
+
+                    if (haHabidoNuevos && !initialLoadMesas) {
+                        reproducirSonidoAlerta();
+                    }
+                    
+                    initialLoadMesas = false;
+                    renderizarMesasGrid(cantidadMesasTotales);
+                });
+        }
+
+        function renderizarMesasGrid(cantidadMesas) {
+            const grid = document.getElementById('grid-mesas');
+            grid.innerHTML = '';
+
+            for(let i=1; i <= cantidadMesas; i++) {
+                const mesaData = mesasActivasGlobales.find(m => String(m.mesaId) === String(i));
+                
+                const isOcupado = !!mesaData;
+                let isNuevoPedido = false;
+
+                if (isOcupado) {
+                    const orderHash = generarHashPedido(mesaData.pedido);
+                    const adminVistoHash = mesaData.adminVistoHash || "";
+                    if (adminVistoHash !== orderHash) {
+                        isNuevoPedido = true;
+                    }
+                }
+
+                const estadoText = isOcupado ? 'Ocupada' : 'Libre';
+                const bgClass = isOcupado ? 'bg-red-500 shadow-red-200 text-white border-transparent' : 'bg-white border-2 border-gray-100 text-gray-400 shadow-sm';
+                const textNumberClass = isOcupado ? 'text-white' : 'text-gray-300';
+                const hoverClass = isOcupado ? 'hover:bg-red-600' : 'hover:border-green-400 hover:text-green-500';
+                
+                const ringEfect = isNuevoPedido ? '<div class="absolute inset-0 ring-4 ring-orange-500 rounded-2xl animate-pulse pointer-events-none z-10"></div>' : '';
+                const badgeNuevo = isNuevoPedido ? '<div class="absolute -top-2 -right-2 bg-orange-600 text-white text-[11px] font-black px-2.5 py-1.5 rounded-full shadow-lg z-20 animate-bounce uppercase tracking-wider">¡Nuevo!</div>' : '';
+
+                const onClickFunc = isOcupado ? `abrirDetalleMesa('${mesaData.id}')` : ``;
+                const cursorClass = isOcupado ? 'cursor-pointer active:scale-95' : 'cursor-default';
+
+                grid.innerHTML += `
+                    <div class="relative w-full aspect-square">
+                        ${badgeNuevo}
+                        <div onclick="${onClickFunc}" class="${bgClass} ${hoverClass} ${cursorClass} rounded-2xl shadow-lg transition-all flex flex-col items-center justify-center relative overflow-hidden group w-full h-full">
+                            ${ringEfect}
+                            ${isOcupado ? '<div class="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>' : ''}
+                            <span class="text-4xl font-black mb-1 ${textNumberClass} ${isOcupado ? 'drop-shadow-md' : ''}">${i}</span>
+                            <span class="text-[11px] font-bold uppercase tracking-wider ${isOcupado ? 'bg-black/20' : 'bg-gray-100 text-gray-500'} px-3 py-1 rounded-full mb-1">${estadoText}</span>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // ==========================================
+        // GESTIÓN DE ORDEN (ABRIR, VISTO, LIBERAR, PDF)
+        // ==========================================
+
+        function abrirDetalleMesa(docId) {
+            const mesaActiva = mesasActivasGlobales.find(m => m.id === docId);
+            if(!mesaActiva) return;
+
+            const orderHash = generarHashPedido(mesaActiva.pedido);
+            const isNuevo = mesaActiva.adminVistoHash !== orderHash;
+
+            if (isNuevo) {
+                let pedidoAnterior = {};
+                if (mesaActiva.adminVistoHash) {
+                    try {
+                        const arrayAnterior = JSON.parse(mesaActiva.adminVistoHash);
+                        arrayAnterior.forEach(([key, val]) => {
+                            pedidoAnterior[key] = val;
+                        });
+                    } catch(e) {}
+                }
+
+                let htmlNuevos = '<ul class="divide-y divide-orange-100/80">';
+                let hayNuevos = false;
+
+                for (const [prodId, qty] of Object.entries(mesaActiva.pedido)) {
+                    const item = menuData.find(i => i.id == prodId);
+                    const nombre = item ? item.nombre || item.name : 'Producto desconocido';
+                    const cantAnterior = pedidoAnterior[prodId] || 0;
+                    const cantNueva = qty - cantAnterior;
+
+                    if (cantNueva > 0) {
+                        hayNuevos = true;
+                        htmlNuevos += `
+                            <li class="py-3 flex justify-between items-center">
+                                <div class="flex items-center gap-3">
+                                    <span class="bg-orange-600 text-white font-black text-lg w-9 h-9 flex items-center justify-center rounded-xl shadow-sm">${cantNueva}x</span>
+                                    <span class="font-bold text-gray-900 text-[15px]">${nombre}</span>
+                                </div>
+                            </li>
+                        `;
+                    }
+                }
+                htmlNuevos += '</ul>';
+
+                if (hayNuevos) {
+                    document.getElementById('titulo-modal-nuevos').innerText = `Comanda Mesa ${mesaActiva.mesaId}`;
+                    document.getElementById('contenido-nuevos-pedidos').innerHTML = htmlNuevos;
+
+                    hashPendienteEntregar = orderHash;
+                    idMesaActivaAbierta = docId;
+                    
+                    const modalNuevos = document.getElementById('modal-nuevos-pedidos');
+                    const contentNuevos = document.getElementById('modal-nuevos-content');
+                    modalNuevos.classList.remove('hidden');
+                    void modalNuevos.offsetWidth;
+                    contentNuevos.classList.remove('scale-95', 'opacity-0');
+                    contentNuevos.classList.add('scale-100', 'opacity-100');
+                    return; 
+                } else {
+                    dbFirestore.collection('mesas_activas').doc(docId).update({
+                        adminVistoHash: orderHash
+                    });
+                    mesaActiva.adminVistoHash = orderHash;
+                }
+            }
+
+            idMesaActivaAbierta = docId;
+            document.getElementById('titulo-modal-mesa').innerText = `Cuenta Total - Mesa ${mesaActiva.mesaId}`;
+
+            let htmlPedido = '<ul class="divide-y divide-gray-200">';
+            let total = 0;
+            for (const [prodId, qty] of Object.entries(mesaActiva.pedido)) {
+                const item = menuData.find(i => i.id == prodId);
+                const nombre = item ? item.nombre || item.name : 'Producto desconocido';
+                const precio = item ? Number(item.precio || item.price) : 0;
+                const subtotal = precio * qty;
+                total += subtotal;
+
+                htmlPedido += `
+                    <li class="py-3.5 flex justify-between items-center">
+                        <div class="flex flex-col flex-1 pr-2">
+                            <span class="font-bold text-gray-900 text-[15px]">${qty}x ${nombre}</span>
+                            <span class="text-[12px] text-gray-500 mt-0.5">Precio unitario: $${precio.toFixed(2)}</span>
+                        </div>
+                        <span class="font-black text-[#2d7d9a] text-[16px] shrink-0">$${subtotal.toFixed(2)}</span>
+                    </li>
+                `;
+            }
+            htmlPedido += `
+                <li class="py-4 flex justify-between items-center bg-gray-100/50 mt-3 px-4 rounded-2xl border border-gray-200">
+                    <span class="font-black text-gray-900 text-[17px] uppercase tracking-wide">Total a Cobrar:</span>
+                    <span class="font-black text-orange-600 text-[22px]">$${total.toFixed(2)}</span>
+                </li>
+            </ul>`;
+
+            document.getElementById('contenido-pedido-mesa').innerHTML = htmlPedido;
+
+            const btnLiberarSinTicket = document.getElementById('btn-liberar-sin-ticket');
+            const btnLiberarConTicket = document.getElementById('btn-liberar-con-ticket');
+            
+            btnLiberarSinTicket.onclick = () => liberarMesa(docId, false);
+            btnLiberarConTicket.onclick = () => liberarMesa(docId, true);
+
+            const modal = document.getElementById('modal-detalle-mesa');
+            const content = document.getElementById('modal-detalle-content');
+            modal.classList.remove('hidden'); document.body.classList.add('modal-open');
+            void modal.offsetWidth;
+            content.classList.remove('scale-95', 'opacity-0');
+            content.classList.add('scale-100', 'opacity-100');
+        }
+
+        function cerrarModalNuevos() {
+            const content = document.getElementById('modal-nuevos-content');
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                document.getElementById('modal-nuevos-pedidos').classList.add('hidden');
+                idMesaActivaAbierta = null;
+            }, 300);
+        }
+
+        function cerrarModalDetalleMesa() {
+            const content = document.getElementById('modal-detalle-content');
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                document.getElementById('modal-detalle-mesa').classList.add('hidden');
+                document.body.classList.remove('modal-open');
+                idMesaActivaAbierta = null;
+            }, 300);
+        }
+
+        function marcarPedidoEntregado() {
+            if (!idMesaActivaAbierta || !hashPendienteEntregar) return;
+
+            const docId = idMesaActivaAbierta;
+            const orderHash = hashPendienteEntregar;
+            const btn = document.getElementById('btn-entregar-pedido');
+            const textoOriginal = btn.innerHTML;
+            
+            btn.innerHTML = `<svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Marcando...`;
+            btn.disabled = true;
+
+            dbFirestore.collection('mesas_activas').doc(docId).update({
+                adminVistoHash: orderHash
+            }).then(() => {
+                cerrarModalNuevos();
+            }).catch(e => {
+                console.error("Error al marcar visto:", e);
+                showCustomAlert("Hubo un error al marcar como preparado.");
+            }).finally(() => {
+                setTimeout(() => {
+                    btn.innerHTML = textoOriginal;
+                    btn.disabled = false;
+                }, 300);
+            });
+        }
+
+        async function liberarMesa(docId, generarPDF) {
+            const mensaje = generarPDF 
+                ? '¿Seguro que deseas cobrar, generar el ticket y liberar esta mesa?' 
+                : '¿Seguro que deseas liberar esta mesa sin ticket? Toda la orden se borrará.';
+                
+            if(confirm(mensaje)) {
+                if (generarPDF) {
+                    await generarTicketPDFCocina(docId);
+                }
+                
+                dbFirestore.collection('mesas_activas').doc(docId).delete()
+                    .then(() => {
+                        cerrarModalDetalleMesa();
+                    })
+                    .catch(e => console.error("Error al liberar mesa:", e));
+            }
+        }
+
+        // GENERACIÓN DE TICKET CON LOGO, FECHA, HORA, SIN "ATENDIDO POR[span_0](start_span)[span_1](start_span)[span_2](start_span)"[span_0](end_span)[span_1](end_span)[span_2](end_span)
+        function generarTicketPDFCocina(docId) {
+            return new Promise((resolve) => {
+                try {
+                    const mesaActiva = mesasActivasGlobales.find(m => m.id === docId);
+                    if(!mesaActiva) return resolve();
+                    
+                    const sucursales = tiendaData.sucursales || [];
+                    const sucActual = sucursales.find(s => String(s.id) === String(sucursalActivaGlobal));
+                    const nombreTienda = tiendaData.nombreTienda || 'Restaurante';
+                    
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF({ unit: 'mm', format: [80, 200] });
+
+                    let y = 10;
+                    const centerX = 40; 
+                    
+                    const crearContenido = (logoDataUrl = null) => {
+                        if (logoDataUrl) {
+                            // Centrar logo de 20x20mm
+                            doc.addImage(logoDataUrl, 'PNG', 30, y, 20, 20);
+                            y += 24;
+                        } else {
+                            y += 5;
+                        }
+
+                        doc.setFont("helvetica", "bold");
+                        doc.setFontSize(14);
+                        doc.text(nombreTienda, centerX, y, { align: "center" });
+                        y += 6;
+                        
+                        doc.setFont("helvetica", "normal");
+                        doc.setFontSize(10);
+                        if (sucActual) {
+                            doc.text(sucActual.nombre, centerX, y, { align: "center" });
+                            y += 5;
+                            const dirLines = doc.splitTextToSize(sucActual.direccion || '', 70);
+                            doc.text(dirLines, centerX, y, { align: "center" });
+                            y += (dirLines.length * 4) + 2;
+                        }
+                        
+                        doc.setFont("helvetica", "bold");
+                        doc.setFontSize(12);
+                        doc.text(`MESA: ${mesaActiva.mesaId}`, centerX, y, { align: "center" });
+                        y += 6;
+
+                        // Agregar Fecha y Hora
+                        const fechaActual = new Date();
+                        const fechaStr = fechaActual.toLocaleDateString('es-MX');
+                        const horaStr = fechaActual.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+                        doc.setFont("helvetica", "normal");
+                        doc.setFontSize(9);
+                        doc.text(`Fecha: ${fechaStr} ${horaStr}`, centerX, y, { align: "center" });
+                        y += 6;
+                        
+                        doc.setLineWidth(0.5);
+                        doc.line(5, y, 75, y);
+                        y += 4;
+                        
+                        let total = 0;
+                        const tableData = [];
+                        for (const [prodId, qty] of Object.entries(mesaActiva.pedido)) {
+                            const item = menuData.find(i => i.id == prodId);
+                            const nombre = item ? item.nombre || item.name : 'Producto';
+                            const precio = item ? Number(item.precio || item.price) : 0;
+                            const subtotal = precio * qty;
+                            total += subtotal;
+                            tableData.push([`${qty}x ${nombre}`, `$${subtotal.toFixed(2)}`]);
+                        }
+
+                        doc.autoTable({
+                            startY: y,
+                            head: [['Cant. Artículo', 'Subtotal']],
+                            body: tableData,
+                            theme: 'plain',
+                            styles: { fontSize: 9, cellPadding: 1, overflow: 'linebreak', font: 'helvetica' },
+                            columnStyles: { 1: { halign: 'right', cellWidth: 20 } },
+                            margin: { left: 5, right: 5 }
+                        });
+
+                        y = doc.lastAutoTable.finalY + 5;
+                        doc.line(5, y, 75, y);
+                        y += 5;
+                        
+                        doc.setFontSize(11);
+                        doc.setFont("helvetica", "bold");
+                        doc.text("TOTAL:", 5, y);
+                        doc.text(`$${total.toFixed(2)}`, 75, y, { align: "right" });
+                        y += 10;
+                        
+                        doc.setFontSize(10);
+                        doc.setFont("helvetica", "italic");
+                        doc.text("¡Gracias por su preferencia!", centerX, y, { align: "center" });
+                        // Eliminada la frase "Atendido por" a petición.
+                        
+                        doc.save(`Ticket_Mesa_${mesaActiva.mesaId}.pdf`);
+                        resolve();
+                    };
+
+                    if (tiendaData && tiendaData.apariencia && tiendaData.apariencia.logo) {
+                        const img = new Image();
+                        img.crossOrigin = "Anonymous";
+                        img.onload = function() {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = img.width;
+                            canvas.height = img.height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0);
+                            const dataUrl = canvas.toDataURL('image/png');
+                            crearContenido(dataUrl);
+                        };
+                        img.onerror = function() {
+                            crearContenido(null);
+                        };
+                        img.src = tiendaData.apariencia.logo;
+                    } else {
+                        crearContenido(null);
+                    }
+
+                } catch(e) {
+                    console.error("Error generando PDF:", e);
+                    alert("No se pudo generar el PDF. Verifica que tu navegador permita descargas.");
+                    resolve();
+                }
+            });
+        }
+
+        // ==========================================
+        // UTILIDADES
+        // ==========================================
+        
+        function showCustomAlert(message, title = "Aviso") {
+            document.getElementById('custom-alert-title').innerText = title;
+            document.getElementById('custom-alert-message').innerText = message;
+            
+            const modal = document.getElementById('custom-alert');
+            const bg = document.getElementById('custom-alert-bg');
+            const content = document.getElementById('custom-alert-content');
+            
+            modal.classList.remove('hidden');
+            void modal.offsetWidth; 
+            
+            bg.classList.remove('opacity-0');
+            content.classList.remove('scale-90', 'opacity-0');
+            content.classList.add('scale-100', 'opacity-100');
+        }
+
+        function closeCustomAlert() {
+            const modal = document.getElementById('custom-alert');
+            const bg = document.getElementById('custom-alert-bg');
+            const content = document.getElementById('custom-alert-content');
+            
+            bg.classList.add('opacity-0');
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-90', 'opacity-0');
+            
+            setTimeout(() => { modal.classList.add('hidden'); }, 200);
+        }
+
+        // Arrancar
+        window.onload = checkInitialState;
+    </script>
+</body>
+</html>
