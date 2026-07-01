@@ -22,8 +22,6 @@
 </head>
 <body class="text-gray-800 antialiased min-h-screen">
 
-    <div id="toast-container" class="fixed top-5 right-5 z-[100] flex flex-col gap-3 overflow-visible pointer-events-none p-2"></div>
-
     <div id="loading-view" class="min-h-screen flex flex-col items-center justify-center p-4 bg-white z-[100] relative">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mb-4"></div>
         <p class="text-gray-500 font-bold tracking-wide">Cargando tu panel...</p>
@@ -69,10 +67,9 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                     Meseros
                 </button>
-                <button onclick="switchTab('mesas')" id="tab-mesas" class="w-full text-left px-4 py-3 rounded-xl font-semibold text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors flex items-center gap-3 relative">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z"></path></svg>
-                    Mesas
-                    <span id="badge-sidebar-mesas" class="ml-auto bg-orange-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full hidden shadow-sm animate-pulse">0</span>
+                <button onclick="switchTab('cocina')" id="tab-cocina" class="w-full text-left px-4 py-3 rounded-xl font-semibold text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors flex items-center gap-3">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    Personal Cocina
                 </button>
                 <button onclick="switchTab('pagos')" id="tab-pagos" class="w-full text-left px-4 py-3 rounded-xl font-semibold text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors flex items-center gap-3">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
@@ -400,54 +397,54 @@
                     <div id="grid-meseros" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
                 </div>
 
-                <div id="seccion-mesas" class="hidden p-4 sm:p-8 max-w-7xl mx-auto pb-10">
-                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-                        <h3 class="text-2xl font-black text-gray-800 tracking-tight">Gestión de Mesas</h3>
-                        <div class="w-full sm:w-auto">
-                            <select id="select-sucursal-mesas" onchange="renderizarMesas()" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-bold text-gray-700 shadow-sm focus:outline-none focus:border-[#2d7d9a] transition-all">
-                                <option value="">Selecciona Sucursal...</option>
-                            </select>
-                        </div>
+                <div id="seccion-cocina" class="hidden p-4 sm:p-8 max-w-5xl mx-auto pb-10">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-black text-gray-800 tracking-tight">Personal de Cocina / Pedidos</h3>
+                        <button onclick="abrirModalCocina()" class="bg-[#2d7d9a] hover:bg-[#23647a] text-white font-bold py-2 sm:py-2.5 px-4 sm:px-5 rounded-xl shadow-md transition-transform active:scale-95 text-sm flex items-center gap-2">
+                            + Personal
+                        </button>
                     </div>
-                    
-                    <div id="grid-mesas" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                    </div>
-                </div>
 
-                <div id="modal-detalle-mesa" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-[60] hidden flex items-center justify-center p-4">
-                    <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] flex flex-col relative overflow-hidden">
-                        
-                        <div class="flex justify-between items-center mb-4 border-b pb-2">
-                            <h4 id="titulo-modal-mesa" class="font-bold text-gray-900 text-lg">Mesa X - Pedido</h4>
-                            <button onclick="cerrarModalDetalleMesa()" class="text-gray-400 hover:text-gray-700 text-2xl font-bold leading-none">&times;</button>
-                        </div>
-                        <div id="contenido-pedido-mesa" class="overflow-y-auto flex-grow text-sm text-gray-700 mb-4 bg-gray-50 p-3 rounded-lg border border-gray-100 relative z-10">
-                        </div>
-                        <div class="flex justify-between items-center w-full gap-2 mt-auto border-t border-gray-100 pt-4 relative z-10">
-                            <button onclick="cerrarModalDetalleMesa()" class="bg-gray-100 text-gray-700 font-bold py-2.5 px-4 rounded-xl hover:bg-gray-200 transition-colors text-sm flex-1">Cerrar</button>
-                            <button id="btn-liberar-sin-ticket" class="bg-red-500 text-white font-bold py-2.5 px-3 rounded-xl shadow-md hover:bg-red-600 transition-transform active:scale-95 text-[11px] sm:text-xs flex-1">Liberar sin ticket</button>
-                            <button id="btn-liberar-con-ticket" class="bg-[#2d7d9a] text-white font-bold py-2.5 px-3 rounded-xl shadow-md hover:bg-[#23647a] transition-transform active:scale-95 text-[11px] sm:text-xs flex-1">Liberar y Descargar PDF</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="modal-nuevos-pedidos" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-[70] hidden flex items-center justify-center p-4">
-                    <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] flex flex-col relative overflow-hidden ring-4 ring-orange-500">
-                        <div class="flex justify-between items-center mb-4 border-b pb-2 border-orange-100">
-                            <div class="flex items-center gap-2">
-                                <span class="bg-orange-600 text-white text-[11px] font-black px-2 py-1 rounded-md animate-pulse">NUEVO</span>
-                                <h4 id="titulo-modal-nuevos" class="font-bold text-gray-900 text-lg">Mesa X</h4>
+                    <div id="modal-cocina" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+                        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-xl border border-gray-100 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+                            <div class="flex justify-between items-center mb-5 border-b pb-2">
+                                <h4 id="titulo-modal-cocina" class="font-bold text-gray-900">Agregar Personal de Cocina</h4>
+                                <button onclick="cerrarModalCocina()" class="text-gray-400 hover:text-gray-700 text-2xl font-bold leading-none">&times;</button>
                             </div>
-                            <button onclick="cerrarModalNuevos()" class="text-gray-400 hover:text-gray-700 text-2xl font-bold leading-none">&times;</button>
-                        </div>
-                        <p class="text-sm text-gray-600 mb-3 font-medium">Acaban de pedir lo siguiente:</p>
-                        <div id="contenido-nuevos-pedidos" class="overflow-y-auto flex-grow text-sm text-gray-700 mb-4 bg-orange-50/50 p-3 rounded-lg border border-orange-100 relative z-10">
-                        </div>
-                        <div class="grid grid-cols-2 w-full gap-2 mt-auto border-t border-gray-100 pt-4 relative z-10">
-                            <button onclick="cerrarModalNuevos()" class="bg-gray-100 text-gray-700 font-bold py-3 px-2 rounded-xl hover:bg-gray-200 transition-colors text-[12px] sm:text-sm shadow-sm active:scale-95 text-center">¡Entendido, a preparar!</button>
-                            <button id="btn-entregar-pedido" onclick="marcarPedidoEntregado()" class="bg-orange-600 text-white font-bold py-3 px-2 rounded-xl hover:bg-orange-700 transition-colors text-[12px] sm:text-sm shadow-md active:scale-95 text-center">Entregar pedido</button>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Nombre Completo</label>
+                                    <input type="text" id="cocina-nombre" placeholder="Ej. Cocinero Juan" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#2d7d9a] focus:bg-white transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Correo de Acceso (Usuario)</label>
+                                    <input type="email" id="cocina-email" placeholder="Ej. cocina@mitienda.com" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#2d7d9a] focus:bg-white transition-all">
+                                    <p class="text-[11px] text-gray-400 mt-1">Este usuario entrará al panel de Cocina para gestionar pedidos.</p>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Contraseña</label>
+                                    <input type="text" id="cocina-password" placeholder="Asigna una contraseña segura" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#2d7d9a] focus:bg-white transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Sucursal Asignada</label>
+                                    <select id="cocina-sucursal" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#2d7d9a] focus:bg-white transition-all cursor-pointer">
+                                        </select>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-end gap-3 mt-6">
+                                <button onclick="cerrarModalCocina()" class="bg-gray-100 text-gray-700 font-bold py-3 px-6 rounded-xl hover:bg-gray-200 transition-colors text-sm">
+                                    Cancelar
+                                </button>
+                                <button id="btn-guardar-cocina" onclick="guardarCocina()" class="bg-[#2d7d9a] text-white font-bold py-3 px-8 rounded-xl shadow-md hover:bg-[#23647a] transition-transform active:scale-95 text-sm min-w-[140px]">
+                                    Guardar
+                                </button>
+                            </div>
                         </div>
                     </div>
+
+                    <div id="grid-cocina" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
                 </div>
 
                 <div id="seccion-pagos" class="hidden p-4 sm:p-8 max-w-4xl mx-auto pb-10">
@@ -694,85 +691,18 @@
         let indexSucursalEdicion = null; 
         let indexMetodoEdicion = null;
         let indexMeseroEdicion = null;
+        let indexCocinaEdicion = null;
         
         let dbLocal = {
             categorias: [],
             productos: [],
             sucursales: [],
-            mesasActivas: [],
             metodosPago: [],
-            meseros: []
+            meseros: [],
+            cocineros: []
         };
         let currentApariencia = { logo: '', portada: '' };
         
-        // --- SISTEMA DE NOTIFICACIONES PARA PEDIDOS NUEVOS ---
-        let initialLoadMesas = true;
-        let idMesaActivaAbierta = null;
-        let hashPendienteEntregar = null; 
-
-        function reproducirSonidoAlerta() {
-            try {
-                const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
-                audio.play().catch(e => console.log('Sonido bloqueado por el navegador', e));
-            } catch(e) {}
-        }
-
-        function generarHashPedido(pedidoObj) {
-            if (!pedidoObj) return "";
-            return JSON.stringify(Object.entries(pedidoObj).sort((a, b) => a[0].localeCompare(b[0])));
-        }
-
-        function mostrarNotificacionToast(mensaje, mesaId) {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = "bg-white border-l-4 border-orange-500 shadow-2xl rounded-lg p-4 flex items-start gap-3 transform translate-x-full transition-transform duration-300 w-80 mb-2";
-            
-            toast.innerHTML = `
-                <div class="p-2 bg-orange-50 rounded-full text-orange-500 shrink-0">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-                </div>
-                <div class="flex-1 cursor-pointer" onclick="switchTab('mesas')">
-                    <h4 class="text-sm font-bold text-gray-900">¡Pedido Nuevo!</h4>
-                    <p class="text-[13px] text-gray-600 mt-1">${mensaje}</p>
-                </div>
-                <button class="text-gray-400 hover:text-gray-600 focus:outline-none shrink-0" onclick="this.parentElement.remove()">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            `;
-            
-            container.appendChild(toast);
-            
-            setTimeout(() => toast.classList.remove('translate-x-full'), 10);
-            
-            setTimeout(() => {
-                if(toast.parentElement) {
-                    toast.classList.add('translate-x-full');
-                    setTimeout(() => toast.remove(), 300);
-                }
-            }, 6000);
-        }
-
-        function actualizarBadgeSidebar() {
-            const badge = document.getElementById('badge-sidebar-mesas');
-            let pedidosNuevos = 0;
-            
-            dbLocal.mesasActivas.forEach(mesa => {
-                const orderHash = generarHashPedido(mesa.pedido);
-                const dbVistoHash = mesa.adminVistoHash || "";
-                if (dbVistoHash !== orderHash) {
-                    pedidosNuevos++;
-                }
-            });
-
-            if(pedidosNuevos > 0) {
-                badge.innerText = pedidosNuevos;
-                badge.classList.remove('hidden');
-            } else {
-                badge.classList.add('hidden');
-            }
-        }
-        // ---------------------------------------------------
-
         async function descargarQRGeneral(nombreAccion, titulo, subtitulo) {
             const url = `https://mimenudigitalmx.com/${miTiendaId}`;
             const nombreTienda = document.getElementById('conf-nombre-tienda').value.trim() || 'MI TIENDA';
@@ -900,127 +830,6 @@
             }
         }
 
-        async function descargarQRMesa(event, url, numeroMesa) {
-            event.stopPropagation();
-            
-            const canvasQR = document.createElement('canvas');
-            const qrSize = 500;
-            const qr = new QRious({
-                element: canvasQR,
-                value: url,
-                size: qrSize,
-                level: 'H'
-            });
-
-            const finalCanvas = document.createElement('canvas');
-            finalCanvas.width = 800;
-            finalCanvas.height = 1100;
-            const ctx = finalCanvas.getContext('2d');
-            
-            ctx.fillStyle = '#f2f2f7';
-            ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
-            
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
-            ctx.shadowBlur = 40;
-            ctx.shadowOffsetY = 20;
-            ctx.fillStyle = '#ffffff';
-            ctx.beginPath();
-            if (ctx.roundRect) {
-                ctx.roundRect(50, 50, 700, 1000, 40);
-            } else {
-                ctx.fillRect(50, 50, 700, 1000);
-            }
-            ctx.fill();
-            ctx.shadowColor = 'transparent';
-
-            ctx.fillStyle = '#ea580c';
-            ctx.beginPath();
-            if (ctx.roundRect) {
-                ctx.roundRect(50, 50, 700, 220, {tl: 40, tr: 40, bl: 0, br: 0});
-            } else {
-                ctx.fillRect(50, 50, 700, 220);
-            }
-            ctx.fill();
-
-            ctx.fillStyle = '#ffffff';
-            ctx.font = '900 80px Inter, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText('ORDENA AQUÍ', 400, 150);
-            
-            ctx.font = '600 28px Inter, sans-serif';
-            ctx.fillText('ESCANEA EL CÓDIGO', 400, 215);
-
-            const qrX = (800 - qrSize) / 2;
-            const qrY = 320;
-            
-            ctx.lineWidth = 4;
-            ctx.strokeStyle = '#f3f4f6';
-            ctx.strokeRect(qrX - 10, qrY - 10, qrSize + 20, qrSize + 20);
-
-            ctx.drawImage(canvasQR, qrX, qrY);
-
-            ctx.beginPath();
-            ctx.moveTo(150, 890);
-            ctx.lineTo(650, 890);
-            ctx.strokeStyle = '#e5e7eb';
-            ctx.lineWidth = 3;
-            ctx.stroke();
-
-            ctx.fillStyle = '#111827';
-            ctx.font = '900 70px Inter, sans-serif';
-            ctx.fillText('MESA ' + numeroMesa, 400, 990);
-
-            const descargarCanvas = () => {
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF({
-                    orientation: 'portrait',
-                    unit: 'px',
-                    format: [finalCanvas.width, finalCanvas.height]
-                });
-                pdf.addImage(finalCanvas.toDataURL('image/png', 1.0), 'PNG', 0, 0, finalCanvas.width, finalCanvas.height);
-                pdf.save(`Display_Mesa_${numeroMesa}_MiMenuDigital.pdf`);
-            };
-
-            if (currentApariencia && currentApariencia.logo) {
-                const logoImg = new Image();
-                logoImg.crossOrigin = "Anonymous"; 
-                
-                logoImg.onload = () => {
-                    const logoSize = qrSize * 0.25; 
-                    const logoX = qrX + (qrSize - logoSize) / 2;
-                    const logoY = qrY + (qrSize - logoSize) / 2;
-
-                    ctx.fillStyle = '#ffffff';
-                    ctx.beginPath();
-                    ctx.arc(qrX + qrSize / 2, qrY + qrSize / 2, logoSize / 2 + 10, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    ctx.save();
-                    ctx.beginPath();
-                    ctx.arc(qrX + qrSize / 2, qrY + qrSize / 2, logoSize / 2, 0, Math.PI * 2);
-                    ctx.clip();
-                    ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
-                    ctx.restore();
-
-                    ctx.beginPath();
-                    ctx.arc(qrX + qrSize / 2, qrY + qrSize / 2, logoSize / 2, 0, Math.PI * 2);
-                    ctx.lineWidth = 3;
-                    ctx.strokeStyle = '#ffffff';
-                    ctx.stroke();
-
-                    descargarCanvas();
-                };
-                
-                logoImg.onerror = () => {
-                    descargarCanvas();
-                };
-                
-                logoImg.src = currentApariencia.logo;
-            } else {
-                descargarCanvas(); 
-            }
-        }
-
         auth.onAuthStateChanged(async (user) => {
             if (user) {
                 document.getElementById('sidebar-user-email').innerText = user.email;
@@ -1089,6 +898,7 @@
                     dbLocal.categorias = data.categorias || [];
                     dbLocal.sucursales = data.sucursales || [];
                     dbLocal.meseros = data.meseros || [];
+                    dbLocal.cocineros = data.cocineros || [];
                     
                     let metodosData = data.metodosPago || [];
                     
@@ -1146,9 +956,9 @@
                     actualizarChecklist(data);
                     renderizarListas();
                     renderizarSucursales();
-                    actualizarSelectSucursalesMesas();
                     renderizarMetodosPago();
                     renderizarMeseros();
+                    renderizarCocina();
                 }
             });
 
@@ -1159,38 +969,6 @@
                 });
                 actualizarChecklistProd();
                 renderizarListas();
-            });
-
-            dbFirestore.collection('mesas_activas').where('tiendaId', '==', miTiendaId).onSnapshot(snapshot => {
-                dbLocal.mesasActivas = [];
-                let haHabidoNuevos = false;
-
-                snapshot.forEach(doc => {
-                    let docData = doc.data();
-                    let docId = doc.id;
-                    dbLocal.mesasActivas.push({ id: docId, ...docData });
-
-                    const orderHash = generarHashPedido(docData.pedido);
-                    const adminVistoHash = docData.adminVistoHash || "";
-                    
-                    if (adminVistoHash !== orderHash) {
-                        if (!initialLoadMesas) {
-                            mostrarNotificacionToast(`Tienes una actualización en la Mesa ${docData.mesaId}`, docData.mesaId);
-                            haHabidoNuevos = true;
-                        }
-                    }
-                });
-
-                if (haHabidoNuevos && !initialLoadMesas) {
-                    reproducirSonidoAlerta();
-                }
-                
-                initialLoadMesas = false;
-                actualizarBadgeSidebar();
-
-                if(!document.getElementById('seccion-mesas').classList.contains('hidden')){
-                    renderizarMesas();
-                }
             });
         }
 
@@ -1403,7 +1181,7 @@
         }
 
         function switchTab(tab) {
-            const tabs = ['inicio', 'productos', 'sucursales', 'meseros', 'mesas', 'pagos', 'configuracion']; 
+            const tabs = ['inicio', 'productos', 'sucursales', 'meseros', 'cocina', 'pagos', 'configuracion']; 
             
             tabs.forEach(t => {
                 const seccion = document.getElementById(`seccion-${t}`);
@@ -1427,12 +1205,11 @@
             if(window.innerWidth < 1024 && !sidebar.classList.contains('-translate-x-full')) {
                 toggleSidebar();
             }
-
-            if(tab === 'mesas') {
-                renderizarMesas();
-            }
         }
 
+        // ==========================================
+        // GESTIÓN DE MESEROS
+        // ==========================================
         function actualizarSelectSucursalesMeseros() {
             const select = document.getElementById('mesero-sucursal');
             if(select) {
@@ -1557,6 +1334,138 @@
                 </div>`;
             });
         }
+
+        // ==========================================
+        // GESTIÓN DE COCINEROS (NUEVA)
+        // ==========================================
+        function actualizarSelectSucursalesCocina() {
+            const select = document.getElementById('cocina-sucursal');
+            if(select) {
+                select.innerHTML = '<option value="">Selecciona Sucursal...</option>';
+                dbLocal.sucursales.forEach(suc => {
+                    select.innerHTML += `<option value="${suc.id}">${suc.nombre}</option>`;
+                });
+            }
+        }
+
+        function abrirModalCocina() {
+            actualizarSelectSucursalesCocina();
+            document.getElementById('modal-cocina').classList.remove('hidden');
+        }
+
+        function cerrarModalCocina() {
+            document.getElementById('modal-cocina').classList.add('hidden');
+            document.getElementById('cocina-nombre').value = '';
+            document.getElementById('cocina-email').value = '';
+            document.getElementById('cocina-password').value = '';
+            document.getElementById('cocina-sucursal').value = '';
+            indexCocinaEdicion = null;
+            document.getElementById('titulo-modal-cocina').innerText = "Agregar Personal de Cocina";
+            document.getElementById('btn-guardar-cocina').innerText = "Guardar";
+        }
+
+        function editarCocina(index) {
+            indexCocinaEdicion = index;
+            const c = dbLocal.cocineros[index];
+            document.getElementById('cocina-nombre').value = c.nombre || '';
+            document.getElementById('cocina-email').value = c.email || '';
+            document.getElementById('cocina-password').value = c.password || '';
+            actualizarSelectSucursalesCocina();
+            document.getElementById('cocina-sucursal').value = c.sucursalId || '';
+            
+            document.getElementById('titulo-modal-cocina').innerText = "Editar Personal de Cocina";
+            document.getElementById('btn-guardar-cocina').innerText = "Actualizar";
+            document.getElementById('modal-cocina').classList.remove('hidden');
+        }
+
+        function guardarCocina() {
+            const nombre = document.getElementById('cocina-nombre').value.trim();
+            const email = document.getElementById('cocina-email').value.trim();
+            const password = document.getElementById('cocina-password').value.trim();
+            const sucursalId = document.getElementById('cocina-sucursal').value;
+
+            if(!nombre || !email || !password || !sucursalId) {
+                alert("Por favor llena todos los campos, incluyendo la sucursal.");
+                return;
+            }
+
+            const cocinaData = {
+                id: (indexCocinaEdicion !== null && dbLocal.cocineros[indexCocinaEdicion].id) ? dbLocal.cocineros[indexCocinaEdicion].id : Date.now().toString(),
+                nombre: nombre,
+                email: email,
+                password: password,
+                sucursalId: sucursalId
+            };
+
+            if (indexCocinaEdicion !== null) {
+                dbLocal.cocineros[indexCocinaEdicion] = cocinaData;
+            } else {
+                if(dbLocal.cocineros.some(c => c.email.toLowerCase() === email.toLowerCase())) {
+                    alert("Este correo ya está registrado para otro personal de cocina.");
+                    return;
+                }
+                dbLocal.cocineros.push(cocinaData);
+            }
+
+            dbFirestore.collection('tiendas').doc(miTiendaId).update({
+                cocineros: dbLocal.cocineros
+            }).then(() => {
+                cerrarModalCocina();
+            }).catch(err => {
+                console.error("Error guardando personal de cocina: ", err);
+                alert("Error al guardar personal.");
+            });
+        }
+
+        function eliminarCocina(index) {
+            if(confirm('¿Seguro que deseas eliminar este usuario de cocina? Perderá el acceso inmediatamente.')) {
+                dbLocal.cocineros.splice(index, 1);
+                dbFirestore.collection('tiendas').doc(miTiendaId).update({
+                    cocineros: dbLocal.cocineros
+                });
+            }
+        }
+
+        function renderizarCocina() {
+            const grid = document.getElementById('grid-cocina');
+            if(!grid) return;
+            grid.innerHTML = '';
+
+            if(dbLocal.cocineros.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-10 bg-white rounded-2xl border border-dashed border-gray-300 text-gray-500">No hay personal de cocina registrado.</div>`;
+                return;
+            }
+
+            dbLocal.cocineros.forEach((c, index) => {
+                const sucursal = dbLocal.sucursales.find(s => String(s.id) === String(c.sucursalId));
+                const nombreSucursal = sucursal ? sucursal.nombre : 'Sucursal no encontrada';
+
+                grid.innerHTML += `
+                <div class="bg-white rounded-[20px] p-5 shadow-sm border border-gray-100 flex flex-col gap-3 relative group hover:shadow-md transition-all">
+                    <div class="flex items-center gap-3 border-b border-gray-100 pb-3">
+                        <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-black text-lg">
+                            ${c.nombre.charAt(0).toUpperCase()}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-bold text-gray-900 truncate text-lg">${c.nombre}</h4>
+                            <p class="text-[13px] text-gray-500 truncate">${nombreSucursal}</p>
+                        </div>
+                    </div>
+                    <div class="text-[13px] text-gray-600 space-y-1">
+                        <p><b>Usuario:</b> ${c.email}</p>
+                        <p><b>Contraseña:</b> ${c.password}</p>
+                    </div>
+                    <div class="flex gap-2 mt-2">
+                        <button onclick="editarCocina(${index})" class="flex-1 py-2 bg-blue-50 text-blue-600 font-bold rounded-lg hover:bg-blue-100 transition-colors text-xs active:scale-95">Editar</button>
+                        <button onclick="eliminarCocina(${index})" class="flex-1 py-2 bg-red-50 text-red-600 font-bold rounded-lg hover:bg-red-100 transition-colors text-xs active:scale-95">Eliminar</button>
+                    </div>
+                </div>`;
+            });
+        }
+
+        // ==========================================
+        // MÉTODOS DE PAGO Y RESTO DE FUNCIONES
+        // ==========================================
 
         function renderizarMetodosPago() {
             const lista = document.getElementById('lista-metodos-pago');
@@ -1875,352 +1784,6 @@
                         </button>
                     </div>
                 </div>`;
-            });
-        }
-
-        function actualizarSelectSucursalesMesas() {
-            const select = document.getElementById('select-sucursal-mesas');
-            select.innerHTML = '<option value="">Selecciona Sucursal...</option>';
-            dbLocal.sucursales.forEach(suc => {
-                select.innerHTML += `<option value="${suc.id}">${suc.nombre}</option>`;
-            });
-        }
-
-        function renderizarMesas() {
-            const sucursalId = document.getElementById('select-sucursal-mesas').value;
-            const grid = document.getElementById('grid-mesas');
-            grid.innerHTML = '';
-
-            if(!sucursalId) {
-                grid.innerHTML = `<div class="col-span-full text-center py-10 bg-white rounded-2xl border border-dashed border-gray-300 text-gray-500">Selecciona una sucursal arriba para ver sus mesas.</div>`;
-                return;
-            }
-
-            const sucursal = dbLocal.sucursales.find(s => s.id === sucursalId);
-            if(!sucursal || !sucursal.cantidadMesas) {
-                grid.innerHTML = `<div class="col-span-full text-center py-10 bg-white rounded-2xl border border-dashed border-gray-300 text-gray-500">Esta sucursal no tiene mesas configuradas. Edítala en la pestaña Sucursales.</div>`;
-                return;
-            }
-
-            for(let i=1; i <= sucursal.cantidadMesas; i++) {
-                const mesaActiva = dbLocal.mesasActivas.find(m => String(m.mesaId) === String(i) && String(m.sucursalId) === String(sucursalId));
-                
-                const isOcupado = !!mesaActiva;
-                let isNuevoPedido = false;
-
-                if (isOcupado) {
-                    const orderHash = generarHashPedido(mesaActiva.pedido);
-                    const dbVistoHash = mesaActiva.adminVistoHash || "";
-                    if (dbVistoHash !== orderHash) {
-                        isNuevoPedido = true;
-                    }
-                }
-
-                const estadoText = isOcupado ? 'Ocupado' : 'Disponible';
-                let bgClass = isOcupado ? 'bg-red-500 hover:bg-red-600 shadow-red-200' : 'bg-green-500 hover:bg-green-600 shadow-green-200';
-                
-                const ringEfect = isNuevoPedido ? '<div class="absolute inset-0 ring-4 ring-orange-500 rounded-2xl animate-pulse pointer-events-none"></div>' : '';
-                const badgeNuevo = isNuevoPedido ? '<div class="absolute -top-2 -right-2 bg-orange-600 text-white text-[11px] font-black px-2.5 py-1 rounded-full shadow-lg z-20 animate-bounce">¡NUEVO!</div>' : '';
-
-                const onClickFunc = isOcupado ? `abrirDetalleMesa('${mesaActiva.id}')` : `alert('Mesa libre. Los usuarios pueden solicitarla desde el menú.')`;
-
-                grid.innerHTML += `
-                    <div class="relative">
-                        ${badgeNuevo}
-                        ${ringEfect}
-                        <div onclick="${onClickFunc}" class="${bgClass} text-white p-5 rounded-2xl shadow-lg cursor-pointer transition-all active:scale-95 flex flex-col items-center justify-center h-32 relative overflow-hidden group w-full">
-                            <div class="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
-                            <span class="text-3xl font-black mb-1 drop-shadow-md">${i}</span>
-                            <span class="text-[11px] font-bold uppercase tracking-wider bg-black/20 px-2 py-0.5 rounded-full mb-1">${estadoText}</span>
-                            
-                            <button onclick="descargarQRMesa(event, 'https://mimenudigitalmx.com/${miTiendaId}?sucursal=${sucursalId}&mesa=${i}', ${i})" class="absolute bottom-2 right-2 bg-black/20 hover:bg-black/40 p-2 rounded-lg backdrop-blur-sm transition-colors z-10" title="Descargar QR de esta mesa">
-                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }
-        }
-
-        function abrirDetalleMesa(docId) {
-            const mesaActiva = dbLocal.mesasActivas.find(m => m.id === docId);
-            if(!mesaActiva) return;
-
-            const orderHash = generarHashPedido(mesaActiva.pedido);
-            const isNuevo = mesaActiva.adminVistoHash !== orderHash;
-
-            if (isNuevo) {
-                let pedidoAnterior = {};
-                if (mesaActiva.adminVistoHash) {
-                    try {
-                        const arrayAnterior = JSON.parse(mesaActiva.adminVistoHash);
-                        arrayAnterior.forEach(([key, val]) => {
-                            pedidoAnterior[key] = val;
-                        });
-                    } catch(e) {}
-                }
-
-                let htmlNuevos = '<ul class="divide-y divide-orange-200/50">';
-                let hayNuevos = false;
-
-                for (const [prodId, qty] of Object.entries(mesaActiva.pedido)) {
-                    const item = dbLocal.productos.find(i => i.id == prodId);
-                    const nombre = item ? item.nombre : 'Producto desconocido';
-                    
-                    const cantAnterior = pedidoAnterior[prodId] || 0;
-                    const cantNueva = qty - cantAnterior;
-
-                    if (cantNueva > 0) {
-                        hayNuevos = true;
-                        htmlNuevos += `
-                            <li class="py-3 flex justify-between items-center">
-                                <div class="flex items-center gap-3">
-                                    <span class="bg-orange-600 text-white font-black text-lg w-8 h-8 flex items-center justify-center rounded-lg shadow-sm">${cantNueva}x</span>
-                                    <span class="font-bold text-gray-900 text-[15px]">${nombre}</span>
-                                </div>
-                            </li>
-                        `;
-                    }
-                }
-                htmlNuevos += '</ul>';
-
-                if (hayNuevos) {
-                    document.getElementById('titulo-modal-nuevos').innerText = `Mesa ${mesaActiva.mesaId}`;
-                    document.getElementById('contenido-nuevos-pedidos').innerHTML = htmlNuevos;
-
-                    hashPendienteEntregar = orderHash;
-                    idMesaActivaAbierta = docId;
-                    
-                    document.getElementById('modal-nuevos-pedidos').classList.remove('hidden');
-                    return; 
-                } else {
-                    dbFirestore.collection('mesas_activas').doc(docId).update({
-                        adminVistoHash: orderHash
-                    }).catch(e => console.error("Error sincronizando estado visto:", e));
-                    mesaActiva.adminVistoHash = orderHash;
-                }
-            }
-
-            idMesaActivaAbierta = docId;
-            document.getElementById('titulo-modal-mesa').innerText = `Mesa ${mesaActiva.mesaId} - Cuenta Completa`;
-
-            let htmlPedido = '<ul class="divide-y divide-gray-200">';
-            let total = 0;
-            for (const [prodId, qty] of Object.entries(mesaActiva.pedido)) {
-                const item = dbLocal.productos.find(i => i.id == prodId);
-                const nombre = item ? item.nombre : 'Producto desconocido';
-                const precio = item ? Number(item.precio) : 0;
-                const subtotal = precio * qty;
-                total += subtotal;
-
-                htmlPedido += `
-                    <li class="py-3 flex justify-between items-center">
-                        <div class="flex flex-col flex-1 pr-2">
-                            <span class="font-bold text-gray-900">${qty}x ${nombre}</span>
-                            <span class="text-xs text-gray-500 mt-0.5">Precio unitario: $${precio.toFixed(2)}</span>
-                        </div>
-                        <span class="font-bold text-[#2d7d9a] shrink-0">$${subtotal.toFixed(2)}</span>
-                    </li>
-                `;
-            }
-            htmlPedido += `
-                <li class="py-3 flex justify-between items-center bg-gray-100/50 mt-2 px-2 rounded-lg">
-                    <span class="font-black text-gray-900 text-base">Total Mesa:</span>
-                    <span class="font-black text-orange-600 text-lg">$${total.toFixed(2)}</span>
-                </li>
-            </ul>`;
-
-            document.getElementById('contenido-pedido-mesa').innerHTML = htmlPedido;
-
-            const btnLiberarSinTicket = document.getElementById('btn-liberar-sin-ticket');
-            const btnLiberarConTicket = document.getElementById('btn-liberar-con-ticket');
-            
-            btnLiberarSinTicket.onclick = () => liberarMesa(docId, false);
-            btnLiberarConTicket.onclick = () => liberarMesa(docId, true);
-
-            document.getElementById('modal-detalle-mesa').classList.remove('hidden');
-        }
-
-        function cerrarModalNuevos() {
-            document.getElementById('modal-nuevos-pedidos').classList.add('hidden');
-            idMesaActivaAbierta = null;
-        }
-
-        function marcarPedidoEntregado() {
-            if (!idMesaActivaAbierta || !hashPendienteEntregar) return;
-
-            const docId = idMesaActivaAbierta;
-            const orderHash = hashPendienteEntregar;
-            const btn = document.getElementById('btn-entregar-pedido');
-            const textoOriginal = btn.innerText;
-            
-            btn.innerText = "Guardando...";
-            btn.disabled = true;
-
-            dbFirestore.collection('mesas_activas').doc(docId).update({
-                adminVistoHash: orderHash
-            }).then(() => {
-                const mesaActiva = dbLocal.mesasActivas.find(m => m.id === docId);
-                if (mesaActiva) {
-                    mesaActiva.adminVistoHash = orderHash;
-                }
-                actualizarBadgeSidebar();
-                if(!document.getElementById('seccion-mesas').classList.contains('hidden')){
-                    renderizarMesas();
-                }
-                cerrarModalNuevos();
-            }).catch(e => {
-                console.error("Error sincronizando estado visto:", e);
-                alert("Hubo un error al marcar el pedido como entregado.");
-            }).finally(() => {
-                btn.innerText = textoOriginal;
-                btn.disabled = false;
-            });
-        }
-
-        function cerrarModalDetalleMesa() {
-            document.getElementById('modal-detalle-mesa').classList.add('hidden');
-            idMesaActivaAbierta = null;
-        }
-
-        async function liberarMesa(docId, generarPDF) {
-            const mensaje = generarPDF 
-                ? '¿Seguro que deseas liberar esta mesa y generar el ticket de cobro en PDF?' 
-                : '¿Seguro que deseas liberar esta mesa sin generar ticket? El pedido se borrará.';
-                
-            if(confirm(mensaje)) {
-                if (generarPDF) {
-                    await generarTicketPDF(docId);
-                }
-                
-                dbFirestore.collection('mesas_activas').doc(docId).delete()
-                    .then(() => {
-                        cerrarModalDetalleMesa();
-                    })
-                    .catch(e => console.error("Error al liberar mesa:", e));
-            }
-        }
-
-        function generarTicketPDF(docId) {
-            return new Promise((resolve) => {
-                try {
-                    const mesaActiva = dbLocal.mesasActivas.find(m => m.id === docId);
-                    if(!mesaActiva) return resolve();
-                    const sucursal = dbLocal.sucursales.find(s => s.id === mesaActiva.sucursalId);
-                    const nombreTienda = document.getElementById('conf-nombre-tienda').value || 'Restaurante';
-                    
-                    const { jsPDF } = window.jspdf;
-                    const doc = new jsPDF({ unit: 'mm', format: [80, 200] });
-
-                    let y = 10;
-                    const centerX = 40; 
-                    
-                    const crearContenido = (logoDataUrl = null) => {
-                        if (logoDataUrl) {
-                            // Centrar logo de 20x20mm
-                            doc.addImage(logoDataUrl, 'PNG', 30, y, 20, 20);
-                            y += 24;
-                        } else {
-                            y += 5;
-                        }
-
-                        doc.setFont("helvetica", "bold");
-                        doc.setFontSize(14);
-                        doc.text(nombreTienda, centerX, y, { align: "center" });
-                        y += 6;
-                        
-                        doc.setFont("helvetica", "normal");
-                        doc.setFontSize(10);
-                        if (sucursal) {
-                            doc.text(sucursal.nombre, centerX, y, { align: "center" });
-                            y += 5;
-                            const dirLines = doc.splitTextToSize(sucursal.direccion || '', 70);
-                            doc.text(dirLines, centerX, y, { align: "center" });
-                            y += (dirLines.length * 4) + 2;
-                        }
-                        
-                        doc.setFont("helvetica", "bold");
-                        doc.setFontSize(12);
-                        doc.text(`MESA: ${mesaActiva.mesaId}`, centerX, y, { align: "center" });
-                        y += 6;
-                        
-                        // Agregar Fecha y Hora
-                        const fechaActual = new Date();
-                        const fechaStr = fechaActual.toLocaleDateString('es-MX');
-                        const horaStr = fechaActual.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
-                        doc.setFont("helvetica", "normal");
-                        doc.setFontSize(9);
-                        doc.text(`Fecha: ${fechaStr} ${horaStr}`, centerX, y, { align: "center" });
-                        y += 6;
-
-                        doc.setLineWidth(0.5);
-                        doc.line(5, y, 75, y);
-                        y += 4;
-                        
-                        let total = 0;
-                        const tableData = [];
-                        for (const [prodId, qty] of Object.entries(mesaActiva.pedido)) {
-                            const item = dbLocal.productos.find(i => i.id == prodId);
-                            const nombre = item ? item.nombre : 'Producto genérico';
-                            const precio = item ? Number(item.precio) : 0;
-                            const subtotal = precio * qty;
-                            total += subtotal;
-                            tableData.push([`${qty}x ${nombre}`, `$${subtotal.toFixed(2)}`]);
-                        }
-
-                        doc.autoTable({
-                            startY: y,
-                            head: [['Cant. Artículo', 'Subtotal']],
-                            body: tableData,
-                            theme: 'plain',
-                            styles: { fontSize: 9, cellPadding: 1, overflow: 'linebreak', font: 'helvetica' },
-                            columnStyles: { 1: { halign: 'right', cellWidth: 20 } },
-                            margin: { left: 5, right: 5 }
-                        });
-
-                        y = doc.lastAutoTable.finalY + 5;
-                        doc.line(5, y, 75, y);
-                        y += 5;
-                        
-                        doc.setFontSize(11);
-                        doc.setFont("helvetica", "bold");
-                        doc.text("TOTAL:", 5, y);
-                        doc.text(`$${total.toFixed(2)}`, 75, y, { align: "right" });
-                        y += 10;
-                        
-                        doc.setFontSize(10);
-                        doc.setFont("helvetica", "italic");
-                        doc.text("¡Gracias por su preferencia!", centerX, y, { align: "center" });
-                        
-                        doc.save(`Ticket_Mesa_${mesaActiva.mesaId}.pdf`);
-                        resolve();
-                    };
-
-                    if (currentApariencia && currentApariencia.logo) {
-                        const img = new Image();
-                        img.crossOrigin = "Anonymous";
-                        img.onload = function() {
-                            const canvas = document.createElement('canvas');
-                            canvas.width = img.width;
-                            canvas.height = img.height;
-                            const ctx = canvas.getContext('2d');
-                            ctx.drawImage(img, 0, 0);
-                            const dataUrl = canvas.toDataURL('image/png');
-                            crearContenido(dataUrl);
-                        };
-                        img.onerror = function() {
-                            crearContenido(null);
-                        };
-                        img.src = currentApariencia.logo;
-                    } else {
-                        crearContenido(null);
-                    }
-
-                } catch(e) {
-                    console.error("Error generando PDF:", e);
-                    alert("No se pudo generar el PDF. Verifica que tu navegador permita descargas.");
-                    resolve();
-                }
             });
         }
 
