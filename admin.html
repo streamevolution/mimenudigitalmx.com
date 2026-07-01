@@ -65,6 +65,10 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                     Sucursales
                 </button>
+                <button onclick="switchTab('meseros')" id="tab-meseros" class="w-full text-left px-4 py-3 rounded-xl font-semibold text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors flex items-center gap-3">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    Meseros
+                </button>
                 <button onclick="switchTab('mesas')" id="tab-mesas" class="w-full text-left px-4 py-3 rounded-xl font-semibold text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors flex items-center gap-3 relative">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z"></path></svg>
                     Mesas
@@ -346,6 +350,56 @@
                     <div id="grid-sucursales" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
                 </div>
 
+                <div id="seccion-meseros" class="hidden p-4 sm:p-8 max-w-5xl mx-auto pb-10">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-black text-gray-800 tracking-tight">Gestión de Meseros</h3>
+                        <button onclick="abrirModalMesero()" class="bg-[#2d7d9a] hover:bg-[#23647a] text-white font-bold py-2 sm:py-2.5 px-4 sm:px-5 rounded-xl shadow-md transition-transform active:scale-95 text-sm flex items-center gap-2">
+                            + Mesero
+                        </button>
+                    </div>
+
+                    <div id="modal-mesero" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+                        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-xl border border-gray-100 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+                            <div class="flex justify-between items-center mb-5 border-b pb-2">
+                                <h4 id="titulo-modal-mesero" class="font-bold text-gray-900">Agregar Nuevo Mesero</h4>
+                                <button onclick="cerrarModalMesero()" class="text-gray-400 hover:text-gray-700 text-2xl font-bold leading-none">&times;</button>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Nombre Completo</label>
+                                    <input type="text" id="mesero-nombre" placeholder="Ej. Juan Pérez" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#2d7d9a] focus:bg-white transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Correo de Acceso (Usuario)</label>
+                                    <input type="email" id="mesero-email" placeholder="Ej. juan@mitienda.com" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#2d7d9a] focus:bg-white transition-all">
+                                    <p class="text-[11px] text-gray-400 mt-1">Debe ser único para que pueda iniciar sesión.</p>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Contraseña</label>
+                                    <input type="text" id="mesero-password" placeholder="Asigna una contraseña segura" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#2d7d9a] focus:bg-white transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Sucursal Asignada</label>
+                                    <select id="mesero-sucursal" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#2d7d9a] focus:bg-white transition-all cursor-pointer">
+                                        </select>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-end gap-3 mt-6">
+                                <button onclick="cerrarModalMesero()" class="bg-gray-100 text-gray-700 font-bold py-3 px-6 rounded-xl hover:bg-gray-200 transition-colors text-sm">
+                                    Cancelar
+                                </button>
+                                <button id="btn-guardar-mesero" onclick="guardarMesero()" class="bg-[#2d7d9a] text-white font-bold py-3 px-8 rounded-xl shadow-md hover:bg-[#23647a] transition-transform active:scale-95 text-sm min-w-[140px]">
+                                    Guardar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="grid-meseros" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+                </div>
+
                 <div id="seccion-mesas" class="hidden p-4 sm:p-8 max-w-7xl mx-auto pb-10">
                     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
                         <h3 class="text-2xl font-black text-gray-800 tracking-tight">Gestión de Mesas</h3>
@@ -377,7 +431,6 @@
                     </div>
                 </div>
 
-                <!-- MODAL EXCLUSIVO PARA COMANDAS NUEVAS -->
                 <div id="modal-nuevos-pedidos" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-[70] hidden flex items-center justify-center p-4">
                     <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] flex flex-col relative overflow-hidden ring-4 ring-orange-500">
                         <div class="flex justify-between items-center mb-4 border-b pb-2 border-orange-100">
@@ -640,20 +693,22 @@
         let idProductoEdicion = null; 
         let indexSucursalEdicion = null; 
         let indexMetodoEdicion = null;
+        let indexMeseroEdicion = null;
         
         let dbLocal = {
             categorias: [],
             productos: [],
             sucursales: [],
             mesasActivas: [],
-            metodosPago: []
+            metodosPago: [],
+            meseros: []
         };
         let currentApariencia = { logo: '', portada: '' };
         
         // --- SISTEMA DE NOTIFICACIONES PARA PEDIDOS NUEVOS ---
         let initialLoadMesas = true;
         let idMesaActivaAbierta = null;
-        let hashPendienteEntregar = null; // Guardará el hash del nuevo pedido temporalmente
+        let hashPendienteEntregar = null; 
 
         function reproducirSonidoAlerta() {
             try {
@@ -662,7 +717,6 @@
             } catch(e) {}
         }
 
-        // ¡CLAVE DE LA SOLUCIÓN! Esta función evita que diferentes celulares generen hashes distintos
         function generarHashPedido(pedidoObj) {
             if (!pedidoObj) return "";
             return JSON.stringify(Object.entries(pedidoObj).sort((a, b) => a[0].localeCompare(b[0])));
@@ -688,10 +742,8 @@
             
             container.appendChild(toast);
             
-            // Animación de entrada
             setTimeout(() => toast.classList.remove('translate-x-full'), 10);
             
-            // Remover después de 6 segundos
             setTimeout(() => {
                 if(toast.parentElement) {
                     toast.classList.add('translate-x-full');
@@ -1036,6 +1088,7 @@
                     
                     dbLocal.categorias = data.categorias || [];
                     dbLocal.sucursales = data.sucursales || [];
+                    dbLocal.meseros = data.meseros || [];
                     
                     let metodosData = data.metodosPago || [];
                     
@@ -1095,6 +1148,7 @@
                     renderizarSucursales();
                     actualizarSelectSucursalesMesas();
                     renderizarMetodosPago();
+                    renderizarMeseros();
                 }
             });
 
@@ -1107,7 +1161,6 @@
                 renderizarListas();
             });
 
-            // ESCUCHADOR DE MESAS - Lógica de Notificaciones de Nuevos Pedidos Global
             dbFirestore.collection('mesas_activas').where('tiendaId', '==', miTiendaId).onSnapshot(snapshot => {
                 dbLocal.mesasActivas = [];
                 let haHabidoNuevos = false;
@@ -1117,7 +1170,6 @@
                     let docId = doc.id;
                     dbLocal.mesasActivas.push({ id: docId, ...docData });
 
-                    // Usamos el hash determinista para comparar
                     const orderHash = generarHashPedido(docData.pedido);
                     const adminVistoHash = docData.adminVistoHash || "";
                     
@@ -1351,7 +1403,7 @@
         }
 
         function switchTab(tab) {
-            const tabs = ['inicio', 'productos', 'sucursales', 'mesas', 'pagos', 'configuracion']; 
+            const tabs = ['inicio', 'productos', 'sucursales', 'meseros', 'mesas', 'pagos', 'configuracion']; 
             
             tabs.forEach(t => {
                 const seccion = document.getElementById(`seccion-${t}`);
@@ -1379,6 +1431,131 @@
             if(tab === 'mesas') {
                 renderizarMesas();
             }
+        }
+
+        function actualizarSelectSucursalesMeseros() {
+            const select = document.getElementById('mesero-sucursal');
+            if(select) {
+                select.innerHTML = '<option value="">Selecciona Sucursal...</option>';
+                dbLocal.sucursales.forEach(suc => {
+                    select.innerHTML += `<option value="${suc.id}">${suc.nombre}</option>`;
+                });
+            }
+        }
+
+        function abrirModalMesero() {
+            actualizarSelectSucursalesMeseros();
+            document.getElementById('modal-mesero').classList.remove('hidden');
+        }
+
+        function cerrarModalMesero() {
+            document.getElementById('modal-mesero').classList.add('hidden');
+            document.getElementById('mesero-nombre').value = '';
+            document.getElementById('mesero-email').value = '';
+            document.getElementById('mesero-password').value = '';
+            document.getElementById('mesero-sucursal').value = '';
+            indexMeseroEdicion = null;
+            document.getElementById('titulo-modal-mesero').innerText = "Agregar Nuevo Mesero";
+            document.getElementById('btn-guardar-mesero').innerText = "Guardar";
+        }
+
+        function editarMesero(index) {
+            indexMeseroEdicion = index;
+            const m = dbLocal.meseros[index];
+            document.getElementById('mesero-nombre').value = m.nombre || '';
+            document.getElementById('mesero-email').value = m.email || '';
+            document.getElementById('mesero-password').value = m.password || '';
+            actualizarSelectSucursalesMeseros();
+            document.getElementById('mesero-sucursal').value = m.sucursalId || '';
+            
+            document.getElementById('titulo-modal-mesero').innerText = "Editar Mesero";
+            document.getElementById('btn-guardar-mesero').innerText = "Actualizar";
+            document.getElementById('modal-mesero').classList.remove('hidden');
+        }
+
+        function guardarMesero() {
+            const nombre = document.getElementById('mesero-nombre').value.trim();
+            const email = document.getElementById('mesero-email').value.trim();
+            const password = document.getElementById('mesero-password').value.trim();
+            const sucursalId = document.getElementById('mesero-sucursal').value;
+
+            if(!nombre || !email || !password || !sucursalId) {
+                alert("Por favor llena todos los campos, incluyendo la sucursal.");
+                return;
+            }
+
+            const meseroData = {
+                id: (indexMeseroEdicion !== null && dbLocal.meseros[indexMeseroEdicion].id) ? dbLocal.meseros[indexMeseroEdicion].id : Date.now().toString(),
+                nombre: nombre,
+                email: email,
+                password: password,
+                sucursalId: sucursalId
+            };
+
+            if (indexMeseroEdicion !== null) {
+                dbLocal.meseros[indexMeseroEdicion] = meseroData;
+            } else {
+                if(dbLocal.meseros.some(m => m.email.toLowerCase() === email.toLowerCase())) {
+                    alert("Este correo de usuario ya está registrado para otro mesero.");
+                    return;
+                }
+                dbLocal.meseros.push(meseroData);
+            }
+
+            dbFirestore.collection('tiendas').doc(miTiendaId).update({
+                meseros: dbLocal.meseros
+            }).then(() => {
+                cerrarModalMesero();
+            }).catch(err => {
+                console.error("Error guardando mesero: ", err);
+                alert("Error al guardar mesero.");
+            });
+        }
+
+        function eliminarMesero(index) {
+            if(confirm('¿Seguro que deseas eliminar este mesero? Perderá el acceso al sistema inmediatamente.')) {
+                dbLocal.meseros.splice(index, 1);
+                dbFirestore.collection('tiendas').doc(miTiendaId).update({
+                    meseros: dbLocal.meseros
+                });
+            }
+        }
+
+        function renderizarMeseros() {
+            const grid = document.getElementById('grid-meseros');
+            if(!grid) return;
+            grid.innerHTML = '';
+
+            if(dbLocal.meseros.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-10 bg-white rounded-2xl border border-dashed border-gray-300 text-gray-500">No hay meseros registrados. Empieza agregando uno nuevo.</div>`;
+                return;
+            }
+
+            dbLocal.meseros.forEach((m, index) => {
+                const sucursal = dbLocal.sucursales.find(s => String(s.id) === String(m.sucursalId));
+                const nombreSucursal = sucursal ? sucursal.nombre : 'Sucursal no encontrada';
+
+                grid.innerHTML += `
+                <div class="bg-white rounded-[20px] p-5 shadow-sm border border-gray-100 flex flex-col gap-3 relative group hover:shadow-md transition-all">
+                    <div class="flex items-center gap-3 border-b border-gray-100 pb-3">
+                        <div class="w-12 h-12 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center font-black text-lg">
+                            ${m.nombre.charAt(0).toUpperCase()}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-bold text-gray-900 truncate text-lg">${m.nombre}</h4>
+                            <p class="text-[13px] text-gray-500 truncate">${nombreSucursal}</p>
+                        </div>
+                    </div>
+                    <div class="text-[13px] text-gray-600 space-y-1">
+                        <p><b>Usuario:</b> ${m.email}</p>
+                        <p><b>Contraseña:</b> ${m.password}</p>
+                    </div>
+                    <div class="flex gap-2 mt-2">
+                        <button onclick="editarMesero(${index})" class="flex-1 py-2 bg-blue-50 text-blue-600 font-bold rounded-lg hover:bg-blue-100 transition-colors text-xs active:scale-95">Editar</button>
+                        <button onclick="eliminarMesero(${index})" class="flex-1 py-2 bg-red-50 text-red-600 font-bold rounded-lg hover:bg-red-100 transition-colors text-xs active:scale-95">Eliminar</button>
+                    </div>
+                </div>`;
+            });
         }
 
         function renderizarMetodosPago() {
@@ -1742,7 +1919,6 @@
                 const estadoText = isOcupado ? 'Ocupado' : 'Disponible';
                 let bgClass = isOcupado ? 'bg-red-500 hover:bg-red-600 shadow-red-200' : 'bg-green-500 hover:bg-green-600 shadow-green-200';
                 
-                // Efecto extra visual si el pedido es nuevo
                 const ringEfect = isNuevoPedido ? '<div class="absolute inset-0 ring-4 ring-orange-500 rounded-2xl animate-pulse pointer-events-none"></div>' : '';
                 const badgeNuevo = isNuevoPedido ? '<div class="absolute -top-2 -right-2 bg-orange-600 text-white text-[11px] font-black px-2.5 py-1 rounded-full shadow-lg z-20 animate-bounce">¡NUEVO!</div>' : '';
 
@@ -1774,7 +1950,6 @@
             const isNuevo = mesaActiva.adminVistoHash !== orderHash;
 
             if (isNuevo) {
-                // 1. RECONSTRUIR EL PEDIDO ANTERIOR
                 let pedidoAnterior = {};
                 if (mesaActiva.adminVistoHash) {
                     try {
@@ -1785,7 +1960,6 @@
                     } catch(e) {}
                 }
 
-                // 2. CALCULAR LOS NUEVOS ITEMS
                 let htmlNuevos = '<ul class="divide-y divide-orange-200/50">';
                 let hayNuevos = false;
 
@@ -1814,14 +1988,12 @@
                     document.getElementById('titulo-modal-nuevos').innerText = `Mesa ${mesaActiva.mesaId}`;
                     document.getElementById('contenido-nuevos-pedidos').innerHTML = htmlNuevos;
 
-                    // NO MARCAMOS COMO LEÍDO AQUÍ PARA QUE LA NOTIFICACIÓN SE MANTENGA
                     hashPendienteEntregar = orderHash;
                     idMesaActivaAbierta = docId;
                     
                     document.getElementById('modal-nuevos-pedidos').classList.remove('hidden');
-                    return; // Terminamos aquí, se mostró la alerta nueva
+                    return; 
                 } else {
-                    // Si hubo cambio pero fue porque eliminaron productos, actualizamos silenciosamente
                     dbFirestore.collection('mesas_activas').doc(docId).update({
                         adminVistoHash: orderHash
                     }).catch(e => console.error("Error sincronizando estado visto:", e));
@@ -1829,7 +2001,6 @@
                 }
             }
 
-            // SI NO ES NUEVO O YA SE MOSTRÓ LA ALERTA, MOSTRAR LA VISTA DE CUENTA COMPLETA
             idMesaActivaAbierta = docId;
             document.getElementById('titulo-modal-mesa').innerText = `Mesa ${mesaActiva.mesaId} - Cuenta Completa`;
 
@@ -1871,7 +2042,6 @@
         }
 
         function cerrarModalNuevos() {
-            // Solo oculta el modal, NO actualiza la base de datos
             document.getElementById('modal-nuevos-pedidos').classList.add('hidden');
             idMesaActivaAbierta = null;
         }
@@ -1887,7 +2057,6 @@
             btn.innerText = "Guardando...";
             btn.disabled = true;
 
-            // ACTUALIZAR BASE DE DATOS COMO LEÍDO AHORA
             dbFirestore.collection('mesas_activas').doc(docId).update({
                 adminVistoHash: orderHash
             }).then(() => {
@@ -1943,72 +2112,110 @@
                     const { jsPDF } = window.jspdf;
                     const doc = new jsPDF({ unit: 'mm', format: [80, 200] });
 
-                    let y = 15;
+                    let y = 10;
                     const centerX = 40; 
                     
-                    doc.setFont("helvetica", "bold");
-                    doc.setFontSize(14);
-                    doc.text(nombreTienda, centerX, y, { align: "center" });
-                    y += 6;
-                    
-                    doc.setFont("helvetica", "normal");
-                    doc.setFontSize(10);
-                    if (sucursal) {
-                        doc.text(sucursal.nombre, centerX, y, { align: "center" });
+                    const crearContenido = (logoDataUrl = null) => {
+                        if (logoDataUrl) {
+                            // Centrar logo de 20x20mm
+                            doc.addImage(logoDataUrl, 'PNG', 30, y, 20, 20);
+                            y += 24;
+                        } else {
+                            y += 5;
+                        }
+
+                        doc.setFont("helvetica", "bold");
+                        doc.setFontSize(14);
+                        doc.text(nombreTienda, centerX, y, { align: "center" });
+                        y += 6;
+                        
+                        doc.setFont("helvetica", "normal");
+                        doc.setFontSize(10);
+                        if (sucursal) {
+                            doc.text(sucursal.nombre, centerX, y, { align: "center" });
+                            y += 5;
+                            const dirLines = doc.splitTextToSize(sucursal.direccion || '', 70);
+                            doc.text(dirLines, centerX, y, { align: "center" });
+                            y += (dirLines.length * 4) + 2;
+                        }
+                        
+                        doc.setFont("helvetica", "bold");
+                        doc.setFontSize(12);
+                        doc.text(`MESA: ${mesaActiva.mesaId}`, centerX, y, { align: "center" });
+                        y += 6;
+                        
+                        // Agregar Fecha y Hora
+                        const fechaActual = new Date();
+                        const fechaStr = fechaActual.toLocaleDateString('es-MX');
+                        const horaStr = fechaActual.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+                        doc.setFont("helvetica", "normal");
+                        doc.setFontSize(9);
+                        doc.text(`Fecha: ${fechaStr} ${horaStr}`, centerX, y, { align: "center" });
+                        y += 6;
+
+                        doc.setLineWidth(0.5);
+                        doc.line(5, y, 75, y);
+                        y += 4;
+                        
+                        let total = 0;
+                        const tableData = [];
+                        for (const [prodId, qty] of Object.entries(mesaActiva.pedido)) {
+                            const item = dbLocal.productos.find(i => i.id == prodId);
+                            const nombre = item ? item.nombre : 'Producto genérico';
+                            const precio = item ? Number(item.precio) : 0;
+                            const subtotal = precio * qty;
+                            total += subtotal;
+                            tableData.push([`${qty}x ${nombre}`, `$${subtotal.toFixed(2)}`]);
+                        }
+
+                        doc.autoTable({
+                            startY: y,
+                            head: [['Cant. Artículo', 'Subtotal']],
+                            body: tableData,
+                            theme: 'plain',
+                            styles: { fontSize: 9, cellPadding: 1, overflow: 'linebreak', font: 'helvetica' },
+                            columnStyles: { 1: { halign: 'right', cellWidth: 20 } },
+                            margin: { left: 5, right: 5 }
+                        });
+
+                        y = doc.lastAutoTable.finalY + 5;
+                        doc.line(5, y, 75, y);
                         y += 5;
-                        const dirLines = doc.splitTextToSize(sucursal.direccion || '', 70);
-                        doc.text(dirLines, centerX, y, { align: "center" });
-                        y += (dirLines.length * 4) + 2;
-                    }
-                    
-                    doc.setFont("helvetica", "bold");
-                    doc.setFontSize(12);
-                    doc.text(`MESA: ${mesaActiva.mesaId}`, centerX, y, { align: "center" });
-                    y += 6;
-                    
-                    doc.setLineWidth(0.5);
-                    doc.line(5, y, 75, y);
-                    y += 4;
-                    
-                    let total = 0;
-                    const tableData = [];
-                    for (const [prodId, qty] of Object.entries(mesaActiva.pedido)) {
-                        const item = dbLocal.productos.find(i => i.id == prodId);
-                        const nombre = item ? item.nombre : 'Producto genérico';
-                        const precio = item ? Number(item.precio) : 0;
-                        const subtotal = precio * qty;
-                        total += subtotal;
-                        tableData.push([`${qty}x ${nombre}`, `$${subtotal.toFixed(2)}`]);
+                        
+                        doc.setFontSize(11);
+                        doc.setFont("helvetica", "bold");
+                        doc.text("TOTAL:", 5, y);
+                        doc.text(`$${total.toFixed(2)}`, 75, y, { align: "right" });
+                        y += 10;
+                        
+                        doc.setFontSize(10);
+                        doc.setFont("helvetica", "italic");
+                        doc.text("¡Gracias por su preferencia!", centerX, y, { align: "center" });
+                        
+                        doc.save(`Ticket_Mesa_${mesaActiva.mesaId}.pdf`);
+                        resolve();
+                    };
+
+                    if (currentApariencia && currentApariencia.logo) {
+                        const img = new Image();
+                        img.crossOrigin = "Anonymous";
+                        img.onload = function() {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = img.width;
+                            canvas.height = img.height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0);
+                            const dataUrl = canvas.toDataURL('image/png');
+                            crearContenido(dataUrl);
+                        };
+                        img.onerror = function() {
+                            crearContenido(null);
+                        };
+                        img.src = currentApariencia.logo;
+                    } else {
+                        crearContenido(null);
                     }
 
-                    doc.autoTable({
-                        startY: y,
-                        head: [['Cant. Artículo', 'Subtotal']],
-                        body: tableData,
-                        theme: 'plain',
-                        styles: { fontSize: 9, cellPadding: 1, overflow: 'linebreak', font: 'helvetica' },
-                        columnStyles: { 1: { halign: 'right', cellWidth: 20 } },
-                        margin: { left: 5, right: 5 }
-                    });
-
-                    y = doc.lastAutoTable.finalY + 5;
-                    doc.line(5, y, 75, y);
-                    y += 5;
-                    
-                    doc.setFontSize(11);
-                    doc.setFont("helvetica", "bold");
-                    doc.text("TOTAL:", 5, y);
-                    doc.text(`$${total.toFixed(2)}`, 75, y, { align: "right" });
-                    y += 10;
-                    
-                    doc.setFontSize(10);
-                    doc.setFont("helvetica", "italic");
-                    doc.text("¡Gracias por su visita!", centerX, y, { align: "center" });
-                    y += 5;
-                    doc.text("Vuelva pronto.", centerX, y, { align: "center" });
-                    
-                    doc.save(`Ticket_Mesa_${mesaActiva.mesaId}.pdf`);
-                    resolve();
                 } catch(e) {
                     console.error("Error generando PDF:", e);
                     alert("No se pudo generar el PDF. Verifica que tu navegador permita descargas.");
