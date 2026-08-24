@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* BASE FLAT DESIGN */
+        body {
+            background-color: #0f172a; 
+            color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .panel {
+            background-color: #1e293b; 
+            padding: 40px 30px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 380px;
+            box-sizing: border-box;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        h2 {
+            margin: 0 0 5px 0;
+            font-weight: 600;
+            font-size: 24px;
+            color: #f1f5f9;
+            text-align: center;
+        }
+        p.subtitle {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            font-size: 13px;
+            color: #cbd5e1;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        
+        select, input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 14px 12px;
+            background-color: #334155; 
+            border: 1px solid #475569;
+            border-radius: 8px;
+            color: #f8fafc;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: border-color 0.2s;
+            appearance: none; 
+            color-scheme: dark; 
+        }
+        
+        select {
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+        }
+        
+        select:focus, input:focus { border-color: #3b82f6; }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        button:hover { background-color: #2563eb; }
+
+        .result-box {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #0f172a;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            min-height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            word-break: break-all;
+        }
+        .result-text { font-size: 26px; font-weight: 600; letter-spacing: 2px; color: #10b981; }
+        .result-error { font-size: 14px; color: #ef4444; }
+        
+        .btn-enlace-final {
+            background-color: #10b981;
+            color: #000;
+            padding: 10px 15px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.85);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        .overlay.active { opacity: 1; pointer-events: auto; }
+        .spinner {
+            width: 40px; height: 40px; border: 4px solid #334155;
+            border-top-color: #3b82f6; border-radius: 50%; animation: girar 1s linear infinite; margin-bottom: 15px;
+        }
+        .overlay p { color: white; font-size: 15px; margin: 0; font-weight: 500; }
+        @keyframes girar { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div id="loadingModal" class="overlay">
+        <div class="spinner"></div>
+        <p id="textoCarga">Procesando...</p>
+    </div>
+
+    <div class="panel">
+        <h2>Panel de Control</h2>
+        <p class="subtitle">Selecciona plataforma o banco</p>
+        
+        <div class="form-group">
+            <label for="plataformaSelect">Plataforma</label>
+            <select id="plataformaSelect" onchange="actualizarOpciones()">
+                <option value="disney">Disney+</option>
+                <option value="netflix">Netflix</option>
+                <option value="vix">ViX</option>
+                <option value="hbo">HBO Max</option>
+                <option value="crunchyroll">Crunchyroll</option>
+                <option value="nu">Nu (Verificar Pago)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="accionSelect">Acción requerida</label>
+            <select id="accionSelect">
+                </select>
+        </div>
+
+        <div id="inputsPlataformas" class="form-group">
+            <label for="emailInput">Correo asignado</label>
+            <input type="email" id="emailInput" placeholder="Ej. cliente+4@gmail.com">
+        </div>
+
+        <div id="inputsNu" style="display: none;">
+            <div class="form-group">
+                <label>Nombre completo</label>
+                <input type="text" id="nuNombre" placeholder="Ej. EMMANUEL ORTIZ RODRIGUEZ">
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <div class="form-group" style="flex: 1;">
+                    <label>Monto</label>
+                    <input type="text" id="nuMonto" placeholder="Ej. 200.00">
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>Fecha</label>
+                    <input type="date" id="nuFecha">
+                </div>
+            </div>
+        </div>
+
+        <button onclick="ejecutarAccion()">Continuar</button>
+
+        <div class="result-box" id="cajaResultado">
+            <span style="color: #64748b; font-size: 14px;">El resultado aparecerá aquí</span>
+        </div>
+    </div>
+
+    <script>
+        const opciones = {
+            'disney': [
+                { texto: 'Código de Acceso', valor: 'acceso_disney' },
+                { texto: 'Código de Hogar', valor: 'hogar_disney' }
+            ],
+            'netflix': [
+                { texto: 'Código de Inicio de sesión', valor: 'acceso_netflix' },
+                { texto: 'Cambiar contraseña', valor: 'pass_netflix' }
+            ],
+            'vix': [
+                { texto: 'Cambiar contraseña', valor: 'pass_vix' }
+            ],
+            'hbo': [
+                { texto: 'Código de un solo uso', valor: 'acceso_hbo' },
+                { texto: 'Cambiar contraseña', valor: 'pass_hbo' } 
+            ],
+            'crunchyroll': [
+                { texto: 'Cambiar contraseña', valor: 'pass_crunchyroll' }
+            ],
+            'nu': [
+                { texto: 'Verificar transferencia', valor: 'verificar_nu' }
+            ]
+        };
+
+        function actualizarOpciones() {
+            const plataforma = document.getElementById('plataformaSelect').value;
+            const selectAccion = document.getElementById('accionSelect');
+            
+            selectAccion.innerHTML = '';
+            opciones[plataforma].forEach(opcion => {
+                const opt = document.createElement('option');
+                opt.value = opcion.valor;
+                opt.textContent = opcion.texto;
+                selectAccion.appendChild(opt);
+            });
+
+            if (plataforma === 'nu') {
+                document.getElementById('inputsPlataformas').style.display = 'none';
+                document.getElementById('inputsNu').style.display = 'block';
+            } else {
+                document.getElementById('inputsPlataformas').style.display = 'block';
+                document.getElementById('inputsNu').style.display = 'none';
+            }
+        }
+
+        actualizarOpciones();
+
+        function convertirFechaNu(fechaCalendario) {
+            if (!fechaCalendario) return "";
+            const partes = fechaCalendario.split('-');
+            const anio = partes[0];
+            const mesNum = partes[1];
+            const dia = partes[2];
+
+            const mesesEspanol = {
+                '01': 'ENE', '02': 'FEB', '03': 'MAR', '04': 'ABR', 
+                '05': 'MAY', '06': 'JUN', '07': 'JUL', '08': 'AGO', 
+                '09': 'SEP', '10': 'OCT', '11': 'NOV', '12': 'DIC'
+            };
+
+            return `${dia} ${mesesEspanol[mesNum]} ${anio}`;
+        }
+
+        function ejecutarAccion() {
+            const accion = document.getElementById('accionSelect').value;
+            const plataforma = document.getElementById('plataformaSelect').value;
+            const cajaResultado = document.getElementById('cajaResultado');
+            
+            let payload = {};
+
+                        if (plataforma === 'nu') {
+                const fechaCruda = document.getElementById('nuFecha').value;
+                const fechaTraducida = convertirFechaNu(fechaCruda);
+
+                payload = {
+                    nombre: document.getElementById('nuNombre').value,
+                    monto: document.getElementById('nuMonto').value,
+                    fecha: fechaTraducida,
+                    solo_verificar: true // <--- ESTO LE DICE AL SERVIDOR QUE NO USE FIREBASE
+                };
+
+                if(!payload.nombre || !payload.monto || !fechaCruda) {
+                    alert("Por favor llena Nombre, Monto y selecciona la Fecha."); return;
+                }
+            } else {
+
+                payload = { email_usuario: document.getElementById('emailInput').value };
+                if(!payload.email_usuario) {
+                    alert("Por favor ingresa un correo asignado."); return;
+                }
+            }
+
+            if (accion === 'acceso_disney') {
+                realizarPeticion('/buscar-correo', 'Obteniendo Código Disney...', payload);
+            } else if (accion === 'hogar_disney') {
+                realizarPeticion('/buscar-enlace-hogar', 'Buscando Código Hogar...', payload);
+            } else if (accion === 'acceso_netflix') {
+                realizarPeticion('/buscar-codigo-netflix', 'Obteniendo Código Netflix...', payload);
+            } else if (accion === 'pass_netflix') {
+                realizarPeticion('/buscar-pass-netflix', 'Obteniendo Enlace de Netflix...', payload);
+            } else if (accion === 'pass_vix') {
+                realizarPeticion('/buscar-enlace-vix', 'Obteniendo Enlace de Vix...', payload);
+            } else if (accion === 'acceso_hbo') {
+                realizarPeticion('/buscar-codigo-hbo', 'Obteniendo Código HBO Max...', payload);
+            } else if (accion === 'pass_hbo') {
+                realizarPeticion('/buscar-pass-hbo', 'Obteniendo Enlace de HBO Max...', payload);
+            } else if (accion === 'pass_crunchyroll') {
+                realizarPeticion('/buscar-pass-crunchyroll', 'Obteniendo Enlace de Crunchyroll...', payload);
+            } else if (accion === 'verificar_nu') {
+                realizarPeticion('/buscar-pago-nu', 'Verificando en cuenta Nu...', payload);
+            } else {
+                cajaResultado.innerHTML = `<span style="color: #64748b; font-size: 14px;">Plataforma en desarrollo.</span>`;
+            }
+        }
+
+        async function realizarPeticion(ruta, mensajeCarga, payload) {
+            const cajaResultado = document.getElementById('cajaResultado');
+            const modal = document.getElementById('loadingModal');
+            const textoCarga = document.getElementById('textoCarga');
+            
+            textoCarga.innerText = mensajeCarga;
+            modal.classList.add('active');
+            cajaResultado.innerHTML = '<span style="color: #64748b; font-size: 14px;">Procesando...</span>';
+
+            try {
+                const baseUrlRailway = 'https://api-disney-bot-production-479c.up.railway.app'; 
+                
+                const response = await fetch(baseUrlRailway + ruta, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+                modal.classList.remove('active');
+
+                if (data.success) {
+                    if(data.tipo === 'codigo') {
+                        cajaResultado.innerHTML = `
+                            <span class="result-text">${data.resultado}</span>
+                            <p style="margin: 10px 0 0 0; color: #94a3b8; font-size: 13px; font-weight: 500;">Recibido: ${data.fecha || 'Fecha no disponible'}</p>
+                        `;
+                    } else if (data.tipo === 'enlace') {
+                        let textoBoton = 'Abrir enlace';
+                        if (ruta.includes('vix')) textoBoton = 'Abrir enlace de ViX';
+                        if (ruta.includes('netflix')) textoBoton = 'Abrir enlace de Netflix';
+                        if (ruta.includes('crunchyroll')) textoBoton = 'Abrir enlace de Crunchyroll';
+                        if (ruta.includes('hogar')) textoBoton = 'Abrir enlace de Disney';
+                        if (ruta.includes('hbo')) textoBoton = 'Abrir enlace de HBO Max';
+
+                        cajaResultado.innerHTML = `
+                            <span style="color: white; font-size: 14px; margin-bottom: 5px;">¡Enlace encontrado!</span>
+                            <a href="${data.resultado}" target="_blank" class="btn-enlace-final">${textoBoton}</a>
+                            <p style="margin: 10px 0 0 0; color: #94a3b8; font-size: 13px; font-weight: 500;">Recibido: ${data.fecha || 'Fecha no disponible'}</p>
+                        `;
+                    } else if (data.tipo === 'pago') {
+                        cajaResultado.innerHTML = `
+                            <span class="result-text" style="font-size: 24px; margin-bottom: 12px; display: inline-block;">✅ ${data.resultado}</span>
+                            <div style="text-align: left; background: #334155; padding: 15px; border-radius: 8px; width: 100%; box-sizing: border-box;">
+                                <p style="margin: 0 0 5px 0; color: #cbd5e1; font-size: 13px;">Nombre de la persona: <span style="color: white; font-weight: 600; font-size: 14px;">${data.datos.nombre}</span></p>
+                                <p style="margin: 0 0 5px 0; color: #cbd5e1; font-size: 13px;">Monto: <span style="color: white; font-weight: 600; font-size: 14px;">${data.datos.monto}</span></p>
+                                <p style="margin: 0 0 5px 0; color: #cbd5e1; font-size: 13px;">Fecha: <span style="color: white; font-weight: 600; font-size: 14px;">${data.datos.fecha}</span></p>
+                                <p style="margin: 0; color: #cbd5e1; font-size: 13px;">Hora: <span style="color: white; font-weight: 600; font-size: 14px;">${data.datos.hora}</span></p>
+                            </div>
+                        `;
+                    } else {
+                        cajaResultado.innerHTML = `<span class="result-error">${data.resultado}</span>`;
+                    }
+                } else {
+                    cajaResultado.innerHTML = `<span class="result-error">${data.mensaje || data.error}</span>`;
+                }
+            } catch (error) {
+                modal.classList.remove('active');
+                cajaResultado.innerHTML = `<span class="result-error">Error de red. Verifica tu conexión a Railway.</span>`;
+            }
+        }
+    </script>
+</body>
+</html>
