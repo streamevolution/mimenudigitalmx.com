@@ -196,7 +196,7 @@
                     <input 
                         type="text" 
                         id="searchInput" 
-                        placeholder="Buscar kilo de asada, tortas, mulitas, burros, tacos, quesadillas..." 
+                        placeholder="Buscar kilo de asada, tortas, mulitas, burros, tacos, quesadillas, aguas..." 
                         class="w-full bg-paper-50 text-charcoal-900 placeholder-gray-500 pl-12 pr-10 py-3.5 rounded-2xl border-2 border-transparent focus:border-trompo-400 focus:outline-none text-sm sm:text-base font-medium shadow-lg transition"
                     >
                     <button id="clearSearchBtn" type="button" class="hidden absolute right-3.5 text-gray-400 hover:text-charcoal-900 p-1" aria-label="Limpiar búsqueda">
@@ -217,10 +217,13 @@
                     🔥 Promociones y Combos
                 </a>
                 <a href="#cat-antojitos" data-cat="cat-antojitos" class="cat-pill shrink-0 px-4 py-2 rounded-xl font-display uppercase tracking-wider text-sm font-bold transition-all bg-white text-charcoal-800 hover:bg-paper-200 border border-paper-300">
-                    🌯 Antojitos con Precio
+                    🌯 Antojitos y Platillos
                 </a>
                 <a href="#cat-especialidades" data-cat="cat-especialidades" class="cat-pill shrink-0 px-4 py-2 rounded-xl font-display uppercase tracking-wider text-sm font-bold transition-all bg-white text-charcoal-800 hover:bg-paper-200 border border-paper-300">
-                    🌮 Especialidades de la Casa
+                    🌮 Tacos y Especialidades
+                </a>
+                <a href="#cat-bebidas" data-cat="cat-bebidas" class="cat-pill shrink-0 px-4 py-2 rounded-xl font-display uppercase tracking-wider text-sm font-bold transition-all bg-white text-charcoal-800 hover:bg-paper-200 border border-paper-300">
+                    🥤 Aguas Frescas
                 </a>
                 <a href="#cat-carnes" data-cat="cat-carnes" class="cat-pill shrink-0 px-4 py-2 rounded-xl font-display uppercase tracking-wider text-sm font-bold transition-all bg-white text-charcoal-800 hover:bg-paper-200 border border-paper-300">
                     🥩 Nuestras 5 Carnes
@@ -232,20 +235,20 @@
     <!-- ==================== CONTENEDOR PRINCIPAL DEL MENÚ ==================== -->
     <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-14">
 
-        <!-- Secciones Dinámicas de Platillos (Promociones, Antojitos, Especialidades) -->
+        <!-- Secciones Dinámicas de Platillos (Promociones, Antojitos, Especialidades, Bebidas) -->
         <div id="menuSectionsContainer" class="space-y-14"></div>
 
         <!-- Estado sin resultados en búsqueda -->
         <div id="emptySearchState" class="hidden max-w-md mx-auto text-center py-14 px-4 bg-white rounded-3xl border border-paper-300 shadow-sm">
             <div class="text-5xl mb-3">🌮</div>
             <h3 class="font-display text-2xl font-bold text-charcoal-900 uppercase">No encontramos ese platillo</h3>
-            <p class="text-gray-600 text-sm mt-1">Intenta buscar con palabras como "adobada", "tortas", "mulitas", "burros" o "kilo".</p>
+            <p class="text-gray-600 text-sm mt-1">Intenta buscar con palabras como "adobada", "tortas", "mulitas", "burros", "aguas" o "kilo".</p>
             <button type="button" onclick="resetSearch()" class="mt-4 px-5 py-2.5 rounded-xl bg-taquero-600 hover:bg-taquero-700 text-white font-bold text-sm transition">
                 Mostrar todo el menú
             </button>
         </div>
 
-        <!-- ==================== SECCIÓN 4: NUESTRAS CARNES AL TROMPO Y PARRILLA ==================== -->
+        <!-- ==================== SECCIÓN 5: NUESTRAS CARNES AL TROMPO Y PARRILLA ==================== -->
         <section id="cat-carnes" class="scroll-mt-24 pt-4">
             <div class="bg-white border-2 border-paper-300 rounded-3xl p-6 sm:p-8 shadow-md">
                 <div class="flex flex-col md:flex-row md:items-end justify-between border-b border-paper-200 pb-5 mb-6 gap-2">
@@ -349,7 +352,7 @@
                     <ul class="mt-4 space-y-3 text-sm text-paper-200">
                         <li class="flex items-start gap-2.5">
                             <span class="w-6 h-6 rounded-full bg-trompo-500 text-charcoal-950 font-bold flex items-center justify-center text-xs shrink-0 mt-0.5">1</span>
-                            <span><strong>Arma tu orden aquí:</strong> Selecciona tus promociones, antojitos o especialidades y personaliza la carne, tortilla y verdura.</span>
+                            <span><strong>Arma tu orden aquí:</strong> Selecciona tus promociones, antojitos, tacos o aguas frescas y personaliza la carne, tortilla y verdura.</span>
                         </li>
                         <li class="flex items-start gap-2.5">
                             <span class="w-6 h-6 rounded-full bg-trompo-500 text-charcoal-950 font-bold flex items-center justify-center text-xs shrink-0 mt-0.5">2</span>
@@ -460,7 +463,7 @@
                 <div id="modalOptionsContainer" class="space-y-4"></div>
 
                 <!-- Selector de Preparación (Verdura y Salsa) -->
-                <div class="bg-white border border-paper-300 rounded-2xl p-4">
+                <div id="modalPrepSection" class="bg-white border border-paper-300 rounded-2xl p-4">
                     <div class="flex items-center justify-between mb-2.5">
                         <span class="font-display uppercase tracking-wide text-sm font-bold text-charcoal-900">Preparación (Verdura y Salsa)</span>
                         <span class="text-[11px] font-bold text-cilantro-600 bg-cilantro-600/10 px-2 py-0.5 rounded">Elige las que gustes</span>
@@ -573,7 +576,7 @@
             <!-- Footer Carrito: Total y Botón Enviar WhatsApp -->
             <div id="cartDrawerFooter" class="p-4 sm:p-5 bg-white border-t border-paper-300 space-y-3 shrink-0">
                 <div class="flex items-center justify-between">
-                    <span class="text-gray-700 font-bold text-sm">Subtotal definido:</span>
+                    <span class="text-gray-700 font-bold text-sm">Total estimado:</span>
                     <span id="drawerTotalPrice" class="font-display text-3xl font-bold text-charcoal-900">$0</span>
                 </div>
                 <p id="unpricedWarningNote" class="hidden text-[11px] text-trompo-600 font-bold bg-trompo-500/10 border border-trompo-500/30 rounded-lg px-2.5 py-1.5">
@@ -624,8 +627,8 @@
     <script>
         // Número oficial de WhatsApp de Taquería Sebas (+52 686 387 7309)
         const WHATSAPP_NUMBER = '526863877309';
-        const STORAGE_CART_KEY = 'taqueria_sebas_cart_v2';
-        const STORAGE_NAME_KEY = 'taqueria_sebas_customer_name_v2';
+        const STORAGE_CART_KEY = 'taqueria_sebas_cart_v3';
+        const STORAGE_NAME_KEY = 'taqueria_sebas_customer_name_v3';
 
         // Las 5 carnes exactas disponibles
         const MEATS_LIST = [
@@ -635,6 +638,15 @@
             'Chorizo',
             'Tripa'
         ];
+
+        // Precios de tacos por tipo de carne
+        const TACO_MEAT_PRICES = {
+            'Adobada': 30,
+            'Suadero': 35,
+            'Asada': 35,
+            'Chorizo': 35,
+            'Tripa': 45
+        };
 
         // Opciones de preparación estándar de taquería
         const PREP_OPTIONS = [
@@ -646,7 +658,7 @@
             'Con limones'
         ];
 
-        // Catálogo exacto basado 100% en el menú oficial + fotografías reales apetitosas
+        // Catálogo actualizado con todos los precios nuevos y editados
         const MENU_SECTIONS = [
             {
                 id: 'cat-promociones',
@@ -700,9 +712,9 @@
                     {
                         id: 'promo-medio-adobada',
                         name: '1/2 Kilo (½) de Adobada',
-                        price: 240,
+                        price: 250,
                         priceKnown: true,
-                        priceLabel: '$240',
+                        priceLabel: '$250',
                         description: 'Medio kilo de carne adobada recién cortada del trompo.',
                         badge: 'Medio Kilo',
                         image: 'https://i.postimg.cc/JhB9BV3y/1795579225869.jpg',
@@ -772,15 +784,15 @@
             },
             {
                 id: 'cat-antojitos',
-                title: 'Antojitos con Precio',
+                title: 'Antojitos y Platillos',
                 subtitle: 'Preparados al momento con tortilla recién calentada y la carne de tu preferencia',
                 items: [
                     {
                         id: 'antojito-mulitas',
                         name: 'Mulitas (Maíz y Harina)',
-                        price: 110,
+                        price: 120,
                         priceKnown: true,
-                        priceLabel: '$110',
+                        priceLabel: '$120',
                         description: 'Elige tortilla de Maíz o Harina y carne: Adobada, Asada, Suadero, Chorizo o Tripa.',
                         badge: 'Maíz o Harina',
                         image: 'https://images.unsplash.com/photo-1618040996337-56904b7850b9?auto=format&fit=crop&w=900&q=80',
@@ -817,9 +829,9 @@
                     {
                         id: 'antojito-burros',
                         name: 'Burros',
-                        price: 170,
+                        price: 200,
                         priceKnown: true,
-                        priceLabel: '$170',
+                        priceLabel: '$200',
                         description: 'Tortilla grande de harina con queso y carne a elegir: Adobada, Asada, Suadero, Chorizo o Tripa.',
                         badge: 'Gran Tamaño',
                         image: 'https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=900&q=80',
@@ -830,21 +842,15 @@
                                 choices: MEATS_LIST
                             }
                         ]
-                    }
-                ]
-            },
-            {
-                id: 'cat-especialidades',
-                title: 'Especialidades de la Casa',
-                subtitle: 'Antojitos y tacos del menú general • Precio según carne elegida (se confirma en tienda/WhatsApp)',
-                items: [
+                    },
                     {
                         id: 'esp-quesadillas',
                         name: 'Quesadillas (Maíz y Harina)',
-                        price: 0,
-                        priceKnown: false,
-                        priceLabel: 'Precio según carne',
+                        price: 110,
+                        priceKnown: true,
+                        priceLabel: '$110',
                         description: 'Elige tortilla de Maíz o Harina + queso fundido y carne a elegir.',
+                        badge: 'Con Carne',
                         image: 'https://images.unsplash.com/photo-1599974579688-8dbdd335c77f?auto=format&fit=crop&w=900&q=80',
                         options: [
                             {
@@ -862,10 +868,11 @@
                     {
                         id: 'esp-quesadillas-sencillas',
                         name: 'Quesadillas Sencillas',
-                        price: 0,
-                        priceKnown: false,
-                        priceLabel: 'Precio según carne',
-                        description: 'Tortilla con queso fundido recién derretido al comal.',
+                        price: 50,
+                        priceKnown: true,
+                        priceLabel: '$50',
+                        description: 'Tortilla de Maíz o Harina con queso fundido recién derretido al comal.',
+                        badge: 'Sencilla',
                         image: 'https://images.unsplash.com/photo-1618040996337-56904b7850b9?auto=format&fit=crop&w=900&q=80',
                         options: [
                             {
@@ -878,9 +885,9 @@
                     {
                         id: 'esp-gorditas',
                         name: 'Gorditas',
-                        price: 0,
-                        priceKnown: false,
-                        priceLabel: 'Precio según carne',
+                        price: 100,
+                        priceKnown: true,
+                        priceLabel: '$100',
                         description: 'Masa dorada rellena con la carne de tu elección.',
                         image: 'https://images.unsplash.com/photo-1604467715878-83e57e8bc129?auto=format&fit=crop&w=900&q=80',
                         options: [
@@ -894,9 +901,9 @@
                     {
                         id: 'esp-tortas',
                         name: 'Tortas',
-                        price: 0,
-                        priceKnown: false,
-                        priceLabel: 'Precio según carne',
+                        price: 110,
+                        priceKnown: true,
+                        priceLabel: '$110',
                         description: 'Telera doradita con la carne de tu elección.',
                         image: 'https://images.unsplash.com/photo-1553909489-cd47e0907980?auto=format&fit=crop&w=900&q=80',
                         options: [
@@ -908,48 +915,11 @@
                         ]
                     },
                     {
-                        id: 'esp-tacos-mixtos',
-                        name: 'Tacos Mixtos',
-                        price: 0,
-                        priceKnown: false,
-                        priceLabel: 'Precio según carne',
-                        description: 'Combinación de carnes a elegir al trompo y a la parrilla.',
-                        image: 'https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?auto=format&fit=crop&w=900&q=80',
-                        options: [
-                            {
-                                id: 'carne-1',
-                                label: 'Carne principal',
-                                choices: MEATS_LIST
-                            },
-                            {
-                                id: 'carne-2',
-                                label: 'Segunda carne para combinar',
-                                choices: MEATS_LIST
-                            }
-                        ]
-                    },
-                    {
-                        id: 'esp-tacos-harina',
-                        name: 'Tacos de Harina',
-                        price: 0,
-                        priceKnown: false,
-                        priceLabel: 'Precio según carne',
-                        description: 'Tortilla de harina suave con la carne de tu elección.',
-                        image: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=900&q=80',
-                        options: [
-                            {
-                                id: 'carne',
-                                label: 'Elige tu carne',
-                                choices: MEATS_LIST
-                            }
-                        ]
-                    },
-                    {
                         id: 'esp-tostadas',
                         name: 'Tostadas',
-                        price: 0,
-                        priceKnown: false,
-                        priceLabel: 'Precio según carne',
+                        price: 50,
+                        priceKnown: true,
+                        priceLabel: '$50',
                         description: 'Tostada crujiente con la carne de tu elección.',
                         image: 'https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?auto=format&fit=crop&w=900&q=80',
                         options: [
@@ -963,9 +933,9 @@
                     {
                         id: 'esp-vampiros',
                         name: 'Vampiros',
-                        price: 0,
-                        priceKnown: false,
-                        priceLabel: 'Precio según carne',
+                        price: 70,
+                        priceKnown: true,
+                        priceLabel: '$70',
                         description: 'Tortilla dorada al carbón con queso fundido y carne a elegir.',
                         image: 'https://images.unsplash.com/photo-1613514785940-daed07799d9b?auto=format&fit=crop&w=900&q=80',
                         options: [
@@ -975,6 +945,97 @@
                                 choices: MEATS_LIST
                             }
                         ]
+                    }
+                ]
+            },
+            {
+                id: 'cat-especialidades',
+                title: 'Tacos y Especialidades',
+                subtitle: 'Adobada $30 • Suadero, Asada y Chorizo $35 • Tripa $45 • Taco de Harina $80',
+                items: [
+                    {
+                        id: 'esp-tacos-mixtos',
+                        name: 'Tacos Mixtos',
+                        price: 30,
+                        priceKnown: true,
+                        priceLabel: '$30 / $35 / $45',
+                        dynamicTacoPricing: true,
+                        description: 'Adobada $30 • Suadero, Asada o Chorizo $35 • Tripa $45. Puedes combinar 2 carnes (aplica precio de la especialidad elegida).',
+                        badge: 'Por Carne',
+                        image: 'https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?auto=format&fit=crop&w=900&q=80',
+                        options: [
+                            {
+                                id: 'carne-1',
+                                label: 'Carne principal',
+                                choices: [
+                                    'Adobada ($30)',
+                                    'Suadero ($35)',
+                                    'Asada ($35)',
+                                    'Chorizo ($35)',
+                                    'Tripa ($45)'
+                                ]
+                            },
+                            {
+                                id: 'carne-2',
+                                label: 'Segunda carne para combinar',
+                                choices: [
+                                    'Sencillo (1 sola carne)',
+                                    'Adobada ($30)',
+                                    'Suadero ($35)',
+                                    'Asada ($35)',
+                                    'Chorizo ($35)',
+                                    'Tripa ($45)'
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        id: 'esp-tacos-harina',
+                        name: 'Tacos de Harina',
+                        price: 80,
+                        priceKnown: true,
+                        priceLabel: '$80',
+                        description: 'Tortilla de harina suave con la carne de tu elección.',
+                        badge: 'Tortilla Harina',
+                        image: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=900&q=80',
+                        options: [
+                            {
+                                id: 'carne',
+                                label: 'Elige tu carne',
+                                choices: MEATS_LIST
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'cat-bebidas',
+                title: 'Aguas Frescas',
+                subtitle: 'Refrescantes aguas frescas del día para acompañar tu orden',
+                items: [
+                    {
+                        id: 'bebida-agua-chica',
+                        name: 'Agua Chica',
+                        price: 35,
+                        priceKnown: true,
+                        priceLabel: '$35',
+                        description: 'Vaso chico de agua fresca natural del día.',
+                        badge: 'Chica',
+                        hidePrep: true,
+                        image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=900&q=80',
+                        options: []
+                    },
+                    {
+                        id: 'bebida-agua-grande',
+                        name: 'Agua Grande',
+                        price: 50,
+                        priceKnown: true,
+                        priceLabel: '$50',
+                        description: 'Vaso grande de agua fresca natural del día.',
+                        badge: 'Grande',
+                        hidePrep: true,
+                        image: 'https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80',
+                        options: []
                     }
                 ]
             }
@@ -1017,6 +1078,25 @@
             } catch (e) {
                 console.warn('No se pudo guardar carrito:', e);
             }
+        }
+
+        // ==================== CÁLCULO DE PRECIO DINÁMICO POR SELECCIÓN ====================
+        function getComputedUnitPrice(item, selectedOptions) {
+            if (!item) return 0;
+            if (item.dynamicTacoPricing && selectedOptions) {
+                let maxPrice = 30;
+                Object.values(selectedOptions).forEach(val => {
+                    if (typeof val === 'string') {
+                        const match = val.match(/\$(\d+)/);
+                        if (match) {
+                            const p = parseInt(match[1], 10);
+                            if (p > maxPrice) maxPrice = p;
+                        }
+                    }
+                });
+                return maxPrice;
+            }
+            return item.price || 0;
         }
 
         // ==================== RENDERIZADO DEL MENÚ ====================
@@ -1071,6 +1151,13 @@
                 ? `<span class="font-display text-2xl font-bold text-paper-50 bg-taquero-600 px-3.5 py-1 rounded-xl shadow-lg border border-white/20">${item.priceLabel}</span>`
                 : `<span class="text-[11px] font-extrabold uppercase tracking-wider bg-charcoal-950/90 text-trompo-400 border border-trompo-400/50 px-3 py-1.5 rounded-xl shadow-lg">${item.priceLabel}</span>`;
 
+            let helperLabel = '🌿 Personaliza verdura y salsa';
+            if (item.hidePrep) {
+                helperLabel = '🥤 Lista para recoger';
+            } else if (item.options && item.options.length > 0) {
+                helperLabel = '🥩 Elige carne y preparación';
+            }
+
             return `
                 <article class="group bg-white hover:bg-paper-50 border-2 border-paper-300 hover:border-taquero-500 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
                     <div>
@@ -1118,7 +1205,7 @@
 
                     <div class="px-5 pb-5 pt-3 border-t border-paper-200 flex items-center justify-between gap-3">
                         <span class="text-xs font-semibold text-gray-500">
-                            ${item.options && item.options.length > 0 ? '🥩 Elige carne y preparación' : '🌿 Personaliza verdura y salsa'}
+                            ${helperLabel}
                         </span>
                         <button 
                             type="button" 
@@ -1193,7 +1280,7 @@
             currentModalItem = item;
             currentModalQty = 1;
             currentModalOptions = {};
-            currentModalPreps = new Set(['Con todo (Cebolla y Cilantro)']);
+            currentModalPreps = item.hidePrep ? new Set() : new Set(['Con todo (Cebolla y Cilantro)']);
 
             if (item.options) {
                 item.options.forEach(opt => {
@@ -1211,16 +1298,14 @@
             document.getElementById('modalItemName').textContent = item.name;
             document.getElementById('modalItemDesc').textContent = item.description;
             document.getElementById('modalItemNotes').value = '';
+            document.getElementById('modalItemNotes').placeholder = item.hidePrep
+                ? 'Ej. Sabor horchata, jamaica, sin hielo...'
+                : 'Ej. Tripa bien dorada, salsa aparte, con limones...';
             document.getElementById('modalQtyDisplay').textContent = '1';
 
-            const priceBadge = document.getElementById('modalItemPriceBadge');
-            if (item.priceKnown) {
-                priceBadge.textContent = `Precio: ${item.priceLabel}`;
-                priceBadge.className = 'inline-block mt-1 text-xs font-bold px-2.5 py-0.5 rounded-md bg-cilantro-600 text-white';
-            } else {
-                priceBadge.textContent = 'Precio según carne (Se confirma en tienda/WhatsApp)';
-                priceBadge.className = 'inline-block mt-1 text-xs font-bold px-2.5 py-0.5 rounded-md bg-trompo-500 text-charcoal-950';
-            }
+            // Mostrar u ocultar preparación de verdura y salsa (oculta para aguas)
+            const prepSection = document.getElementById('modalPrepSection');
+            prepSection.classList.toggle('hidden', Boolean(item.hidePrep));
 
             // Renderizar selectores de carne / tortilla / bebida
             const optionsContainer = document.getElementById('modalOptionsContainer');
@@ -1266,6 +1351,7 @@
                 btn.className = `opt-btn-${groupId} py-2 px-3 rounded-xl border-2 text-xs sm:text-sm font-bold transition text-center bg-paper-50 text-charcoal-800 border-paper-300 hover:border-charcoal-700`;
             });
             btnEl.className = `opt-btn-${groupId} py-2 px-3 rounded-xl border-2 text-xs sm:text-sm font-bold transition text-center bg-charcoal-900 text-white border-charcoal-900`;
+            updateModalTotalDisplay();
         }
 
         function renderPrepCheckboxes() {
@@ -1311,9 +1397,16 @@
         function updateModalTotalDisplay() {
             if (!currentModalItem) return;
             const totalDisplay = document.getElementById('modalTotalPrice');
+            const priceBadge = document.getElementById('modalItemPriceBadge');
+            const unitPrice = getComputedUnitPrice(currentModalItem, currentModalOptions);
+
             if (currentModalItem.priceKnown) {
-                totalDisplay.textContent = `$${currentModalItem.price * currentModalQty}`;
+                priceBadge.textContent = `Precio: $${unitPrice} c/u`;
+                priceBadge.className = 'inline-block mt-1 text-xs font-bold px-2.5 py-0.5 rounded-md bg-cilantro-600 text-white';
+                totalDisplay.textContent = `$${unitPrice * currentModalQty}`;
             } else {
+                priceBadge.textContent = 'Precio según carne (Se confirma en tienda/WhatsApp)';
+                priceBadge.className = 'inline-block mt-1 text-xs font-bold px-2.5 py-0.5 rounded-md bg-trompo-500 text-charcoal-950';
                 totalDisplay.textContent = 'Según carne';
             }
         }
@@ -1337,12 +1430,13 @@
                 });
             }
 
-            if (currentModalPreps.size > 0) {
+            if (!currentModalItem.hidePrep && currentModalPreps.size > 0) {
                 details.push(`Preparación: ${Array.from(currentModalPreps).join(', ')}`);
             }
 
             const notes = document.getElementById('modalItemNotes').value.trim();
-            const signature = `${currentModalItem.id}|${details.join('|')}|${notes}`;
+            const unitPrice = getComputedUnitPrice(currentModalItem, currentModalOptions);
+            const signature = `${currentModalItem.id}|${unitPrice}|${details.join('|')}|${notes}`;
 
             const existingIdx = cart.findIndex(item => item.signature === signature);
             if (existingIdx > -1) {
@@ -1352,7 +1446,7 @@
                     signature,
                     id: currentModalItem.id,
                     name: currentModalItem.name,
-                    price: currentModalItem.price,
+                    price: unitPrice,
                     priceKnown: currentModalItem.priceKnown,
                     qty: currentModalQty,
                     details,
@@ -1398,7 +1492,7 @@
                     <div class="text-center py-12 px-4 bg-white rounded-3xl border border-paper-300">
                         <div class="text-5xl mb-3">🌮</div>
                         <h3 class="font-display text-xl font-bold text-charcoal-900 uppercase">Tu orden está vacía</h3>
-                        <p class="text-sm text-gray-600 mt-1">Selecciona tus promociones, tortas, mulitas o tacos para preparar tu pedido para recoger.</p>
+                        <p class="text-sm text-gray-600 mt-1">Selecciona tus promociones, tortas, mulitas, tacos o aguas para preparar tu pedido para recoger.</p>
                         <button type="button" onclick="closeCartDrawer()" class="mt-5 px-5 py-2.5 rounded-xl bg-taquero-600 hover:bg-taquero-700 text-white font-bold text-sm transition">
                             Explorar Menú
                         </button>
@@ -1546,7 +1640,7 @@
             if (orderNotes) {
                 lines.push(`💬 *Comentarios adicionales:* ${orderNotes}`);
             }
-            lines.push(`💰 *SUBTOTAL DEFINIDO: $${totalDefinedPrice}*`);
+            lines.push(`💰 *TOTAL A PAGAR: $${totalDefinedPrice}*`);
             if (hasUnpricedItems) {
                 lines.push('📌 *Nota:* _El pedido incluye especialidades con precio por confirmar según la carne elegida._');
             }
@@ -1572,7 +1666,7 @@
 
         // Resaltado activo en barra de navegación al hacer scroll
         window.addEventListener('scroll', () => {
-            const sectionIds = ['cat-promociones', 'cat-antojitos', 'cat-especialidades', 'cat-carnes'];
+            const sectionIds = ['cat-promociones', 'cat-antojitos', 'cat-especialidades', 'cat-bebidas', 'cat-carnes'];
             const sections = sectionIds.map(id => document.getElementById(id)).filter(Boolean);
             const scrollPos = window.scrollY + 160;
 
