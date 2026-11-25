@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taquería Sebas | Menú Digital Oficial (Solo Para Recoger)</title>
+
+    <!-- Google Fonts: Oswald (Títulos de alto impacto), Pacifico (Cursiva del logo) y Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Pacifico&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        paper: {
+                            50: '#FDFBF7',
+                            100: '#FAF6F0',
+                            200: '#F2E9DC',
+                            300: '#E5D5BE',
+                        },
+                        charcoal: {
+                            950: '#120E0D',
+                            900: '#1A1412',
+                            800: '#261E1B',
+                            700: '#382C28',
+                        },
+                        taquero: {
+                            500: '#E02E38',
+                            600: '#C8232C',
+                            700: '#A11820',
+                        },
+                        cilantro: {
+                            500: '#229653',
+                            600: '#1B7A43',
+                            700: '#145C32',
+                        },
+                        trompo: {
+                            400: '#F09D38',
+                            500: '#D98218',
+                            600: '#B5670B',
+                        }
+                    },
+                    fontFamily: {
+                        display: ['Oswald', 'sans-serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #FAF6F0;
+            color: #1A1412;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .bg-taqueria-hero {
+            background-color: #1A1412;
+            background-image: 
+                radial-gradient(circle at 85% 20%, rgba(200, 35, 44, 0.30) 0%, transparent 50%),
+                radial-gradient(circle at 15% 80%, rgba(217, 130, 24, 0.24) 0%, transparent 50%),
+                repeating-linear-gradient(45deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 2px, transparent 2px, transparent 14px);
+        }
+
+        @keyframes modalPop {
+            from { opacity: 0; transform: translateY(16px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .animate-modal-pop {
+            animation: modalPop 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes drawerSlide {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        .animate-drawer-slide {
+            animation: drawerSlide 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 12px 32px rgba(200, 35, 44, 0.45); }
+            50% { box-shadow: 0 14px 38px rgba(240, 157, 56, 0.55); }
+        }
+        .cart-glow {
+            animation: pulseGlow 3s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-taquero-600 selection:text-white pb-28">
+
+    <!-- ==================== BANNER SUPERIOR FIJO DE AVISO PICK-UP ==================== -->
+    <div class="bg-taquero-600 text-white py-2.5 px-4 text-center border-b border-taquero-700 shadow-sm">
+        <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs sm:text-sm font-bold tracking-wide">
+            <span class="inline-flex items-center gap-1.5 uppercase">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                </svg>
+                ATENCIÓN: NO CONTAMOS CON ENVÍO A DOMICILIO
+            </span>
+            <span class="hidden sm:inline text-white/50">•</span>
+            <span class="bg-charcoal-900/90 text-trompo-400 px-3 py-0.5 rounded-full text-[11px] sm:text-xs uppercase tracking-wider shadow-inner">
+                🛍️ Todos los pedidos son ÚNICAMENTE PARA RECOGER EN TIENDA
+            </span>
+        </div>
+    </div>
+
+    <!-- ==================== HEADER / HERO TAQUERÍA SEBAS ==================== -->
+    <header class="bg-taqueria-hero text-white pt-8 pb-9 px-4 sm:px-6 lg:px-8 border-b-4 border-trompo-500">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex flex-col lg:flex-row items-center justify-between gap-8">
+                
+                <!-- Identidad Visual con Logotipo Oficial -->
+                <div class="flex flex-col md:flex-row items-center text-center md:text-left gap-6">
+                    <!-- Logotipo Oficial de Taquería Sebas -->
+                    <div class="w-48 sm:w-56 md:w-60 shrink-0 select-none flex items-center justify-center transition-transform duration-300 hover:scale-[1.03]">
+                        <img 
+                            src="https://i.postimg.cc/SQXHxxMB/1795490421533.png" 
+                            alt="Logotipo Oficial Taquería Sebas" 
+                            onerror="this.onerror=null;this.src='https://placehold.co/400x300/1A1412/F09D38?text=Taquer%C3%ADa+Sebas';"
+                            class="w-full h-auto max-h-48 sm:max-h-52 object-contain rounded-2xl drop-shadow-[0_12px_24px_rgba(0,0,0,0.65)]"
+                        >
+                    </div>
+
+                    <div>
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cilantro-600/25 border border-cilantro-500/50 text-cilantro-500 text-xs font-bold uppercase tracking-wider mb-2">
+                            <span class="w-2 h-2 rounded-full bg-cilantro-500 animate-ping"></span>
+                            Ordena por WhatsApp • Recoge Sin Hacer Fila
+                        </div>
+                        <h1 class="font-display text-5xl sm:text-6xl font-bold uppercase tracking-tight text-paper-50 leading-none">
+                            TAQUERÍA <span class="text-trompo-400">SEBAS</span>
+                        </h1>
+                        <p class="mt-2.5 text-paper-200/90 text-sm sm:text-base max-w-xl leading-relaxed">
+                            Auténtico sabor al trompo y a la parrilla. Explora nuestro menú fotográfico, arma tu orden en línea y recógela recién hecha en nuestra sucursal.
+                        </p>
+                        <div class="mt-3.5 flex flex-wrap items-center justify-center md:justify-start gap-2.5">
+                            <a href="https://wa.me/526863877309?text=Hola%20Taquer%C3%ADa%20Sebas,%20quisiera%20hacer%20un%20pedido%20para%20recoger." target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 bg-[#25D366]/15 hover:bg-[#25D366]/25 border border-[#25D366]/50 text-[#4ade80] text-xs font-bold px-3 py-1.5 rounded-xl transition">
+                                <span>📲 WhatsApp:</span>
+                                <span class="underline">+52 686 387 7309</span>
+                            </a>
+                            <a href="tel:+526863877309" class="inline-flex items-center gap-1.5 bg-white/10 hover:bg-white/15 border border-white/20 text-paper-100 text-xs font-bold px-3 py-1.5 rounded-xl transition">
+                                <span>📞 Llamar:</span>
+                                <span>686 387 7309</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta Resumen de Modalidad y Pagos -->
+                <div class="w-full lg:w-auto bg-charcoal-800/90 border border-charcoal-700 rounded-2xl p-4 sm:p-5 shadow-xl shrink-0">
+                    <div class="space-y-3">
+                        <div class="flex items-start gap-3">
+                            <span class="w-8 h-8 rounded-xl bg-taquero-600/20 border border-taquero-500/40 text-taquero-500 flex items-center justify-center text-base shrink-0">🛍️</span>
+                            <div>
+                                <p class="font-display uppercase text-sm font-bold text-paper-50 tracking-wide">Modalidad Única: Pick-Up</p>
+                                <p class="text-xs text-paper-300">Solo para recoger en tienda (Sin envío a domicilio)</p>
+                            </div>
+                        </div>
+                        <div class="border-t border-charcoal-700 pt-3 flex items-start gap-3">
+                            <span class="w-8 h-8 rounded-xl bg-cilantro-600/20 border border-cilantro-500/40 text-cilantro-500 flex items-center justify-center text-base shrink-0">💵</span>
+                            <div>
+                                <p class="font-display uppercase text-sm font-bold text-paper-50 tracking-wide">Métodos de Pago en Tienda</p>
+                                <div class="flex flex-wrap gap-1.5 mt-1">
+                                    <span class="text-[11px] font-semibold bg-charcoal-900 text-paper-100 px-2.5 py-0.5 rounded border border-charcoal-700">💵 Efectivo</span>
+                                    <span class="text-[11px] font-semibold bg-charcoal-900 text-paper-100 px-2.5 py-0.5 rounded border border-charcoal-700">📲 Transferencia</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Barra de Búsqueda Rápida -->
+            <div class="mt-7 max-w-2xl mx-auto relative">
+                <div class="relative flex items-center">
+                    <svg class="w-5 h-5 text-gray-400 absolute left-4 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="Buscar kilo de asada, tortas, mulitas, burros, tacos, quesadillas..." 
+                        class="w-full bg-paper-50 text-charcoal-900 placeholder-gray-500 pl-12 pr-10 py-3.5 rounded-2xl border-2 border-transparent focus:border-trompo-400 focus:outline-none text-sm sm:text-base font-medium shadow-lg transition"
+                    >
+                    <button id="clearSearchBtn" type="button" class="hidden absolute right-3.5 text-gray-400 hover:text-charcoal-900 p-1" aria-label="Limpiar búsqueda">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ==================== NAVEGACIÓN STICKY POR CATEGORÍAS ==================== -->
+    <nav class="sticky top-0 z-30 bg-paper-100/95 backdrop-blur-md border-b border-paper-300 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div id="categoryNav" class="flex items-center gap-2 sm:gap-3 py-3 overflow-x-auto no-scrollbar">
+                <a href="#cat-promociones" data-cat="cat-promociones" class="cat-pill active shrink-0 px-4 py-2 rounded-xl font-display uppercase tracking-wider text-sm font-bold transition-all bg-taquero-600 text-white shadow">
+                    🔥 Promociones y Combos
+                </a>
+                <a href="#cat-antojitos" data-cat="cat-antojitos" class="cat-pill shrink-0 px-4 py-2 rounded-xl font-display uppercase tracking-wider text-sm font-bold transition-all bg-white text-charcoal-800 hover:bg-paper-200 border border-paper-300">
+                    🌯 Antojitos con Precio
+                </a>
+                <a href="#cat-especialidades" data-cat="cat-especialidades" class="cat-pill shrink-0 px-4 py-2 rounded-xl font-display uppercase tracking-wider text-sm font-bold transition-all bg-white text-charcoal-800 hover:bg-paper-200 border border-paper-300">
+                    🌮 Especialidades de la Casa
+                </a>
+                <a href="#cat-carnes" data-cat="cat-carnes" class="cat-pill shrink-0 px-4 py-2 rounded-xl font-display uppercase tracking-wider text-sm font-bold transition-all bg-white text-charcoal-800 hover:bg-paper-200 border border-paper-300">
+                    🥩 Nuestras 5 Carnes
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ==================== CONTENEDOR PRINCIPAL DEL MENÚ ==================== -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-14">
+
+        <!-- Secciones Dinámicas de Platillos (Promociones, Antojitos, Especialidades) -->
+        <div id="menuSectionsContainer" class="space-y-14"></div>
+
+        <!-- Estado sin resultados en búsqueda -->
+        <div id="emptySearchState" class="hidden max-w-md mx-auto text-center py-14 px-4 bg-white rounded-3xl border border-paper-300 shadow-sm">
+            <div class="text-5xl mb-3">🌮</div>
+            <h3 class="font-display text-2xl font-bold text-charcoal-900 uppercase">No encontramos ese platillo</h3>
+            <p class="text-gray-600 text-sm mt-1">Intenta buscar con palabras como "adobada", "tortas", "mulitas", "burros" o "kilo".</p>
+            <button type="button" onclick="resetSearch()" class="mt-4 px-5 py-2.5 rounded-xl bg-taquero-600 hover:bg-taquero-700 text-white font-bold text-sm transition">
+                Mostrar todo el menú
+            </button>
+        </div>
+
+        <!-- ==================== SECCIÓN 4: NUESTRAS CARNES AL TROMPO Y PARRILLA ==================== -->
+        <section id="cat-carnes" class="scroll-mt-24 pt-4">
+            <div class="bg-white border-2 border-paper-300 rounded-3xl p-6 sm:p-8 shadow-md">
+                <div class="flex flex-col md:flex-row md:items-end justify-between border-b border-paper-200 pb-5 mb-6 gap-2">
+                    <div>
+                        <span class="inline-block text-xs font-extrabold uppercase tracking-widest text-taquero-600 bg-taquero-600/10 px-3 py-1 rounded-full mb-2">
+                            Variedad Disponible
+                        </span>
+                        <h2 class="font-display text-3xl sm:text-4xl font-bold uppercase tracking-wide text-charcoal-900">
+                            Nuestras 5 Carnes al Trompo y Parrilla
+                        </h2>
+                        <p class="text-sm text-gray-600 mt-1">
+                            Elige cualquiera de nuestras 5 carnes al personalizar tus tortas, mulitas, burros, quesadillas, gorditas, tacos, tostadas o vampiros.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                    <!-- Adobada -->
+                    <div class="bg-paper-100 border border-paper-300 rounded-2xl p-4 flex flex-col justify-between hover:border-taquero-500 hover:-translate-y-0.5 transition duration-200">
+                        <div>
+                            <div class="w-11 h-11 rounded-xl bg-taquero-600 text-white flex items-center justify-center font-display font-bold text-xl mb-3 shadow-sm">
+                                🔥
+                            </div>
+                            <h3 class="font-display text-xl font-bold uppercase text-charcoal-900">Adobada</h3>
+                            <span class="inline-block text-[11px] font-bold text-taquero-600 uppercase tracking-wider mt-0.5">Al Trompo</span>
+                            <p class="text-xs text-gray-600 mt-2 leading-relaxed">
+                                Carne marinada en nuestro adobo tradicional de la casa, rebanada directo del trompo.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Asada -->
+                    <div class="bg-paper-100 border border-paper-300 rounded-2xl p-4 flex flex-col justify-between hover:border-trompo-500 hover:-translate-y-0.5 transition duration-200">
+                        <div>
+                            <div class="w-11 h-11 rounded-xl bg-trompo-500 text-white flex items-center justify-center font-display font-bold text-xl mb-3 shadow-sm">
+                                🥩
+                            </div>
+                            <h3 class="font-display text-xl font-bold uppercase text-charcoal-900">Asada</h3>
+                            <span class="inline-block text-[11px] font-bold text-trompo-600 uppercase tracking-wider mt-0.5">A la Parrilla</span>
+                            <p class="text-xs text-gray-600 mt-2 leading-relaxed">
+                                Carne de res sazonada y asada al carbón al momento, jugosa y picada al gusto.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Suadero -->
+                    <div class="bg-paper-100 border border-paper-300 rounded-2xl p-4 flex flex-col justify-between hover:border-cilantro-500 hover:-translate-y-0.5 transition duration-200">
+                        <div>
+                            <div class="w-11 h-11 rounded-xl bg-cilantro-600 text-white flex items-center justify-center font-display font-bold text-xl mb-3 shadow-sm">
+                                🍲
+                            </div>
+                            <h3 class="font-display text-xl font-bold uppercase text-charcoal-900">Suadero</h3>
+                            <span class="inline-block text-[11px] font-bold text-cilantro-600 uppercase tracking-wider mt-0.5">Suave y Jugoso</span>
+                            <p class="text-xs text-gray-600 mt-2 leading-relaxed">
+                                Corte tradicional de res cocinado lentamente para lograr una textura suave y doradita.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Chorizo -->
+                    <div class="bg-paper-100 border border-paper-300 rounded-2xl p-4 flex flex-col justify-between hover:border-taquero-500 hover:-translate-y-0.5 transition duration-200">
+                        <div>
+                            <div class="w-11 h-11 rounded-xl bg-taquero-700 text-white flex items-center justify-center font-display font-bold text-xl mb-3 shadow-sm">
+                                🌶️
+                            </div>
+                            <h3 class="font-display text-xl font-bold uppercase text-charcoal-900">Chorizo</h3>
+                            <span class="inline-block text-[11px] font-bold text-taquero-700 uppercase tracking-wider mt-0.5">Bien Dorado</span>
+                            <p class="text-xs text-gray-600 mt-2 leading-relaxed">
+                                Chorizo artesanal sazonado con especias, ideal solo o combinado en tacos mixtos.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Tripa -->
+                    <div class="bg-paper-100 border border-paper-300 rounded-2xl p-4 flex flex-col justify-between hover:border-trompo-500 hover:-translate-y-0.5 transition duration-200">
+                        <div>
+                            <div class="w-11 h-11 rounded-xl bg-charcoal-800 text-trompo-400 flex items-center justify-center font-display font-bold text-xl mb-3 shadow-sm">
+                                ✨
+                            </div>
+                            <h3 class="font-display text-xl font-bold uppercase text-charcoal-900">Tripa</h3>
+                            <span class="inline-block text-[11px] font-bold text-charcoal-700 uppercase tracking-wider mt-0.5">Clásica Taquera</span>
+                            <p class="text-xs text-gray-600 mt-2 leading-relaxed">
+                                Preparada al momento con el toque dorado perfecto (pídela suave o bien doradita en tus notas).
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TARJETA INFORMATIVA DE PICK-UP Y MÉTODOS DE PAGO ==================== -->
+        <section class="bg-charcoal-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl border border-charcoal-700">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div>
+                    <span class="inline-block bg-taquero-600 text-white text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-3">
+                        Información Importante
+                    </span>
+                    <h2 class="font-display text-3xl sm:text-4xl font-bold uppercase text-paper-50">
+                        ¿Cómo funciona tu pedido en Taquería Sebas?
+                    </h2>
+                    <ul class="mt-4 space-y-3 text-sm text-paper-200">
+                        <li class="flex items-start gap-2.5">
+                            <span class="w-6 h-6 rounded-full bg-trompo-500 text-charcoal-950 font-bold flex items-center justify-center text-xs shrink-0 mt-0.5">1</span>
+                            <span><strong>Arma tu orden aquí:</strong> Selecciona tus promociones, antojitos o especialidades y personaliza la carne, tortilla y verdura.</span>
+                        </li>
+                        <li class="flex items-start gap-2.5">
+                            <span class="w-6 h-6 rounded-full bg-trompo-500 text-charcoal-950 font-bold flex items-center justify-center text-xs shrink-0 mt-0.5">2</span>
+                            <span><strong>Envíalo por WhatsApp:</strong> Tu pedido llega directo al <strong>+52 686 387 7309</strong> con todo el detalle listo para prepararse.</span>
+                        </li>
+                        <li class="flex items-start gap-2.5">
+                            <span class="w-6 h-6 rounded-full bg-taquero-600 text-white font-bold flex items-center justify-center text-xs shrink-0 mt-0.5">3</span>
+                            <span><strong>Recoge en sucursal:</strong> Recuerda que <u>no hacemos envíos a domicilio</u>. Pasa por tu pedido y paga en tienda con <strong>Efectivo o Transferencia</strong>.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="bg-charcoal-800 border border-charcoal-700 rounded-2xl p-5 sm:p-6 space-y-4">
+                    <h3 class="font-display text-xl font-bold uppercase text-trompo-400">Formas de Pago en Sucursal</h3>
+                    <div class="grid grid-cols-2 gap-3 text-center">
+                        <div class="bg-charcoal-900 p-4 rounded-xl border border-charcoal-700">
+                            <div class="text-2xl mb-1">💵</div>
+                            <div class="font-display uppercase text-sm font-bold text-paper-50">Efectivo</div>
+                            <p class="text-[11px] text-gray-400 mt-0.5">Pago directo al recoger</p>
+                        </div>
+                        <div class="bg-charcoal-900 p-4 rounded-xl border border-charcoal-700">
+                            <div class="text-2xl mb-1">📲</div>
+                            <div class="font-display uppercase text-sm font-bold text-paper-50">Transferencia</div>
+                            <p class="text-[11px] text-gray-400 mt-0.5">Transferencia bancaria</p>
+                        </div>
+                    </div>
+                    <div class="pt-2 space-y-2.5">
+                        <a href="https://wa.me/526863877309?text=Hola%20Taquer%C3%ADa%20Sebas,%20quisiera%20consultar%20un%20precio%20o%20hacer%20un%20pedido%20para%20recoger." target="_blank" rel="noopener noreferrer" class="w-full inline-flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-charcoal-950 font-display uppercase tracking-wider font-bold py-3 px-4 rounded-xl transition shadow-lg">
+                            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                                <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.1.824z"/>
+                            </svg>
+                            <span>WhatsApp Directo: +52 686 387 7309</span>
+                        </a>
+                        <a href="tel:+526863877309" class="w-full inline-flex items-center justify-center gap-2 bg-charcoal-900 hover:bg-charcoal-950 text-paper-100 border border-charcoal-700 font-display uppercase tracking-wider font-bold py-2.5 px-4 rounded-xl transition text-sm">
+                            <span>📞 Llamar por Teléfono: 686 387 7309</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="bg-charcoal-950 text-paper-300 border-t border-charcoal-800 py-8 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+            <div>
+                <div class="font-display text-2xl font-bold text-paper-50 uppercase tracking-wide">
+                    TAQUERÍA <span class="text-trompo-400">SEBAS</span>
+                </div>
+                <p class="text-xs text-gray-400 mt-1">
+                    Servicio exclusivamente para recoger en tienda • Pagos con Efectivo y Transferencia.
+                </p>
+            </div>
+            <div class="text-xs text-gray-400">
+                Pedidos WhatsApp y Teléfono: <a href="https://wa.me/526863877309" target="_blank" rel="noopener noreferrer" class="text-paper-100 font-bold hover:text-trompo-400 transition">+52 686 387 7309</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ==================== BARRA FLOTANTE INFERIOR DEL CARRITO ==================== -->
+    <div id="floatingCartBar" class="fixed bottom-4 inset-x-0 z-40 px-4 pointer-events-none transition-transform duration-300 translate-y-28">
+        <div class="max-w-xl mx-auto pointer-events-auto">
+            <button type="button" onclick="openCartDrawer()" class="w-full bg-taquero-600 hover:bg-taquero-700 text-white rounded-2xl p-3.5 sm:p-4 cart-glow border-2 border-trompo-400/70 flex items-center justify-between transition transform active:scale-[0.99]">
+                <div class="flex items-center gap-3">
+                    <span id="floatingCartCount" class="flex items-center justify-center w-9 h-9 rounded-xl bg-charcoal-900 text-trompo-400 font-display font-bold text-lg">
+                        0
+                    </span>
+                    <div class="text-left">
+                        <span class="block font-display uppercase tracking-wider font-bold text-base leading-none">Ver Mi Pedido (Pick-Up)</span>
+                        <span class="text-xs text-paper-100/90">Solo para recoger • Enviar por WhatsApp</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span id="floatingCartTotal" class="font-display text-xl sm:text-2xl font-bold text-paper-50">$0</span>
+                    <svg class="w-5 h-5 text-paper-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </div>
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL DE PERSONALIZACIÓN DE PLATILLO ==================== -->
+    <div id="customModalBackdrop" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white border border-paper-300 w-full max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col animate-modal-pop">
+            
+            <!-- Header del Modal con Fotografía del Platillo -->
+            <div class="relative h-48 sm:h-52 bg-charcoal-900 text-white shrink-0 border-b-4 border-trompo-500 overflow-hidden">
+                <img id="modalItemPhoto" src="" alt="" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-charcoal-950 via-charcoal-900/55 to-black/20"></div>
+                <button type="button" onclick="closeCustomModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-charcoal-900/85 hover:bg-charcoal-800 text-white flex items-center justify-center border border-white/20 transition shadow-lg" aria-label="Cerrar">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+                <div class="absolute bottom-4 left-5 right-5">
+                    <span id="modalItemCategory" class="text-[11px] font-bold uppercase tracking-wider text-trompo-400 bg-charcoal-950/85 px-2.5 py-0.5 rounded-md"></span>
+                    <h3 id="modalItemName" class="font-display text-2xl sm:text-3xl font-bold text-paper-50 uppercase leading-tight mt-1 drop-shadow"></h3>
+                    <span id="modalItemPriceBadge" class="inline-block mt-1 text-xs font-bold px-2.5 py-0.5 rounded-md shadow"></span>
+                </div>
+            </div>
+
+            <!-- Cuerpo Scrollable de Opciones -->
+            <div class="p-5 overflow-y-auto space-y-5 flex-1 bg-paper-50">
+                <p id="modalItemDesc" class="text-sm text-gray-700 leading-relaxed"></p>
+
+                <!-- Opciones específicas del platillo (Carne, Tortilla, Bebida, etc.) -->
+                <div id="modalOptionsContainer" class="space-y-4"></div>
+
+                <!-- Selector de Preparación (Verdura y Salsa) -->
+                <div class="bg-white border border-paper-300 rounded-2xl p-4">
+                    <div class="flex items-center justify-between mb-2.5">
+                        <span class="font-display uppercase tracking-wide text-sm font-bold text-charcoal-900">Preparación (Verdura y Salsa)</span>
+                        <span class="text-[11px] font-bold text-cilantro-600 bg-cilantro-600/10 px-2 py-0.5 rounded">Elige las que gustes</span>
+                    </div>
+                    <div id="prepCheckboxes" class="grid grid-cols-2 gap-2"></div>
+                </div>
+
+                <!-- Notas adicionales del platillo -->
+                <div>
+                    <label for="modalItemNotes" class="block font-display uppercase tracking-wide text-sm font-bold text-charcoal-900 mb-1.5">
+                        Instrucciones especiales (Opcional)
+                    </label>
+                    <input type="text" id="modalItemNotes" placeholder="Ej. Tripa bien dorada, salsa aparte, con limones..." class="w-full bg-white border border-paper-300 rounded-xl px-3.5 py-2.5 text-sm text-charcoal-900 placeholder-gray-400 focus:border-taquero-600 focus:outline-none">
+                </div>
+            </div>
+
+            <!-- Footer del Modal: Cantidad y Botón Agregar -->
+            <div class="p-4 sm:p-5 bg-white border-t border-paper-300 flex items-center gap-3 shrink-0">
+                <div class="flex items-center bg-paper-100 rounded-xl border border-paper-300 p-1">
+                    <button type="button" onclick="changeModalQty(-1)" class="w-9 h-9 rounded-lg hover:bg-paper-200 text-charcoal-900 font-bold text-lg flex items-center justify-center transition">-</button>
+                    <span id="modalQtyDisplay" class="w-9 text-center font-display font-bold text-lg text-charcoal-900">1</span>
+                    <button type="button" onclick="changeModalQty(1)" class="w-9 h-9 rounded-lg hover:bg-paper-200 text-charcoal-900 font-bold text-lg flex items-center justify-center transition">+</button>
+                </div>
+                <button type="button" onclick="confirmAddToCart()" class="flex-1 bg-taquero-600 hover:bg-taquero-700 text-white font-display uppercase tracking-wider font-bold py-3 px-4 rounded-xl shadow-lg transition flex items-center justify-between text-base">
+                    <span>Agregar al pedido</span>
+                    <span id="modalTotalPrice" class="text-trompo-400 text-lg">$0</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== DRAWER LATERAL DEL CARRITO Y CHECKOUT WHATSAPP ==================== -->
+    <div id="cartDrawerBackdrop" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex justify-end">
+        <div class="bg-paper-50 border-l border-paper-300 w-full max-w-md h-full flex flex-col shadow-2xl animate-drawer-slide">
+            
+            <!-- Header Carrito -->
+            <div class="p-4 sm:p-5 bg-charcoal-900 text-white border-b-4 border-trompo-500 flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-2xl">🛍️</span>
+                    <div>
+                        <h2 class="font-display text-2xl font-bold text-paper-50 uppercase leading-none">Tu Pedido</h2>
+                        <span class="text-xs text-trompo-400 font-semibold">Taquería Sebas • Solo Para Recoger</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button id="clearCartBtn" type="button" onclick="clearCart()" class="hidden text-xs font-bold text-paper-300 hover:text-taquero-500 bg-charcoal-800 hover:bg-charcoal-700 px-2.5 py-1.5 rounded-lg transition" title="Vaciar carrito">
+                        Vaciar
+                    </button>
+                    <button type="button" onclick="closeCartDrawer()" class="w-9 h-9 rounded-xl bg-charcoal-800 hover:bg-charcoal-700 text-gray-300 hover:text-white flex items-center justify-center transition" aria-label="Cerrar carrito">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Aviso fijo dentro del carrito: SOLO PICK-UP -->
+            <div class="bg-taquero-600/15 border-b border-taquero-600/30 px-4 py-2.5 flex items-center gap-2.5 shrink-0">
+                <span class="text-lg shrink-0">🏪</span>
+                <p class="text-xs font-bold text-taquero-700 leading-snug">
+                    MODALIDAD ÚNICA: SOLO PARA RECOGER EN TIENDA. No realizamos entregas a domicilio.
+                </p>
+            </div>
+
+            <!-- Contenido Scrollable del Carrito + Formulario -->
+            <div class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-6">
+                <!-- Lista de Artículos -->
+                <div id="cartItemsList" class="space-y-3"></div>
+
+                <!-- Formulario de Datos para Recoger -->
+                <div id="checkoutFormSection" class="space-y-4 pt-4 border-t border-paper-300">
+                    <h3 class="font-display text-lg font-bold uppercase text-charcoal-900 tracking-wide">Datos para recoger tu pedido</h3>
+                    
+                    <!-- Nombre del Cliente -->
+                    <div>
+                        <label for="customerName" class="block text-xs font-bold uppercase tracking-wider text-charcoal-800 mb-1">Tu Nombre *</label>
+                        <input type="text" id="customerName" placeholder="Ej. Juan Pérez" class="w-full bg-white border border-paper-300 rounded-xl px-3.5 py-2.5 text-sm text-charcoal-900 placeholder-gray-400 focus:border-taquero-600 focus:outline-none">
+                    </div>
+
+                    <!-- Hora aproximada en que pasa a recoger (Opcional) -->
+                    <div>
+                        <label for="pickupTime" class="block text-xs font-bold uppercase tracking-wider text-charcoal-800 mb-1">¿En cuánto tiempo pasas a recoger? (Opcional)</label>
+                        <input type="text" id="pickupTime" placeholder="Ej. En 20 minutos / A las 8:30 pm" class="w-full bg-white border border-paper-300 rounded-xl px-3.5 py-2.5 text-sm text-charcoal-900 placeholder-gray-400 focus:border-taquero-600 focus:outline-none">
+                    </div>
+
+                    <!-- Método de Pago (Solo Efectivo y Transferencia) -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-charcoal-800 mb-1.5">¿Cómo vas a pagar en tienda? *</label>
+                        <div class="grid grid-cols-2 gap-2.5">
+                            <button type="button" onclick="setPaymentMethod('Efectivo')" class="payment-btn py-2.5 px-3 rounded-xl border-2 text-xs sm:text-sm font-bold transition bg-charcoal-900 text-white border-charcoal-900">
+                                💵 Efectivo
+                            </button>
+                            <button type="button" onclick="setPaymentMethod('Transferencia')" class="payment-btn py-2.5 px-3 rounded-xl border-2 text-xs sm:text-sm font-bold transition bg-white text-charcoal-800 border-paper-300 hover:border-charcoal-700">
+                                📲 Transferencia
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Comentarios Generales -->
+                    <div>
+                        <label for="orderNotes" class="block text-xs font-bold uppercase tracking-wider text-charcoal-800 mb-1">Notas adicionales (Opcional)</label>
+                        <input type="text" id="orderNotes" placeholder="Ej. Limones extra, servilletas..." class="w-full bg-white border border-paper-300 rounded-xl px-3.5 py-2.5 text-sm text-charcoal-900 placeholder-gray-400 focus:border-taquero-600 focus:outline-none">
+                    </div>
+
+                    <!-- Mensaje de validación -->
+                    <div id="checkoutErrorMsg" class="hidden p-3 rounded-xl bg-red-50 border border-taquero-600 text-taquero-700 text-xs font-bold"></div>
+                </div>
+            </div>
+
+            <!-- Footer Carrito: Total y Botón Enviar WhatsApp -->
+            <div id="cartDrawerFooter" class="p-4 sm:p-5 bg-white border-t border-paper-300 space-y-3 shrink-0">
+                <div class="flex items-center justify-between">
+                    <span class="text-gray-700 font-bold text-sm">Subtotal definido:</span>
+                    <span id="drawerTotalPrice" class="font-display text-3xl font-bold text-charcoal-900">$0</span>
+                </div>
+                <p id="unpricedWarningNote" class="hidden text-[11px] text-trompo-600 font-bold bg-trompo-500/10 border border-trompo-500/30 rounded-lg px-2.5 py-1.5">
+                    * Incluye platillos con precio según carne elegida (se confirma al recibir tu WhatsApp).
+                </p>
+                <button type="button" onclick="sendOrderToWhatsApp()" class="w-full bg-[#25D366] hover:bg-[#20bd5a] text-charcoal-950 font-display uppercase tracking-wider font-bold py-3.5 px-5 rounded-xl shadow-lg transition flex items-center justify-center gap-2.5 text-base sm:text-lg">
+                    <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                        <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.1.824z"/>
+                    </svg>
+                    <span>Enviar Pedido por WhatsApp</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== LIGHTBOX / VISTA PREVIA DE FOTOGRAFÍA ==================== -->
+    <div id="photoLightbox" class="fixed inset-0 z-50 hidden bg-black/90 backdrop-blur-md flex items-center justify-center p-4" onclick="closePhotoLightbox()">
+        <div class="relative max-w-2xl w-full bg-charcoal-900 border-2 border-trompo-500/60 rounded-3xl overflow-hidden shadow-2xl animate-modal-pop" onclick="event.stopPropagation()">
+            <button type="button" onclick="closePhotoLightbox()" class="absolute top-3.5 right-3.5 z-10 w-10 h-10 rounded-full bg-charcoal-950/85 hover:bg-taquero-600 text-white flex items-center justify-center border border-white/20 transition shadow-lg" aria-label="Cerrar vista previa">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+            <div class="aspect-[4/3] w-full bg-charcoal-950">
+                <img id="lightboxImg" src="" alt="" class="w-full h-full object-cover">
+            </div>
+            <div class="p-4 sm:p-5 flex items-center justify-between gap-4 bg-charcoal-900 text-white">
+                <div>
+                    <h4 id="lightboxTitle" class="font-display text-2xl font-bold uppercase text-paper-50"></h4>
+                    <p id="lightboxPrice" class="text-sm font-bold text-trompo-400 mt-0.5"></p>
+                </div>
+                <button id="lightboxOrderBtn" type="button" class="bg-taquero-600 hover:bg-taquero-700 text-white font-display uppercase tracking-wider font-bold text-sm px-5 py-2.5 rounded-xl shadow transition">
+                    + Ordenar Platillo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== NOTIFICACIÓN TOAST ==================== -->
+    <div id="toastNotification" class="fixed top-20 right-4 z-50 pointer-events-none opacity-0 transform -translate-y-3 transition-all duration-300">
+        <div class="bg-charcoal-900 border-2 border-trompo-400 text-paper-50 px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-2.5 text-sm font-bold">
+            <span class="w-6 h-6 rounded-full bg-cilantro-600 text-white flex items-center justify-center text-xs">✓</span>
+            <span id="toastText">Agregado a tu orden</span>
+        </div>
+    </div>
+
+    <!-- ==================== JAVASCRIPT DEL MENÚ Y CARRITO ==================== -->
+    <script>
+        // Número oficial de WhatsApp de Taquería Sebas (+52 686 387 7309)
+        const WHATSAPP_NUMBER = '526863877309';
+        const STORAGE_CART_KEY = 'taqueria_sebas_cart_v2';
+        const STORAGE_NAME_KEY = 'taqueria_sebas_customer_name_v2';
+
+        // Las 5 carnes exactas disponibles
+        const MEATS_LIST = [
+            'Adobada',
+            'Asada',
+            'Suadero',
+            'Chorizo',
+            'Tripa'
+        ];
+
+        // Opciones de preparación estándar de taquería
+        const PREP_OPTIONS = [
+            'Con todo (Cebolla y Cilantro)',
+            'Sin cebolla',
+            'Sin cilantro',
+            'Salsa roja',
+            'Salsa verde',
+            'Con limones'
+        ];
+
+        // Catálogo exacto basado 100% en el menú oficial + fotografías reales apetitosas
+        const MENU_SECTIONS = [
+            {
+                id: 'cat-promociones',
+                title: 'Promociones y Combos',
+                subtitle: 'Paquetes por kilo, platos y combos oficiales de Taquería Sebas',
+                items: [
+                    {
+                        id: 'promo-kilo-asada',
+                        name: '1 Kilo de Asada',
+                        price: 600,
+                        priceKnown: true,
+                        priceLabel: '$600',
+                        description: '1 kilogramo completo de carne asada al carbón, lista para compartir.',
+                        badge: 'Por Kilo',
+                        image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80',
+                        options: []
+                    },
+                    {
+                        id: 'promo-kilo-adobada',
+                        name: '1 Kilo de Adobada',
+                        price: 500,
+                        priceKnown: true,
+                        priceLabel: '$500',
+                        description: '1 kilogramo completo de carne adobada tradicional del trompo.',
+                        badge: 'Por Kilo',
+                        image: 'https://images.unsplash.com/photo-1599974579688-8dbdd335c77f?auto=format&fit=crop&w=900&q=80',
+                        options: []
+                    },
+                    {
+                        id: 'promo-plato-asada',
+                        name: '1 Plato de Asada',
+                        price: 300,
+                        priceKnown: true,
+                        priceLabel: '$300',
+                        description: 'Porción generosa de carne asada en plato.',
+                        badge: 'Plato',
+                        image: 'https://images.unsplash.com/photo-1558030006-450675393462?auto=format&fit=crop&w=900&q=80',
+                        options: []
+                    },
+                    {
+                        id: 'promo-plato-adobada',
+                        name: '1 Plato de Adobada',
+                        price: 250,
+                        priceKnown: true,
+                        priceLabel: '$250',
+                        description: 'Porción generosa de carne adobada en plato.',
+                        badge: 'Plato',
+                        image: 'https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?auto=format&fit=crop&w=900&q=80',
+                        options: []
+                    },
+                    {
+                        id: 'promo-medio-adobada',
+                        name: '1/2 Kilo (½) de Adobada',
+                        price: 240,
+                        priceKnown: true,
+                        priceLabel: '$240',
+                        description: 'Medio kilo de carne adobada recién cortada del trompo.',
+                        badge: 'Medio Kilo',
+                        image: 'https://images.unsplash.com/photo-1613514785940-daed07799d9b?auto=format&fit=crop&w=900&q=80',
+                        options: []
+                    },
+                    {
+                        id: 'promo-3-tortas',
+                        name: 'Promo 3 Tortas x $250',
+                        price: 250,
+                        priceKnown: true,
+                        priceLabel: '$250',
+                        description: 'Elige la carne de cada una de las 3 tortas: Adobada, Asada, Suadero, Chorizo o Tripa.',
+                        badge: '3 Tortas x $250',
+                        image: 'https://images.unsplash.com/photo-1509722747041-616f39b57569?auto=format&fit=crop&w=900&q=80',
+                        options: [
+                            {
+                                id: 'carne-torta-1',
+                                label: 'Carne para Torta #1',
+                                choices: MEATS_LIST
+                            },
+                            {
+                                id: 'carne-torta-2',
+                                label: 'Carne para Torta #2',
+                                choices: MEATS_LIST
+                            },
+                            {
+                                id: 'carne-torta-3',
+                                label: 'Carne para Torta #3',
+                                choices: MEATS_LIST
+                            }
+                        ]
+                    },
+                    {
+                        id: 'combo-adobada-4',
+                        name: 'Combo de Adobada (4 Tacos)',
+                        price: 80,
+                        priceKnown: true,
+                        priceLabel: '$80',
+                        description: '4 tacos de carne adobada del trompo.',
+                        badge: '4 Tacos x $80',
+                        image: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=900&q=80',
+                        options: []
+                    },
+                    {
+                        id: 'combo-3-tacos-bebida',
+                        name: 'Combo 3 Tacos + 1 Soda o 1 Agua',
+                        price: 115,
+                        priceKnown: true,
+                        priceLabel: '$115',
+                        description: 'Elige carne para los 3 tacos entre Adobada, Asada, Suadero, Chorizo o Tripa + elige 1 Soda o 1 Agua.',
+                        badge: 'Combo Completo',
+                        image: 'https://images.unsplash.com/photo-1552332386-f8dd00dc2f85?auto=format&fit=crop&w=900&q=80',
+                        options: [
+                            {
+                                id: 'carne-tacos',
+                                label: 'Elige la carne de tus 3 tacos',
+                                choices: MEATS_LIST
+                            },
+                            {
+                                id: 'bebida',
+                                label: 'Elige tu bebida incluida',
+                                choices: ['1 Soda', '1 Agua']
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'cat-antojitos',
+                title: 'Antojitos con Precio',
+                subtitle: 'Preparados al momento con tortilla recién calentada y la carne de tu preferencia',
+                items: [
+                    {
+                        id: 'antojito-mulitas',
+                        name: 'Mulitas (Maíz y Harina)',
+                        price: 110,
+                        priceKnown: true,
+                        priceLabel: '$110',
+                        description: 'Elige tortilla de Maíz o Harina y carne: Adobada, Asada, Suadero, Chorizo o Tripa.',
+                        badge: 'Maíz o Harina',
+                        image: 'https://images.unsplash.com/photo-1618040996337-56904b7850b9?auto=format&fit=crop&w=900&q=80',
+                        options: [
+                            {
+                                id: 'tortilla',
+                                label: 'Tipo de tortilla',
+                                choices: ['Maíz', 'Harina']
+                            },
+                            {
+                                id: 'carne',
+                                label: 'Elige tu carne',
+                                choices: MEATS_LIST
+                            }
+                        ]
+                    },
+                    {
+                        id: 'antojito-pelliscadas',
+                        name: 'Pelliscadas',
+                        price: 100,
+                        priceKnown: true,
+                        priceLabel: '$100',
+                        description: 'Base doradita con queso fundido y carne a elegir: Adobada, Asada, Suadero, Chorizo o Tripa.',
+                        badge: 'Tradicional',
+                        image: 'https://images.unsplash.com/photo-1604467715878-83e57e8bc129?auto=format&fit=crop&w=900&q=80',
+                        options: [
+                            {
+                                id: 'carne',
+                                label: 'Elige tu carne',
+                                choices: MEATS_LIST
+                            }
+                        ]
+                    },
+                    {
+                        id: 'antojito-burros',
+                        name: 'Burros',
+                        price: 170,
+                        priceKnown: true,
+                        priceLabel: '$170',
+                        description: 'Tortilla grande de harina con queso y carne a elegir: Adobada, Asada, Suadero, Chorizo o Tripa.',
+                        badge: 'Gran Tamaño',
+                        image: 'https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=900&q=80',
+                        options: [
+                            {
+                                id: 'carne',
+                                label: 'Elige tu carne',
+                                choices: MEATS_LIST
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'cat-especialidades',
+                title: 'Especialidades de la Casa',
+                subtitle: 'Antojitos y tacos del menú general • Precio según carne elegida (se confirma en tienda/WhatsApp)',
+                items: [
+                    {
+                        id: 'esp-quesadillas',
+                        name: 'Quesadillas (Maíz y Harina)',
+                        price: 0,
+                        priceKnown: false,
+                        priceLabel: 'Precio según carne',
+                        description: 'Elige tortilla de Maíz o Harina + queso fundido y carne a elegir.',
+                        image: 'https://images.unsplash.com/photo-1599974579688-8dbdd335c77f?auto=format&fit=crop&w=900&q=80',
+                        options: [
+                            {
+                                id: 'tortilla',
+                                label: 'Tipo de tortilla',
+                                choices: ['Maíz', 'Harina']
+                            },
+                            {
+                                id: 'carne',
+                                label: 'Elige tu carne',
+                                choices: MEATS_LIST
+                            }
+                        ]
+                    },
+                    {
+                        id: 'esp-quesadillas-sencillas',
+                        name: 'Quesadillas Sencillas',
+                        price: 0,
+                        priceKnown: false,
+                        priceLabel: 'Precio según carne',
+                        description: 'Tortilla con queso fundido recién derretido al comal.',
+                        image: 'https://images.unsplash.com/photo-1618040996337-56904b7850b9?auto=format&fit=crop&w=900&q=80',
+                        options: [
+                            {
+                                id: 'tortilla',
+                                label: 'Tipo de tortilla',
+                                choices: ['Maíz', 'Harina']
+                            }
+                        ]
+                    },
+                    {
+                        id: 'esp-gorditas',
+                        name: 'Gorditas',
+                        price: 0,
+                        priceKnown: false,
+                        priceLabel: 'Precio según carne',
+                        description: 'Masa dorada rellena con la carne de tu elección.',
+                        image: 'https://images.unsplash.com/photo-1604467715878-83e57e8bc129?auto=format&fit=crop&w=900&q=80',
+                        options: [
+                            {
+                                id: 'carne',
+                                label: 'Elige tu carne',
+                                choices: MEATS_LIST
+                            }
+                        ]
+                    },
+                    {
+                        id: 'esp-tortas',
+                        name: 'Tortas',
+                        price: 0,
+                        priceKnown: false,
+                        priceLabel: 'Precio según carne',
+                        description: 'Telera doradita con la carne de tu elección.',
+                        image: 'https://images.unsplash.com/photo-1553909489-cd47e0907980?auto=format&fit=crop&w=900&q=80',
+                        options: [
+                            {
+                                id: 'carne',
+                                label: 'Elige tu carne',
+                                choices: MEATS_LIST
+                            }
+                        ]
+                    },
+                    {
+                        id: 'esp-tacos-mixtos',
+                        name: 'Tacos Mixtos',
+                        price: 0,
+                        priceKnown: false,
+                        priceLabel: 'Precio según carne',
+                        description: 'Combinación de carnes a elegir al trompo y a la parrilla.',
+                        image: 'https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?auto=format&fit=crop&w=900&q=80',
+                        options: [
+                            {
+                                id: 'carne-1',
+                                label: 'Carne principal',
+                                choices: MEATS_LIST
+                            },
+                            {
+                                id: 'carne-2',
+                                label: 'Segunda carne para combinar',
+                                choices: MEATS_LIST
+                            }
+                        ]
+                    },
+                    {
+                        id: 'esp-tacos-harina',
+                        name: 'Tacos de Harina',
+                        price: 0,
+                        priceKnown: false,
+                        priceLabel: 'Precio según carne',
+                        description: 'Tortilla de harina suave con la carne de tu elección.',
+                        image: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=900&q=80',
+                        options: [
+                            {
+                                id: 'carne',
+                                label: 'Elige tu carne',
+                                choices: MEATS_LIST
+                            }
+                        ]
+                    },
+                    {
+                        id: 'esp-tostadas',
+                        name: 'Tostadas',
+                        price: 0,
+                        priceKnown: false,
+                        priceLabel: 'Precio según carne',
+                        description: 'Tostada crujiente con la carne de tu elección.',
+                        image: 'https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?auto=format&fit=crop&w=900&q=80',
+                        options: [
+                            {
+                                id: 'carne',
+                                label: 'Elige tu carne',
+                                choices: MEATS_LIST
+                            }
+                        ]
+                    },
+                    {
+                        id: 'esp-vampiros',
+                        name: 'Vampiros',
+                        price: 0,
+                        priceKnown: false,
+                        priceLabel: 'Precio según carne',
+                        description: 'Tortilla dorada al carbón con queso fundido y carne a elegir.',
+                        image: 'https://images.unsplash.com/photo-1613514785940-daed07799d9b?auto=format&fit=crop&w=900&q=80',
+                        options: [
+                            {
+                                id: 'carne',
+                                label: 'Elige tu carne',
+                                choices: MEATS_LIST
+                            }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        // Estado global del carrito y modal
+        let cart = [];
+        let currentModalItem = null;
+        let currentModalOptions = {};
+        let currentModalPreps = new Set(['Con todo (Cebolla y Cilantro)']);
+        let currentModalQty = 1;
+        let paymentMethod = 'Efectivo';
+
+        // Referencias DOM
+        const menuSectionsContainer = document.getElementById('menuSectionsContainer');
+        const searchInput = document.getElementById('searchInput');
+        const clearSearchBtn = document.getElementById('clearSearchBtn');
+        const emptySearchState = document.getElementById('emptySearchState');
+
+        // ==================== PERSISTENCIA LOCALSTORAGE ====================
+        function loadSavedState() {
+            try {
+                const savedCart = localStorage.getItem(STORAGE_CART_KEY);
+                if (savedCart) {
+                    const parsed = JSON.parse(savedCart);
+                    if (Array.isArray(parsed)) cart = parsed;
+                }
+                const savedName = localStorage.getItem(STORAGE_NAME_KEY);
+                if (savedName && document.getElementById('customerName')) {
+                    document.getElementById('customerName').value = savedName;
+                }
+            } catch (e) {
+                console.warn('No se pudo cargar estado guardado:', e);
+            }
+        }
+
+        function saveCartState() {
+            try {
+                localStorage.setItem(STORAGE_CART_KEY, JSON.stringify(cart));
+            } catch (e) {
+                console.warn('No se pudo guardar carrito:', e);
+            }
+        }
+
+        // ==================== RENDERIZADO DEL MENÚ ====================
+        function renderMenu(filterText = '') {
+            const query = filterText.trim().toLowerCase();
+            menuSectionsContainer.innerHTML = '';
+            let totalMatches = 0;
+
+            MENU_SECTIONS.forEach(section => {
+                const filteredItems = section.items.filter(item => {
+                    if (!query) return true;
+                    return (
+                        item.name.toLowerCase().includes(query) ||
+                        item.description.toLowerCase().includes(query) ||
+                        section.title.toLowerCase().includes(query)
+                    );
+                });
+
+                if (filteredItems.length === 0) return;
+                totalMatches += filteredItems.length;
+
+                const secEl = document.createElement('section');
+                secEl.id = section.id;
+                secEl.className = 'scroll-mt-24';
+
+                secEl.innerHTML = `
+                    <div class="flex flex-col sm:flex-row sm:items-end justify-between border-b-2 border-paper-300 pb-3 mb-6 gap-1">
+                        <div>
+                            <h2 class="font-display text-3xl sm:text-4xl font-bold uppercase tracking-wide text-charcoal-900">
+                                ${section.title}
+                            </h2>
+                            <p class="text-sm text-gray-600 mt-0.5">${section.subtitle}</p>
+                        </div>
+                        <span class="text-xs font-extrabold uppercase tracking-wider text-taquero-600">
+                            ${filteredItems.length} ${filteredItems.length === 1 ? 'opción' : 'opciones'}
+                        </span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        ${filteredItems.map(item => createItemCardHTML(item)).join('')}
+                    </div>
+                `;
+
+                menuSectionsContainer.appendChild(secEl);
+            });
+
+            emptySearchState.classList.toggle('hidden', totalMatches > 0);
+        }
+
+        function createItemCardHTML(item) {
+            const fallbackImg = `https://placehold.co/800x600/1A1412/F09D38?text=${encodeURIComponent(item.name)}`;
+            const priceBadgeHTML = item.priceKnown
+                ? `<span class="font-display text-2xl font-bold text-paper-50 bg-taquero-600 px-3.5 py-1 rounded-xl shadow-lg border border-white/20">${item.priceLabel}</span>`
+                : `<span class="text-[11px] font-extrabold uppercase tracking-wider bg-charcoal-950/90 text-trompo-400 border border-trompo-400/50 px-3 py-1.5 rounded-xl shadow-lg">${item.priceLabel}</span>`;
+
+            return `
+                <article class="group bg-white hover:bg-paper-50 border-2 border-paper-300 hover:border-taquero-500 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+                    <div>
+                        <!-- Fotografía del Platillo con Vista Previa Lightbox -->
+                        <div class="relative h-52 sm:h-56 w-full bg-charcoal-900 overflow-hidden cursor-pointer" onclick="openPhotoLightbox('${item.id}')">
+                            <img 
+                                src="${item.image}" 
+                                alt="${item.name}" 
+                                onerror="this.onerror=null;this.src='${fallbackImg}';"
+                                loading="lazy"
+                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            >
+                            <div class="absolute inset-0 bg-gradient-to-t from-charcoal-950/80 via-transparent to-black/20"></div>
+
+                            <!-- Etiqueta superior izquierda -->
+                            ${item.badge ? `
+                                <span class="absolute top-3 left-3 bg-cilantro-600 text-white text-[11px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-full shadow-md border border-white/20">
+                                    ${item.badge}
+                                </span>
+                            ` : ''}
+
+                            <!-- Botón lupa vista previa -->
+                            <span class="absolute top-3 right-3 w-8 h-8 rounded-full bg-charcoal-950/75 text-white/90 flex items-center justify-center border border-white/20 opacity-90 group-hover:opacity-100 transition" title="Ampliar foto">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/>
+                                </svg>
+                            </span>
+
+                            <!-- Precio sobre la imagen -->
+                            <div class="absolute bottom-3 right-3">
+                                ${priceBadgeHTML}
+                            </div>
+                        </div>
+
+                        <!-- Detalles del Platillo -->
+                        <div class="p-5 pb-3">
+                            <h3 class="font-display text-2xl font-bold uppercase text-charcoal-900 leading-tight group-hover:text-taquero-600 transition-colors">
+                                ${item.name}
+                            </h3>
+                            <p class="text-xs sm:text-sm text-gray-600 mt-2 leading-relaxed">
+                                ${item.description}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="px-5 pb-5 pt-3 border-t border-paper-200 flex items-center justify-between gap-3">
+                        <span class="text-xs font-semibold text-gray-500">
+                            ${item.options && item.options.length > 0 ? '🥩 Elige carne y preparación' : '🌿 Personaliza verdura y salsa'}
+                        </span>
+                        <button 
+                            type="button" 
+                            onclick="openCustomModal('${item.id}')"
+                            class="inline-flex items-center gap-1.5 bg-charcoal-900 hover:bg-taquero-600 text-white font-display uppercase tracking-wider font-bold text-sm px-4 py-2.5 rounded-xl shadow transition transform active:scale-95"
+                        >
+                            <span>+ Agregar</span>
+                        </button>
+                    </div>
+                </article>
+            `;
+        }
+
+        // ==================== LIGHTBOX DE FOTOGRAFÍA ====================
+        function openPhotoLightbox(itemId) {
+            const data = findItemById(itemId);
+            if (!data) return;
+            const { item } = data;
+            const fallbackImg = `https://placehold.co/800x600/1A1412/F09D38?text=${encodeURIComponent(item.name)}`;
+
+            const imgEl = document.getElementById('lightboxImg');
+            imgEl.src = item.image;
+            imgEl.onerror = () => { imgEl.src = fallbackImg; };
+
+            document.getElementById('lightboxTitle').textContent = item.name;
+            document.getElementById('lightboxPrice').textContent = item.priceKnown ? `Precio: ${item.priceLabel}` : item.priceLabel;
+            
+            const orderBtn = document.getElementById('lightboxOrderBtn');
+            orderBtn.onclick = () => {
+                closePhotoLightbox();
+                openCustomModal(item.id);
+            };
+
+            document.getElementById('photoLightbox').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePhotoLightbox() {
+            document.getElementById('photoLightbox').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        // ==================== BUSCADOR ====================
+        searchInput.addEventListener('input', (e) => {
+            const val = e.target.value;
+            clearSearchBtn.classList.toggle('hidden', val.length === 0);
+            renderMenu(val);
+        });
+
+        clearSearchBtn.addEventListener('click', resetSearch);
+
+        function resetSearch() {
+            searchInput.value = '';
+            clearSearchBtn.classList.add('hidden');
+            renderMenu('');
+        }
+
+        // ==================== MODAL DE PERSONALIZACIÓN ====================
+        function findItemById(itemId) {
+            for (const sec of MENU_SECTIONS) {
+                const found = sec.items.find(i => i.id === itemId);
+                if (found) return { item: found, sectionTitle: sec.title };
+            }
+            return null;
+        }
+
+        function openCustomModal(itemId) {
+            const data = findItemById(itemId);
+            if (!data) return;
+
+            const { item, sectionTitle } = data;
+            currentModalItem = item;
+            currentModalQty = 1;
+            currentModalOptions = {};
+            currentModalPreps = new Set(['Con todo (Cebolla y Cilantro)']);
+
+            if (item.options) {
+                item.options.forEach(opt => {
+                    currentModalOptions[opt.id] = opt.choices[0];
+                });
+            }
+
+            // Rellenar cabecera del modal con fotografía real
+            const fallbackImg = `https://placehold.co/800x600/1A1412/F09D38?text=${encodeURIComponent(item.name)}`;
+            const modalPhoto = document.getElementById('modalItemPhoto');
+            modalPhoto.src = item.image;
+            modalPhoto.onerror = () => { modalPhoto.src = fallbackImg; };
+
+            document.getElementById('modalItemCategory').textContent = sectionTitle;
+            document.getElementById('modalItemName').textContent = item.name;
+            document.getElementById('modalItemDesc').textContent = item.description;
+            document.getElementById('modalItemNotes').value = '';
+            document.getElementById('modalQtyDisplay').textContent = '1';
+
+            const priceBadge = document.getElementById('modalItemPriceBadge');
+            if (item.priceKnown) {
+                priceBadge.textContent = `Precio: ${item.priceLabel}`;
+                priceBadge.className = 'inline-block mt-1 text-xs font-bold px-2.5 py-0.5 rounded-md bg-cilantro-600 text-white';
+            } else {
+                priceBadge.textContent = 'Precio según carne (Se confirma en tienda/WhatsApp)';
+                priceBadge.className = 'inline-block mt-1 text-xs font-bold px-2.5 py-0.5 rounded-md bg-trompo-500 text-charcoal-950';
+            }
+
+            // Renderizar selectores de carne / tortilla / bebida
+            const optionsContainer = document.getElementById('modalOptionsContainer');
+            optionsContainer.innerHTML = '';
+
+            if (item.options && item.options.length > 0) {
+                item.options.forEach(opt => {
+                    const box = document.createElement('div');
+                    box.className = 'bg-white border border-paper-300 rounded-2xl p-4';
+                    box.innerHTML = `
+                        <div class="flex items-center justify-between mb-2.5">
+                            <span class="font-display uppercase tracking-wide text-sm font-bold text-charcoal-900">${opt.label}</span>
+                            <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-taquero-600/10 text-taquero-600">Requerido</span>
+                        </div>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                            ${opt.choices.map((choice, idx) => `
+                                <button 
+                                    type="button"
+                                    onclick="selectModalOption('${opt.id}', '${choice}', this)"
+                                    data-group="${opt.id}"
+                                    class="opt-btn-${opt.id} py-2 px-3 rounded-xl border-2 text-xs sm:text-sm font-bold transition text-center ${idx === 0 ? 'bg-charcoal-900 text-white border-charcoal-900' : 'bg-paper-50 text-charcoal-800 border-paper-300 hover:border-charcoal-700'}"
+                                >
+                                    ${choice}
+                                </button>
+                            `).join('')}
+                        </div>
+                    `;
+                    optionsContainer.appendChild(box);
+                });
+            }
+
+            // Renderizar checkboxes de verdura/salsa
+            renderPrepCheckboxes();
+            updateModalTotalDisplay();
+
+            document.getElementById('customModalBackdrop').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function selectModalOption(groupId, value, btnEl) {
+            currentModalOptions[groupId] = value;
+            document.querySelectorAll(`.opt-btn-${groupId}`).forEach(btn => {
+                btn.className = `opt-btn-${groupId} py-2 px-3 rounded-xl border-2 text-xs sm:text-sm font-bold transition text-center bg-paper-50 text-charcoal-800 border-paper-300 hover:border-charcoal-700`;
+            });
+            btnEl.className = `opt-btn-${groupId} py-2 px-3 rounded-xl border-2 text-xs sm:text-sm font-bold transition text-center bg-charcoal-900 text-white border-charcoal-900`;
+        }
+
+        function renderPrepCheckboxes() {
+            const container = document.getElementById('prepCheckboxes');
+            container.innerHTML = PREP_OPTIONS.map(prep => {
+                const isChecked = currentModalPreps.has(prep);
+                return `
+                    <button 
+                        type="button" 
+                        onclick="togglePrepOption('${prep}')"
+                        class="py-2 px-3 rounded-xl border text-left text-xs font-bold flex items-center gap-2 transition ${isChecked ? 'bg-cilantro-600/15 border-cilantro-600 text-cilantro-700' : 'bg-paper-50 border-paper-300 text-gray-700 hover:border-gray-400'}"
+                    >
+                        <span class="w-4 h-4 rounded flex items-center justify-center text-[10px] ${isChecked ? 'bg-cilantro-600 text-white' : 'border border-gray-400'}">
+                            ${isChecked ? '✓' : ''}
+                        </span>
+                        <span class="truncate">${prep}</span>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function togglePrepOption(prep) {
+            if (currentModalPreps.has(prep)) {
+                currentModalPreps.delete(prep);
+            } else {
+                if (prep === 'Con todo (Cebolla y Cilantro)') {
+                    currentModalPreps.delete('Sin cebolla');
+                    currentModalPreps.delete('Sin cilantro');
+                } else if (prep === 'Sin cebolla' || prep === 'Sin cilantro') {
+                    currentModalPreps.delete('Con todo (Cebolla y Cilantro)');
+                }
+                currentModalPreps.add(prep);
+            }
+            renderPrepCheckboxes();
+        }
+
+        function changeModalQty(delta) {
+            currentModalQty = Math.max(1, currentModalQty + delta);
+            document.getElementById('modalQtyDisplay').textContent = currentModalQty;
+            updateModalTotalDisplay();
+        }
+
+        function updateModalTotalDisplay() {
+            if (!currentModalItem) return;
+            const totalDisplay = document.getElementById('modalTotalPrice');
+            if (currentModalItem.priceKnown) {
+                totalDisplay.textContent = `$${currentModalItem.price * currentModalQty}`;
+            } else {
+                totalDisplay.textContent = 'Según carne';
+            }
+        }
+
+        function closeCustomModal() {
+            document.getElementById('customModalBackdrop').classList.add('hidden');
+            document.body.style.overflow = '';
+            currentModalItem = null;
+        }
+
+        function confirmAddToCart() {
+            if (!currentModalItem) return;
+
+            const details = [];
+            if (currentModalItem.options) {
+                currentModalItem.options.forEach(opt => {
+                    const chosen = currentModalOptions[opt.id];
+                    if (chosen) {
+                        details.push(`${opt.label}: ${chosen}`);
+                    }
+                });
+            }
+
+            if (currentModalPreps.size > 0) {
+                details.push(`Preparación: ${Array.from(currentModalPreps).join(', ')}`);
+            }
+
+            const notes = document.getElementById('modalItemNotes').value.trim();
+            const signature = `${currentModalItem.id}|${details.join('|')}|${notes}`;
+
+            const existingIdx = cart.findIndex(item => item.signature === signature);
+            if (existingIdx > -1) {
+                cart[existingIdx].qty += currentModalQty;
+            } else {
+                cart.push({
+                    signature,
+                    id: currentModalItem.id,
+                    name: currentModalItem.name,
+                    price: currentModalItem.price,
+                    priceKnown: currentModalItem.priceKnown,
+                    qty: currentModalQty,
+                    details,
+                    notes
+                });
+            }
+
+            const addedName = currentModalItem.name;
+            saveCartState();
+            closeCustomModal();
+            updateCartUI();
+            showToast(`"${addedName}" agregado a tu pedido`);
+        }
+
+        // ==================== GESTIÓN DEL CARRITO ====================
+        function updateCartUI() {
+            const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+            const totalDefinedPrice = cart.reduce((sum, item) => sum + (item.priceKnown ? item.price * item.qty : 0), 0);
+            const hasUnpricedItems = cart.some(item => !item.priceKnown);
+
+            const floatingBar = document.getElementById('floatingCartBar');
+            const clearCartBtn = document.getElementById('clearCartBtn');
+
+            document.getElementById('floatingCartCount').textContent = totalItems;
+            document.getElementById('floatingCartTotal').textContent = hasUnpricedItems && totalDefinedPrice === 0
+                ? 'Por confirmar'
+                : `$${totalDefinedPrice}${hasUnpricedItems ? '+' : ''}`;
+
+            if (totalItems > 0) {
+                floatingBar.classList.remove('translate-y-28');
+                clearCartBtn.classList.remove('hidden');
+            } else {
+                floatingBar.classList.add('translate-y-28');
+                clearCartBtn.classList.add('hidden');
+            }
+
+            const cartItemsList = document.getElementById('cartItemsList');
+            const checkoutFormSection = document.getElementById('checkoutFormSection');
+            const cartDrawerFooter = document.getElementById('cartDrawerFooter');
+
+            if (cart.length === 0) {
+                cartItemsList.innerHTML = `
+                    <div class="text-center py-12 px-4 bg-white rounded-3xl border border-paper-300">
+                        <div class="text-5xl mb-3">🌮</div>
+                        <h3 class="font-display text-xl font-bold text-charcoal-900 uppercase">Tu orden está vacía</h3>
+                        <p class="text-sm text-gray-600 mt-1">Selecciona tus promociones, tortas, mulitas o tacos para preparar tu pedido para recoger.</p>
+                        <button type="button" onclick="closeCartDrawer()" class="mt-5 px-5 py-2.5 rounded-xl bg-taquero-600 hover:bg-taquero-700 text-white font-bold text-sm transition">
+                            Explorar Menú
+                        </button>
+                    </div>
+                `;
+                checkoutFormSection.classList.add('hidden');
+                cartDrawerFooter.classList.add('hidden');
+                return;
+            }
+
+            checkoutFormSection.classList.remove('hidden');
+            cartDrawerFooter.classList.remove('hidden');
+
+            document.getElementById('drawerTotalPrice').textContent = `$${totalDefinedPrice}`;
+            document.getElementById('unpricedWarningNote').classList.toggle('hidden', !hasUnpricedItems);
+
+            cartItemsList.innerHTML = cart.map((item, idx) => `
+                <div class="bg-white border border-paper-300 rounded-2xl p-3.5 shadow-sm">
+                    <div class="flex items-start justify-between gap-2">
+                        <h4 class="font-display text-lg font-bold text-charcoal-900 uppercase leading-tight">${item.name}</h4>
+                        <span class="font-display text-lg font-bold ${item.priceKnown ? 'text-taquero-600' : 'text-trompo-600 text-xs uppercase bg-trompo-500/15 px-2 py-0.5 rounded'} shrink-0">
+                            ${item.priceKnown ? `$${item.price * item.qty}` : 'Precio según carne'}
+                        </span>
+                    </div>
+
+                    ${item.details.length > 0 ? `
+                        <ul class="mt-1.5 space-y-0.5">
+                            ${item.details.map(d => `<li class="text-xs text-gray-600 flex items-start gap-1.5"><span class="text-taquero-600 font-bold">•</span> <span>${d}</span></li>`).join('')}
+                        </ul>
+                    ` : ''}
+
+                    ${item.notes ? `
+                        <p class="mt-1.5 text-xs text-charcoal-800 bg-paper-100 px-2.5 py-1 rounded-lg italic">
+                            📝 "${item.notes}"
+                        </p>
+                    ` : ''}
+
+                    <div class="mt-3 pt-2.5 border-t border-paper-200 flex items-center justify-between">
+                        <span class="text-xs font-semibold text-gray-500">
+                            ${item.priceKnown ? `$${item.price} c/u` : 'Confirmar precio en tienda'}
+                        </span>
+                        <div class="flex items-center bg-paper-100 rounded-lg border border-paper-300">
+                            <button type="button" onclick="updateCartItemQty(${idx}, -1)" class="w-7 h-7 flex items-center justify-center text-charcoal-900 hover:bg-paper-200 rounded-l-lg font-bold">-</button>
+                            <span class="w-7 text-center text-xs font-extrabold text-charcoal-900">${item.qty}</span>
+                            <button type="button" onclick="updateCartItemQty(${idx}, 1)" class="w-7 h-7 flex items-center justify-center text-charcoal-900 hover:bg-paper-200 rounded-r-lg font-bold">+</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateCartItemQty(idx, delta) {
+            if (!cart[idx]) return;
+            cart[idx].qty += delta;
+            if (cart[idx].qty <= 0) {
+                cart.splice(idx, 1);
+            }
+            saveCartState();
+            updateCartUI();
+        }
+
+        function clearCart() {
+            cart = [];
+            saveCartState();
+            updateCartUI();
+            showToast('Carrito vaciado');
+        }
+
+        function openCartDrawer() {
+            updateCartUI();
+            document.getElementById('cartDrawerBackdrop').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeCartDrawer() {
+            document.getElementById('cartDrawerBackdrop').classList.add('hidden');
+            document.body.style.overflow = '';
+            document.getElementById('checkoutErrorMsg').classList.add('hidden');
+        }
+
+        // ==================== CHECKOUT Y WHATSAPP ====================
+        function setPaymentMethod(method) {
+            paymentMethod = method;
+            document.querySelectorAll('.payment-btn').forEach(btn => {
+                if (btn.textContent.includes(method)) {
+                    btn.className = 'payment-btn py-2.5 px-3 rounded-xl border-2 text-xs sm:text-sm font-bold transition bg-charcoal-900 text-white border-charcoal-900';
+                } else {
+                    btn.className = 'payment-btn py-2.5 px-3 rounded-xl border-2 text-xs sm:text-sm font-bold transition bg-white text-charcoal-800 border-paper-300 hover:border-charcoal-700';
+                }
+            });
+        }
+
+        function sendOrderToWhatsApp() {
+            if (cart.length === 0) return;
+
+            const customerName = document.getElementById('customerName').value.trim();
+            const pickupTime = document.getElementById('pickupTime').value.trim();
+            const orderNotes = document.getElementById('orderNotes').value.trim();
+            const errorBox = document.getElementById('checkoutErrorMsg');
+
+            if (!customerName) {
+                errorBox.textContent = '⚠️ Por favor escribe tu nombre para identificar tu pedido cuando pases a recoger.';
+                errorBox.classList.remove('hidden');
+                document.getElementById('customerName').focus();
+                return;
+            }
+
+            try {
+                localStorage.setItem(STORAGE_NAME_KEY, customerName);
+            } catch (e) {}
+
+            errorBox.classList.add('hidden');
+
+            const totalDefinedPrice = cart.reduce((sum, item) => sum + (item.priceKnown ? item.price * item.qty : 0), 0);
+            const hasUnpricedItems = cart.some(item => !item.priceKnown);
+
+            let lines = [];
+            lines.push('🌮 *NUEVO PEDIDO - TAQUERÍA SEBAS* 🌮');
+            lines.push('────────────────────');
+            lines.push(`👤 *Cliente:* ${customerName}`);
+            lines.push('🛍️ *Modalidad:* SOLO PARA RECOGER EN TIENDA');
+            if (pickupTime) {
+                lines.push(`⏰ *Tiempo estimado de llegada:* ${pickupTime}`);
+            }
+            lines.push(`💵 *Método de pago:* ${paymentMethod}`);
+            lines.push('────────────────────');
+            lines.push('🔥 *DETALLE DE LA ORDEN:*');
+            lines.push('');
+
+            cart.forEach(item => {
+                const itemTotalStr = item.priceKnown ? `$${item.price * item.qty}` : 'Precio por confirmar según carne';
+                lines.push(`▪ *${item.qty}x ${item.name}* — ${itemTotalStr}`);
+                if (item.details && item.details.length > 0) {
+                    item.details.forEach(detail => {
+                        lines.push(`   ↳ ${detail}`);
+                    });
+                }
+                if (item.notes) {
+                    lines.push(`   📝 _Nota: ${item.notes}_`);
+                }
+            });
+
+            lines.push('');
+            lines.push('────────────────────');
+            if (orderNotes) {
+                lines.push(`💬 *Comentarios adicionales:* ${orderNotes}`);
+            }
+            lines.push(`💰 *SUBTOTAL DEFINIDO: $${totalDefinedPrice}*`);
+            if (hasUnpricedItems) {
+                lines.push('📌 *Nota:* _El pedido incluye especialidades con precio por confirmar según la carne elegida._');
+            }
+            lines.push('────────────────────');
+            lines.push('¡Gracias! Paso a recoger mi orden en sucursal.');
+
+            const message = encodeURIComponent(lines.join('\n'));
+            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
+            window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+        }
+
+        // ==================== UTILIDADES UI ====================
+        let toastTimer;
+        function showToast(text) {
+            const toast = document.getElementById('toastNotification');
+            document.getElementById('toastText').textContent = text;
+            toast.classList.remove('opacity-0', '-translate-y-3');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toast.classList.add('opacity-0', '-translate-y-3');
+            }, 2400);
+        }
+
+        // Resaltado activo en barra de navegación al hacer scroll
+        window.addEventListener('scroll', () => {
+            const sectionIds = ['cat-promociones', 'cat-antojitos', 'cat-especialidades', 'cat-carnes'];
+            const sections = sectionIds.map(id => document.getElementById(id)).filter(Boolean);
+            const scrollPos = window.scrollY + 160;
+
+            let activeId = sections[0]?.id;
+            sections.forEach(sec => {
+                if (sec.offsetTop <= scrollPos) {
+                    activeId = sec.id;
+                }
+            });
+
+            document.querySelectorAll('.cat-pill').forEach(pill => {
+                if (pill.dataset.cat === activeId) {
+                    pill.className = 'cat-pill active shrink-0 px-4 py-2 rounded-xl font-display uppercase tracking-wider text-sm font-bold transition-all bg-taquero-600 text-white shadow';
+                } else {
+                    pill.className = 'cat-pill shrink-0 px-4 py-2 rounded-xl font-display uppercase tracking-wider text-sm font-bold transition-all bg-white text-charcoal-800 hover:bg-paper-200 border border-paper-300';
+                }
+            });
+        });
+
+        // Cerrar modales al hacer clic fuera o presionar Escape
+        document.getElementById('customModalBackdrop').addEventListener('click', (e) => {
+            if (e.target.id === 'customModalBackdrop') closeCustomModal();
+        });
+        document.getElementById('cartDrawerBackdrop').addEventListener('click', (e) => {
+            if (e.target.id === 'cartDrawerBackdrop') closeCartDrawer();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeCustomModal();
+                closeCartDrawer();
+                closePhotoLightbox();
+            }
+        });
+
+        // Inicializar menú y estado guardado al cargar el DOM
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSavedState();
+            renderMenu();
+            updateCartUI();
+        });
+        // Llamada directa adicional de respaldo
+        loadSavedState();
+        renderMenu();
+        updateCartUI();
+    </script>
+</body>
+</html>
