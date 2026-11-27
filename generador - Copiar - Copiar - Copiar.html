@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Generador de Enlace - Documento</title>
+    <!-- Librerías para generar QR y rellenar/aplanar PDF en el navegador -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <style>
+
+    :root {
+      --primary: #1032D1;
+      --primary-dark: #0a2299;
+      --primary-light: #eef2ff;
+      --primary-border: #c7d2fe;
+      --accent-red: #dc2626;
+      --bg-page: #f0f4f9;
+      --bg-card: #ffffff;
+      --bg-section: #f8fafc;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --border-color: #cbd5e1;
+      --radius-lg: 16px;
+      --radius-md: 10px;
+      --radius-sm: 8px;
+      --shadow-card: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Roboto, Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #e8eef7 0%, #f4f7fb 100%);
+      margin: 0;
+      padding: 24px 14px 40px;
+      display: flex;
+      justify-content: center;
+      color: var(--text-main);
+    }
+
+    .container {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      width: 100%;
+      max-width: 680px;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+    }
+
+    /* Encabezado superior con identidad visual */
+    .app-header {
+      background: linear-gradient(135deg, var(--primary) 0%, #1e40af 100%);
+      color: #ffffff;
+      padding: 22px 26px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 4px solid var(--accent-red);
+    }
+
+    .app-header-info h1 {
+      margin: 0;
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+
+    .app-header-info p {
+      margin: 4px 0 0;
+      font-size: 12px;
+      color: #dbeafe;
+    }
+
+    .header-badge {
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    form {
+      padding: 22px 26px 26px;
+    }
+
+    @media (max-width: 520px) {
+      .app-header {
+        padding: 18px 18px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      form {
+        padding: 16px 16px 22px;
+      }
+    }
+
+    /* Tarjetas internas por bloque */
+    .section-card {
+      background: var(--bg-section);
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-md);
+      padding: 16px 18px 8px;
+      margin-bottom: 18px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--primary);
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 8px;
+      margin: 0 0 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .section-title span.dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--primary);
+      display: inline-block;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+    }
+
+    @media (max-width: 560px) {
+      .grid-2, .grid-3 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 5px;
+      letter-spacing: 0.2px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+      text-transform: uppercase;
+      background-color: #ffffff;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    textarea {
+      text-transform: none;
+      font-family: "Consolas", "Courier New", monospace;
+      font-weight: 400;
+      height: 95px;
+      resize: vertical;
+      line-height: 1.4;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(16, 50, 209, 0.14);
+    }
+
+    .input-with-btn {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .input-with-btn input {
+      flex: 1;
+      min-width: 0;
+      font-family: "Consolas", monospace;
+      font-size: 12px;
+    }
+
+    .btn-mini {
+      flex: 0 0 auto;
+      padding: 10px 12px;
+      background-color: var(--primary-light);
+      color: var(--primary);
+      border: 1px solid var(--primary-border);
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .btn-mini:hover {
+      background-color: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+        /* Botones principales de acción */
+    .btn-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1.15fr;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    button.pdf-btn {
+      background-color: #dc2626;
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(220, 38, 38, 0.25);
+    }
+
+    button.pdf-btn:hover {
+      background-color: #b91c1c;
+    }
+
+    button.pdf-btn:disabled {
+      opacity: 0.65;
+      cursor: wait;
+    }
+
+
+    @media (max-width: 560px) {
+      .btn-group {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    button.main-btn {
+      padding: 13px 14px;
+      background-color: var(--primary);
+      color: #ffffff;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: transform 0.1s, background-color 0.2s, box-shadow 0.2s;
+      box-shadow: 0 2px 6px rgba(16, 50, 209, 0.22);
+    }
+
+    button.main-btn:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    button.main-btn:active {
+      transform: translateY(0);
+    }
+
+    button.secondary {
+      background-color: #334155;
+      box-shadow: 0 2px 6px rgba(51, 65, 85, 0.2);
+    }
+
+    button.secondary:hover {
+      background-color: #1e293b;
+    }
+
+    button.qr-btn {
+      background-color: #ffffff;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+      box-shadow: none;
+    }
+
+    button.qr-btn:hover {
+      background-color: var(--primary-light);
+      color: var(--primary-dark);
+    }
+
+    /* Caja de enlace copiado */
+    .link-box {
+      margin-top: 16px;
+      display: none;
+      background: #f8fafc;
+      padding: 12px 14px;
+      border: 1px dashed var(--primary-border);
+      border-radius: var(--radius-sm);
+      word-break: break-all;
+      font-family: "Consolas", monospace;
+      font-size: 12px;
+      color: var(--text-main);
+      line-height: 1.4;
+    }
+
+    /* Contenedor del Código QR generado */
+    .qr-panel {
+      margin-top: 18px;
+      display: none;
+      background: #ffffff;
+      border: 2px solid var(--primary-border);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 4px 14px rgba(16, 50, 209, 0.08);
+      animation: fadeIn 0.25s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .qr-panel h3 {
+      margin: 0 0 4px;
+      font-size: 14px;
+      color: var(--primary);
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+
+    .qr-panel p {
+      margin: 0 0 14px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .qr-frame {
+      display: inline-flex;
+      padding: 14px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-md);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    #qrcode img, #qrcode canvas {
+      display: block;
+      margin: 0 auto;
+    }
+
+    .qr-actions {
+      margin-top: 14px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-download-qr {
+      padding: 9px 16px;
+      background-color: var(--primary);
+      color: #ffffff;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .btn-download-qr:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .btn-close-qr {
+      padding: 9px 14px;
+      background-color: #f1f5f9;
+      color: var(--text-muted);
+      border: 1px solid #cbd5e1;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .btn-close-qr:hover {
+      background-color: #e2e8f0;
+      color: var(--text-main);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="app-header">
+      <div class="app-header-info">
+        <h1>Generador de Documento</h1>
+        <p>Captura rápida, enlace directo y código QR verificable</p>
+      </div>
+      <span class="header-badge">Sistema Activo</span>
+    </div>
+
+    <form id="generadorForm">
+      <!-- Bloque 1: Identificación y Registro -->
+      <div class="section-card">
+        <div class="section-title"><span class="dot"></span> Identificación y Registro</div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Identificador Electrónico (31 dígitos)</label>
+            <div class="input-with-btn">
+              <input type="text" id="idElec" required maxlength="31" minlength="31" value="0200400032026009475044410200400" />
+              <button type="button" class="btn-mini" id="btnGenId">Generar</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>CURP</label>
+            <input type="text" id="curp" required maxlength="18" value="MELH040909HBCZZGA6" />
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Entidad de Registro</label>
+            <select id="entidad" required></select>
+          </div>
+          <div class="form-group">
+            <label>Municipio de Registro</label>
+            <select id="municipio" required></select>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Oficialía</label>
+            <input type="text" id="oficialia" required value="0003" />
+          </div>
+          <div class="form-group">
+            <label>Fecha de Registro</label>
+            <input type="text" id="fechaReg" required value="28/09/2004" />
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Libro</label>
+            <div class="input-with-btn">
+              <input type="text" id="libro" required value="26" />
+              <button type="button" class="btn-mini" id="btnGenLibro">Generar</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Número de Acta</label>
+            <div class="input-with-btn">
+              <input type="text" id="acta" required value="5102" />
+              <button type="button" class="btn-mini" id="btnGenActa">Generar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bloque 2: Persona Registrada -->
+      <div class="section-card">
+        <div class="section-title"><span class="dot"></span> Datos de la Persona Registrada</div>
+        <div class="grid-3">
+          <div class="form-group">
+            <label>Nombre(s)</label>
+            <input type="text" id="nombre" required value="HUGO ORLANDO" />
+          </div>
+          <div class="form-group">
+            <label>Primer Apellido</label>
+            <input type="text" id="apellido1" required value="MEZA" />
+          </div>
+          <div class="form-group">
+            <label>Segundo Apellido</label>
+            <input type="text" id="apellido2" required value="LIZOLA" />
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div class="form-group">
+            <label>Sexo</label>
+            <select id="sexo" required>
+              <option value="HOMBRE" selected>HOMBRE</option>
+              <option value="MUJER">MUJER</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Fecha de Nacimiento</label>
+            <input type="text" id="fechaNac" required value="09/09/2004" />
+          </div>
+          <div class="form-group">
+            <label>Lugar de Nacimiento</label>
+            <input type="text" id="lugarNac" required value="TIJUANA, BAJA CALIFORNIA" />
+          </div>
+        </div>
+      </div>
+
+            <!-- Bloque 3: Filiación Padre 1 -->
+      <div class="section-card">
+        <div class="section-title"><span class="dot"></span> Filiación - Padre 1</div>
+        <div class="grid-3">
+          <div class="form-group">
+            <label>Nombre(s)</label>
+            <input type="text" id="p1Nombre" required value="HUGO ORLANDO" />
+          </div>
+          <div class="form-group">
+            <label>Primer Apellido</label>
+            <input type="text" id="p1Ap1" required value="MEZA" />
+          </div>
+          <div class="form-group">
+            <label>Segundo Apellido</label>
+            <input type="text" id="p1Ap2" required value="RUIZ" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Bloque 4: Filiación Padre 2 -->
+      <div class="section-card">
+        <div class="section-title"><span class="dot"></span> Filiación - Padre 2</div>
+        <div class="grid-3">
+          <div class="form-group">
+            <label>Nombre(s)</label>
+            <input type="text" id="p2Nombre" required value="MARIA LAURA" />
+          </div>
+          <div class="form-group">
+            <label>Primer Apellido</label>
+            <input type="text" id="p2Ap1" required value="LIZOLA" />
+          </div>
+          <div class="form-group">
+            <label>Segundo Apellido</label>
+            <input type="text" id="p2Ap2" required value="CEBALLOS" />
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Bloque 5: Certificación y Cadena -->
+      <div class="section-card">
+        <div class="section-title"><span class="dot"></span> Certificación y Cadena Inferior</div>
+        <div class="form-group">
+          <label>Texto de Fecha de Certificación</label>
+          <input type="text" id="certFecha" style="text-transform:none;" required />
+        </div>
+
+        <div class="form-group">
+          <label>Texto del Cuadro Inferior (Opcional: si se deja vacío se arma automático)</label>
+          <textarea id="rawText" placeholder="Deja vacío para autogenerar con los datos de arriba o pega tu texto personalizado..."></textarea>
+        </div>
+      </div>
+
+            <!-- Botones de acción -->
+      <div class="btn-group">
+        <button type="button" class="main-btn secondary" id="btnCopiar">Copiar Enlace</button>
+        <button type="button" class="main-btn qr-btn" id="btnGenerarQR">Generar Código QR</button>
+        <button type="button" class="main-btn pdf-btn" id="btnDescargarPDF">Descargar PDF</button>
+        <button type="submit" class="main-btn">Generar y Abrir</button>
+      </div>
+
+
+      <!-- Enlace generado -->
+      <div class="link-box" id="linkBox"></div>
+
+      <!-- Panel visual del Código QR -->
+      <div class="qr-panel" id="qrPanel">
+        <h3>Código QR del Documento</h3>
+        <p>Escanea con la cámara para abrir directamente el visor con estos datos</p>
+        <div class="qr-frame">
+          <div id="qrcode"></div>
+        </div>
+        <div class="qr-actions">
+          <button type="button" class="btn-download-qr" id="btnDescargarQR">Descargar QR (PNG)</button>
+          <button type="button" class="btn-close-qr" id="btnCerrarQR">Ocultar QR</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // Catálogo de las 32 Entidades Federativas y sus municipios
+    const ENTIDADES_MUNICIPIOS = {
+      "AGUASCALIENTES": [
+        "AGUASCALIENTES", "ASIENTOS", "CALVILLO", "COSÍO", "EL LLANO",
+        "JESÚS MARÍA", "PABELLÓN DE ARTEAGA", "RINCÓN DE ROMOS",
+        "SAN FRANCISCO DE LOS ROMO", "SAN JOSÉ DE GRACIA", "TEPEZALÁ"
+      ],
+      "BAJA CALIFORNIA": [
+        "ENSENADA", "MEXICALI", "PLAYAS DE ROSARITO", "SAN FELIPE",
+        "SAN QUINTÍN", "TECATE", "TIJUANA"
+      ],
+      "BAJA CALIFORNIA SUR": [
+        "COMONDÚ", "LA PAZ", "LORETO", "LOS CABOS", "MULEGÉ"
+      ],
+      "CAMPECHE": [
+        "CALAKMUL", "CALKINÍ", "CAMPECHE", "CANDELARIA", "CARMEN",
+        "CHAMPOTÓN", "DZITBALCHÉ", "ESCÁRCEGA", "HECELCHAKÁN", "HOPELCHÉN",
+        "PALIZADA", "SEYBAPLAYA", "TENABO"
+      ],
+      "CHIAPAS": [
+        "ACAPETAHUA", "ALTAMIRANO", "ARRIAGA", "BERRIOZÁBAL", "BOCHIL",
+        "CACAHOATÁN", "CATAZAJÁ", "CHIAPA DE CORZO", "CHILÓN", "CINTALAPA",
+        "COMITÁN DE DOMÍNGUEZ", "EL BOSQUE", "ESCUINTLA", "FRONTERA COMALAPA",
+        "HUEHUETÁN", "HUIXTLA", "JIQUIPILAS", "LA CONCORDIA", "LA TRINITARIA",
+        "LAS MARGARITAS", "LAS ROSAS", "MAPASTEPEC", "MOTOZINTLA", "OCOSINGO",
+        "OCOZOCOAUTLA DE ESPINOSA", "OXCHUC", "PALENQUE", "PANTEPEC", "PICHUCALCO",
+        "PIJIJIAPAN", "REFORMA", "SALTO DE AGUA", "SAN CRISTÓBAL DE LAS CASAS",
+        "SILTEPEC", "SIMOJOVEL", "SUCHIATE", "TAPACHULA", "TEOPISCA", "TILA",
+        "TONALÁ", "TUMBALÁ", "TUXTLA CHICO", "TUXTLA GUTIÉRREZ", "VENUSTIANO CARRANZA",
+        "VILLA CORZO", "VILLAFLORES", "YAJALÓN"
+      ],
+      "CHIHUAHUA": [
+        "AHUMADA", "ALDAMA", "ALLENDE", "AQUILES SERDÁN", "ASCENSIÓN",
+        "BACHÍNIVA", "BALLEZA", "BATOPILAS", "BOCOYNA", "BUENAVENTURA",
+        "CAMARGO", "CARICHÍ", "CASAS GRANDES", "CHIHUAHUA", "CHÍNIPAS",
+        "CORONADO", "COYAME DEL SOTOL", "CUAUHTÉMOC", "CUSIHUIRIACHI", "DELICIAS",
+        "GÓMEZ FARÍAS", "GUACHOCHI", "GUADALUPE", "GUADALUPE Y CALVO", "GUAZAPARES",
+        "GUERRERO", "HIDALGO DEL PARRAL", "IGNACIO ZARAGOZA", "JANOS", "JIMÉNEZ",
+        "JUÁREZ", "JULIMES", "LA CRUZ", "LÓPEZ", "MADERA", "MANUEL BENAVIDES",
+        "MATACHÍ", "MATAMOROS", "MEOQUI", "MORELOS", "MORIS", "NAMIQUIPA",
+        "NONOAVA", "NUEVO CASAS GRANDES", "OCAMPO", "OJINAGA", "PRAXEDIS G. GUERRERO",
+        "RIVA PALACIO", "ROSALES", "SAN FRANCISCO DE BORJA", "SAN FRANCISCO DE CONCHOS",
+        "SAN FRANCISCO DEL ORO", "SANTA BÁRBARA", "SANTA ISABEL", "SATEVÓ",
+        "SAUCILLO", "TEMÓSACHIC", "URIQUE", "URUACHI", "VALLE DE ZARAGOZA"
+      ],
+      "CIUDAD DE MÉXICO": [
+        "ÁLVARO OBREGÓN", "AZCAPOTZALCO", "BENITO JUÁREZ", "COYOACÁN",
+        "CUAJIMALPA DE MORELOS", "CUAUHTÉMOC", "GUSTAVO A. MADERO", "IZTACALCO",
+        "IZTAPALAPA", "LA MAGDALENA CONTRERAS", "MIGUEL HIDALGO", "MILPA ALTA",
+        "TLÁHUAC", "TLALPAN", "VENUSTIANO CARRANZA", "XOCHIMILCO"
+      ],
+      "COAHUILA": [
+        "ABASOLO", "ACUÑA", "ALLENDE", "ARTEAGA", "CANDELA", "CASTAÑOS",
+        "CUATRO CIÉNEGAS", "ESCOBEDO", "FRANCISCO I. MADERO", "FRONTERA",
+        "GENERAL CEPEDA", "GUERRERO", "HIDALGO", "JIMÉNEZ", "JUÁREZ",
+        "LAMADRID", "MATAMOROS", "MONCLOVA", "MORELOS", "MÚZQUIZ", "NADADORES",
+        "NAVA", "OCAMPO", "PARRAS", "PIEDRAS NEGRAS", "PROGRESO", "RAMOS ARIZPE",
+        "SABINAS", "SACRAMENTO", "SALTILLO", "SAN BUENAVENTURA", "SAN JUAN DE SABINAS",
+        "SAN PEDRO", "SIERRA MOJADA", "TORREÓN", "VIESCA", "VILLA UNIÓN", "ZARAGOZA"
+      ],
+      "COLIMA": [
+        "ARMERÍA", "COLIMA", "COMALA", "COQUIMATLÁN", "CUAUHTÉMOC",
+        "IXTLAHUACÁN", "MANZANILLO", "MINATITLÁN", "TECOMÁN", "VILLA DE ÁLVAREZ"
+      ],
+      "DURANGO": [
+        "CANATLÁN", "CANELAS", "CONETO DE COMONFORT", "CUENCAMÉ", "DURANGO",
+        "EL ORO", "GÓMEZ PALACIO", "GUADALUPE VICTORIA", "GUANACEVÍ", "HIDALGO",
+        "INDÉ", "LERDO", "MAPIMÍ", "MEZQUITAL", "NAZAS", "NOMBRE DE DIOS",
+        "NUEVO IDEAL", "OCAMPO", "OTÁEZ", "PÁNUCO DE CORONADO", "PEÑÓN BLANCO",
+        "POANAS", "PUEBLO NUEVO", "RODEO", "SAN BERNARDO", "SAN DIMAS",
+        "SAN JUAN DE GUADALUPE", "SAN JUAN DEL RÍO", "SAN LUIS DEL CORDERO",
+        "SAN PEDRO DEL GALLO", "SANTA CLARA", "SANTIAGO PAPASQUIARO", "SÚCHIL",
+        "TAMAZULA", "TEPEHUANES", "TLAHUALILO", "TOPIA", "VICENTE GUERRERO"
+      ],
+      "ESTADO DE MÉXICO": [
+        "ACAMBAY", "ACOLMAN", "ACULCO", "ALMOLOYA DE ALQUISIRAS", "ALMOLOYA DE JUÁREZ",
+        "ALMOLOYA DEL RÍO", "AMANALCO", "AMATEPEC", "AMECAMECA", "APAXCO", "ATENCO",
+        "ATIZAPÁN", "ATIZAPÁN DE ZARAGOZA", "ATLACOMULCO", "ATLAUTLA", "AXAPUSCO",
+        "AYAPANGO", "CALIMAYA", "CAPULHUAC", "CHALCO", "CHAPA DE MOTA", "CHAPULTEPEC",
+        "CHIAUTLA", "CHICOLOAPAN", "CHICONCUAC", "CHIMALHUACÁN", "COACALCO DE BERRIOZÁBAL",
+        "COATEPEC HARINAS", "COCOTITLÁN", "COYOTEPEC", "CUAUTITLÁN", "CUAUTITLÁN IZCALLI",
+        "DONATO GUERRA", "ECATEPEC DE MORELOS", "ECATZINGO", "EL ORO", "HUEHUETOCA",
+        "HUEYPOXTLA", "HUIXQUILUCAN", "ISIDRO FABELA", "IXTAPALUCA", "IXTAPAN DE LA SAL",
+        "IXTAPAN DEL ORO", "IXTLAHUACA", "JALTENCO", "JILOTEPEC", "JILOTZINGO",
+        "JIQUIPILCO", "JOCOTITLÁN", "JOQUICINGO", "JUCHITEPEC", "LA PAZ",
+        "LERMA", "LUVIANOS", "MALINALCO", "MELCHOR OCAMPO", "METEPEC", "MEXICALTZINGO",
+        "MORELOS", "NAUCALPAN DE JUÁREZ", "NEXTLALPAN", "NEZAHUALCÓYOTL", "NICOLÁS ROMERO",
+        "NOPALTEPEC", "OCOYOACAC", "OCUILAN", "OTUMBA", "OTZOLOAPAN", "OTZOLOTEPEC",
+        "OZUMBA", "PAPALOTLA", "POLOTITLÁN", "RAYÓN", "SAN ANTONIO LA ISLA",
+        "SAN FELIPE DEL PROGRESO", "SAN JOSÉ DEL RINCÓN", "SAN MARTÍN DE LAS PIRÁMIDES",
+        "SAN MATEO ATENCO", "SAN SIMÓN DE GUERRERO", "SANTO TOMÁS", "SOYANIQUILPAN DE JUÁREZ",
+        "SULTEPEC", "TECÁMAC", "TEJUPILCO", "TEMAMATLA", "TEMASCALAPA", "TEMASCALCINGO",
+        "TEMASCALTEPEC", "TEMOAYA", "TENANCINGO", "TENANGO DEL AIRE", "TENANGO DEL VALLE",
+        "TEOLOYUCAN", "TEOTIHUACÁN", "TEPETLAOXTOC", "TEPETLIXPA", "TEPOTZOTLÁN",
+        "TEQUIXQUIAC", "TEXCALTITLÁN", "TEXCALYACAC", "TEXCOCO", "TEZOYUCA",
+        "TIANGUISTENCO", "TIMILPAN", "TLALMANALCO", "TLALNEPANTLA DE BAZ", "TLATLAYA",
+        "TOLUCA", "TONANITLA", "TONATICO", "TULTEPEC", "TULTITLÁN", "VALLE DE BRAVO",
+        "VALLE DE CHALCO SOLIDARIDAD", "VILLA DE ALLENDE", "VILLA DEL CARBÓN",
+        "VILLA GUERRERO", "VILLA VICTORIA", "XALATLACO", "XONACATLÁN", "ZACAZONAPAN",
+        "ZACUALPAN", "ZINACANTEPEC", "ZUMPAHUACÁN", "ZUMPANGO"
+      ],
+      "GUANAJUATO": [
+        "ABASOLO", "ACÁMBARO", "APASEO EL ALTO", "APASEO EL GRANDE", "ATARJEA",
+        "CELAYA", "COMONFORT", "CORONEO", "CORTAZAR", "CUERÁMARO", "DOCTOR MORA",
+        "DOLORES HIDALGO", "GUANAJUATO", "HUANÍMARO", "IRAPUATO", "JARAL DEL PROGRESO",
+        "JERÉCUARO", "LEÓN", "MANUEL DOBLADO", "MOROLEÓN", "OCAMPO", "PÉNJAMO",
+        "PUEBLO NUEVO", "PURÍSIMA DEL RINCÓN", "ROMITA", "SALAMANCA", "SALVATIERRA",
+        "SAN DIEGO DE LA UNIÓN", "SAN FELIPE", "SAN FRANCISCO DEL RINCÓN",
+        "SAN JOSÉ ITURBIDE", "SAN LUIS DE LA PAZ", "SAN MIGUEL DE ALLENDE",
+        "SANTA CATARINA", "SANTA CRUZ DE JUVENTINO ROSAS", "SANTIAGO MARAVATÍO",
+        "SILAO DE LA VICTORIA", "TARANDACUAO", "TARIMORO", "TIERRA BLANCA",
+        "URIANGATO", "VALLE DE SANTIAGO", "VICTORIA", "VILLAGRÁN", "XICHÚ", "YURIRIA"
+      ],
+      "GUERRERO": [
+        "ACAPULCO DE JUÁREZ", "AJUCHITLÁN DEL PROGRESO", "ALCOZAUCA DE GUERRERO",
+        "ALPOYECA", "APAXTLA", "ARCELIA", "ATENANGO DEL RÍO", "ATLIXTAC",
+        "ATOYAC DE ÁLVAREZ", "AYUTLA DE LOS LIBRES", "AZOYÚ", "BENITO JUÁREZ",
+        "BUENAVISTA DE CUÉLLAR", "CHILAPA DE ÁLVAREZ", "CHILPANCINGO DE LOS BRAVO",
+        "COAHUAYUTLA", "COCULA", "COPALA", "COPALILLO", "COPANATOYAC", "COYUCA DE BENÍTEZ",
+        "COYUCA DE CATALÁN", "CUAJINICUILAPA", "CUTZAMALA DE PINZÓN", "EDUARDO NERI",
+        "FLORENCIO VILLARREAL", "HUAMUXTITLÁN", "HUITZUCO DE LOS FIGUEROA",
+        "IGUALA DE LA INDEPENDENCIA", "IXCATEOPAN DE CUAUHTÉMOC", "JOSÉ AZUETA",
+        "LA UNIÓN DE ISIDORO MONTES DE OCA", "LEONARDO BRAVO", "MALINALTEPEC",
+        "MARQUELIA", "METLATÓNOC", "MOCHITLÁN", "OLINALÁ", "OMETEPEC", "PETATLÁN",
+        "PILCAYA", "PUNGARABATO", "QUECHULTENANGO", "SAN LUIS ACATLÁN", "SAN MARCOS",
+        "TAXCO DE ALARCÓN", "TECOANAPA", "TÉCPAN DE GALEANA", "TELOLOAPAN",
+        "TEPECOACUILCO DE TRUJANO", "TIXTLA DE GUERRERO", "TLACOAPA", "TLAPA DE COMONFORT",
+        "TLAPEHUALA", "XALPATLÁHUAC", "XOCHIHUEHUETLÁN", "XOCHISTLAHUACA",
+        "ZAPOTITLÁN TABLAS", "ZIHUATANEJO DE AZUETA", "ZIRÁNDARO"
+      ],
+      "HIDALGO": [
+        "ACATLÁN", "ACAXOCHITLÁN", "ACTOPAN", "AGUA BLANCA DE ITURBIDE", "AJACUBA",
+        "ALFAJAYUCAN", "ALMOLOYA", "APAN", "ATITALAQUIA", "ATLAPEXCO", "ATOTONILCO DE TULA",
+        "ATOTONILCO EL GRANDE", "CALNALI", "CARDONAL", "CHAPANTONGO", "CHAPULHUACÁN",
+        "CHILCUAUTLA", "CUAUTEPEC DE HINOJOSA", "EL ARENAL", "ELOXOCHITLÁN",
+        "EMILIANO ZAPATA", "EPAZOYUCAN", "FRANCISCO I. MADERO", "HUASCA DE OCAMPO",
+        "HUAUTLA", "HUAZALINGO", "HUEHUETLA", "HUEJUTLA DE REYES", "HUICHAPAN",
+        "IXMIQUILPAN", "JACALA DE LEDEZMA", "JALTOCÁN", "JUÁREZ HIDALGO", "LA MISIÓN",
+        "LOLOTLA", "METEPEC", "METZTITLÁN", "MINERAL DE LA REFORMA", "MINERAL DEL CHICO",
+        "MINERAL DEL MONTE", "MIXQUIAHUALA DE JUÁREZ", "MOLANGO DE ESCAMILLA",
+        "NICOLÁS FLORES", "NOPALA DE VILLAGRÁN", "OMITLÁN DE JUÁREZ", "PACULA",
+        "PACHUCA DE SOTO", "PISAFLORES", "PROGRESO DE OBREGÓN", "SAN AGUSTÍN METZQUITITLÁN",
+        "SAN AGUSTÍN TLAXIACA", "SAN BARTOLO TUTOTEPEC", "SAN FELIPE ORIZATLÁN",
+        "SAN SALVADOR", "SANTIAGO DE ANAYA", "SANTIAGO TULANTEPEC", "SINGUILUCAN",
+        "TASQUILLO", "TECOZAUTLA", "TENANGO DE DORIA", "TEPEAPULCO", "TEPEHUACÁN DE GUERRERO",
+        "TEPEJI DEL RÍO DE OCAMPO", "TEPETITLÁN", "TETEPANGO", "TEZONTEPEC DE ALDAMA",
+        "TIANGUISTENGO", "TIZAYUCA", "TLAHUELILPAN", "TLAHUILTEPA", "TLANALAPA",
+        "TLANCHINOL", "TLAXCOAPAN", "TOLCAYUCA", "TULA DE ALLENDE", "TULANCINGO DE BRAVO",
+        "XOCHIATIPAN", "XOCHICOATLÁN", "YAHUALICA", "ZACUALTIPÁN DE ÁNGELES",
+        "ZAPOTLÁN DE JUÁREZ", "ZEMPOALA", "ZIMAPÁN"
+      ],
+      "JALISCO": [
+        "ACATIC", "ACATLÁN DE JUÁREZ", "AHUALULCO DE MERCADO", "AMACUECA", "AMATITÁN",
+        "AMECA", "ARANDAS", "ATEMAJAC DE BRIZUELA", "ATENGO", "ATENGUILLO",
+        "ATOTONILCO EL ALTO", "ATOYAC", "AUTLÁN DE NAVARRO", "AYOTLÁN", "AYUTLA",
+        "BOLAÑOS", "CABO CORRIENTES", "CASIMIRO CASTILLO", "CHAPALA", "CHIMALTITÁN",
+        "CHIQUILISTLÁN", "CIHUATLÁN", "COCULA", "COLOTLÁN", "CONCEPCIÓN DE BUENOS AIRES",
+        "CUAUTITLÁN DE GARCÍA BARRAGÁN", "CUAUTLA", "CUQUÍO", "DEGOLLADO", "EJUTLA",
+        "EL ARENAL", "EL GRULLO", "EL LIMÓN", "EL SALTO", "ENCARNACIÓN DE DÍAZ",
+        "ETZATLÁN", "GÓMEZ FARÍAS", "GUACHINANGO", "GUADALAJARA", "HOSTOTIPAQUILLO",
+        "HUEJÚCAR", "HUEJUQUILLA EL ALTO", "IXTLAHUACÁN DE LOS MEMBRILLOS",
+        "IXTLAHUACÁN DEL RÍO", "JALOSTOTITLÁN", "JAMAY", "JESÚS MARÍA", "JILOTLÁN DE LOS DOLORES",
+        "JOCOTEPEC", "JUANACATLÁN", "JUCHITLÁN", "LA BARCA", "LA HUERTA", "LA MANZANILLA DE LA PAZ",
+        "LAGOS DE MORENO", "MAGDALENA", "MASCOTA", "MAZAMITLA", "MEXTICACÁN", "MEZQUITIC",
+        "MIXTLÁN", "OCOTLÁN", "OJUELOS DE JALISCO", "PIHUAMO", "PONCITLÁN",
+        "PUERTO VALLARTA", "QUITUPAN", "SAN CRISTÓBAL DE LA BARRANCA", "SAN DIEGO DE ALEJANDRÍA",
+        "SAN GABRIEL", "SAN IGNACIO CERRO GORDO", "SAN JUAN DE LOS LAGOS", "SAN JUANITO DE ESCOBEDO",
+        "SAN JULIÁN", "SAN MARCOS", "SAN MARTÍN DE BOLAÑOS", "SAN MARTÍN HIDALGO",
+        "SAN MIGUEL EL ALTO", "SAN PEDRO TLAQUEPAQUE", "SAN SEBASTIÁN DEL OESTE",
+        "SANTA MARÍA DE LOS ÁNGELES", "SANTA MARÍA DEL ORO", "SAYULA", "TALA",
+        "TALPA DE ALLENDE", "TAMAZULA DE GORDIANO", "TAPALPA", "TECALITLÁN",
+        "TECHALUTA DE MONTENEGRO", "TECOLOTLÁN", "TENAMAXTLÁN", "TEOCALTICHE",
+        "TEOCUITATLÁN DE CORONA", "TEPATITLÁN DE MORELOS", "TEQUILA", "TEUCHITLÁN",
+        "TIZAPÁN EL ALTO", "TLAJOMULCO DE ZÚÑIGA", "TOLIMÁN", "TOMATLÁN", "TONALÁ",
+        "TONAYA", "TONILA", "TOTATICHE", "TOTOTLÁN", "TUXCACUESCO", "TUXCUECA",
+        "TUXPAN", "UNIÓN DE SAN ANTONIO", "UNIÓN DE TULA", "VALLE DE GUADALUPE",
+        "VALLE DE JUÁREZ", "VILLA CORONA", "VILLA GUERRERO", "VILLA HIDALGO",
+        "VILLA PURIFICACIÓN", "YAHUALICA DE GONZÁLEZ GALLO", "ZACOALCO DE TORRES",
+        "ZAPOPAN", "ZAPOTILTIC", "ZAPOTITLÁN DE VADILLO", "ZAPOTLÁN DEL REY",
+        "ZAPOTLÁN EL GRANDE", "ZAPOTLANEJO"
+      ],
+      "MICHOACÁN": [
+        "ACUITZIO", "AGUILILLA", "ÁLVARO OBREGÓN", "ANGAMACUTIRO", "ANGANGUEO",
+        "APATZINGÁN", "APORO", "AQUILA", "ARIO", "ARTEAGA", "BRISEÑAS",
+        "BUENAVISTA", "CARÁCUARO", "CHARAPAN", "CHARO", "CHAVINDA", "CHERÁN",
+        "CHILCHOTA", "CHINICUILA", "CHUCÁNDIRO", "CHURINTZIO", "CHURUMUCO",
+        "COAHUAYANA", "COALCOMÁN DE VÁZQUEZ PALLARES", "COENEO", "COJUMATLÁN DE RÉGULES",
+        "CONTEPEC", "COPÁNDARO", "COTIJA", "CUITZEO", "ECUANDUREO", "EPITACIO HUERTA",
+        "ERONGARÍCUARO", "GABRIEL ZAMORA", "HIDALGO", "HUANDACAREO", "HUANIQUEO",
+        "HUETAMO", "HUIRAMBA", "INDAPARAPEO", "IRIMBO", "IXTLÁN", "JACONA",
+        "JIMÉNEZ", "JIQUILPAN", "JOSÉ SIXTO VERDUZCO", "JUÁREZ", "JUNGAPEO",
+        "LA HUACANA", "LA PIEDAD", "LAGUNILLAS", "LÁZARO CÁRDENAS", "LOS REYES",
+        "MADERO", "MARAVATÍO", "MARCOS CASTELLANOS", "MORELIA", "MORELOS",
+        "MÚGICA", "NAHUATZEN", "NOCUPÉTARO", "NUEVO PARANGARICUTIRO", "NUEVO URECHO",
+        "NUMARÁN", "OCAMPO", "PAJACUARÁN", "PANINDÍCUARO", "PARACUARO", "PARACHO",
+        "PÁTZCUARO", "PENJAMILLO", "PERIBÁN", "PURÉPERO", "PURUÁNDIRO", "QUERÉNDARO",
+        "QUIROGA", "SAHUAYO", "SALVADOR ESCALANTE", "SAN LUCAS", "SANTA ANA MAYA",
+        "SENGUIO", "SUSUPUATO", "TACÁMBARO", "TANCÍTARO", "TANGAMANDAPIO",
+        "TANGANCÍCUARO", "TANHUATO", "TARETAN", "TARÍMBARO", "TEPALCATEPEC",
+        "TINGAMBATO", "TINGÜINDÍN", "TIQUICHEO DE NICOLÁS ROMERO", "TLALPUJAHUA",
+        "TLAZAZALCA", "TOCUMBO", "TUMBISCATÍO", "TURICATO", "TUXPAN", "TUZANTLA",
+        "TZINTZUNTZAN", "TZITZIO", "URUAPAN", "VENUSTIANO CARRANZA", "VILLAMAR",
+        "VISTA HERMOSA", "YURÉCUARO", "ZACAPU", "ZAMORA", "ZINÁPARO", "ZINAPÉCUARO",
+        "ZIRACUARETIRO", "ZITÁCUARO"
+      ],
+      "MORELOS": [
+        "AMACUZAC", "ATLATLAHUCAN", "AXOCHIAPAN", "AYALA", "COATLÁN DEL RÍO",
+        "COATETELCO", "CUAUTLA", "CUERNAVACA", "EMILIANO ZAPATA", "HUEYAPAN",
+        "HUITZILAC", "JANTETELCO", "JIUTEPEC", "JOJUTLA", "JONACATEPEC",
+        "MAZATEPEC", "MIACATLÁN", "OCUITUCO", "PUENTE DE IXTLA", "TEMIXCO",
+        "TEMOAC", "TEPALCINGO", "TEPOZTLÁN", "TETECALA", "TETELA DEL VOLCÁN",
+        "TLALNEPANTLA", "TLALTIZAPÁN DE ZAPATA", "TLAQUILTENANGO", "TLAYACAPAN",
+        "TOTOLAPAN", "XOCHITEPEC", "XOXOCOTLA", "YAUTEPEC", "YECAPIXTLA",
+        "ZACATEPEC", "ZACUALPAN DE AMILPAS"
+      ],
+      "NAYARIT": [
+        "ACAPONETA", "AHUACATLÁN", "AMATLÁN DE CAÑAS", "BAHÍA DE BANDERAS",
+        "COMPOSTELA", "DEL NAYAR", "HUAJICORI", "IXTLÁN DEL RÍO", "JALA",
+        "LA YESCA", "ROSAMORADA", "RUÍZ", "SAN BLAS", "SAN PEDRO LAGUNILLAS",
+        "SANTA MARÍA DEL ORO", "SANTIAGO IXCUINTLA", "TECUALA", "TEPIC",
+        "TUXPAN", "XALISCO"
+      ],
+      "NUEVO LEÓN": [
+        "ABASOLO", "AGUALEGUAS", "ALLENDE", "ANÁHUAC", "APODACA", "ARAMBERRI",
+        "BUSTAMANTE", "CADEREYTA JIMÉNEZ", "CERRALVO", "CHINA", "CIÉNEGA DE FLORES",
+        "DOCTOR ARROYO", "DOCTOR COSS", "DOCTOR GONZÁLEZ", "EL CARMEN", "GALEANA",
+        "GARCÍA", "GENERAL BRAVO", "GENERAL ESCOBEDO", "GENERAL TERÁN", "GENERAL TREVIÑO",
+        "GENERAL ZARAGOZA", "GENERAL ZUAZUA", "GUADALUPE", "HIDALGO", "HIGUERAS",
+        "HUALAHUISES", "ITURBIDE", "JUÁREZ", "LAMPAZOS DE NARANJO", "LINARES",
+        "LOS ALDAMAS", "LOS HERRERAS", "LOS RAMONES", "MARÍN", "MELCHOR OCAMPO",
+        "MIER Y NORIEGA", "MINA", "MONTEMORELOS", "MONTERREY", "PARÁS", "PESQUERÍA",
+        "RAYONES", "SABINAS HIDALGO", "SALINAS VICTORIA", "SAN NICOLÁS DE LOS GARZA",
+        "SAN PEDRO GARZA GARCÍA", "SANTA CATARINA", "SANTIAGO", "VALLECILLO", "VILLALDAMA"
+      ],
+      "OAXACA": [
+        "ACATLÁN DE PÉREZ FIGUEROA", "ASUNCIÓN NOCHIXTLÁN", "CHAHUITES",
+        "CIUDAD IXTEPEC", "COSOLAPA", "CUILÁPAM DE GUERRERO", "EL ESPINAL",
+        "HEROICA CIUDAD DE EJUTLA DE CRESPO", "HEROICA CIUDAD DE HUAJUAPAN DE LEÓN",
+        "HEROICA CIUDAD DE JUCHITÁN DE ZARAGOZA", "HEROICA CIUDAD DE TLAXIACO",
+        "HUAUTLA DE JIMÉNEZ", "IXTLÁN DE JUÁREZ", "LOMA BONITA", "MATÍAS ROMERO AVENDAÑO",
+        "MIAHUATLÁN DE PORFIRIO DÍAZ", "OAXACA DE JUÁREZ", "OCOTLÁN DE MORELOS",
+        "PINOTEPA DE DON LUIS", "PUTLA VILLA DE GUERRERO", "SALINA CRUZ",
+        "SAN AGUSTÍN DE LAS JUNTAS", "SAN ANTONIO DE LA CAL", "SAN BLAS ATEMPA",
+        "SAN FRANCISCO TELIXTLAHUACA", "SAN JACINTO AMILPAS", "SAN JUAN BAUTISTA CUICATLÁN",
+        "SAN JUAN BAUTISTA TUXTEPEC", "SAN JUAN BAUTISTA VALLE NACIONAL",
+        "SAN JUAN COTZOCÓN", "SAN JUAN GUICHICOVI", "SAN LORENZO CACAOTEPEC",
+        "SAN LUCAS OJITLÁN", "SAN PABLO ETLA", "SAN PABLO HUIXTEPEC",
+        "SAN PEDRO MIXTEPEC", "SAN PEDRO POCHUTLA", "SAN PEDRO TAPANATEPEC",
+        "SAN SEBASTIÁN TUTLA", "SANTA CRUZ AMILPAS", "SANTA CRUZ XOXOCOTLÁN",
+        "SANTA LUCÍA DEL CAMINO", "SANTA MARÍA ATZOMPA", "SANTA MARÍA COLOTEPEC",
+        "SANTA MARÍA DEL TULE", "SANTA MARÍA HUATULCO", "SANTA MARÍA MIXTEQUILLA",
+        "SANTIAGO JAMILTEPEC", "SANTIAGO JUXTLAHUACA", "SANTIAGO PINOTEPA NACIONAL",
+        "SANTO DOMINGO INGENIO", "SANTO DOMINGO TEHUANTEPEC", "TEOTITLÁN DE FLORES MAGÓN",
+        "TLACOLULA DE MATAMOROS", "UNIÓN HIDALGO", "VILLA DE ETLA",
+        "VILLA DE ZAACHILA", "ZIMATLÁN DE ÁLVAREZ"
+      ],
+      "PUEBLA": [
+        "ACAJETE", "ACATENO", "ACATLÁN", "ACATZINGO", "AJALPAN", "ALJOJUCA",
+        "AMOZOC", "AQUIXTLA", "ATEMPAN", "ATLIXCO", "ATZITZIHUACÁN", "CHALCHICOMULA DE SESMA",
+        "CHIAUTLA", "CHIGNAHUAPAN", "CHIGNAUTLA", "CHIETLA", "CORONANGO", "COXCATLÁN",
+        "CUAPIAXTLA DE MADERO", "CUAUTINCHÁN", "CUAUTLANCINGO", "CUETZALAN DEL PROGRESO",
+        "ELOXOCHITLÁN", "ESPERANZA", "GENERAL FELIPE ÁNGELES", "GUADALUPE VICTORIA",
+        "HUAQUECHULA", "HUAUCHINANGO", "HUEHUETLA", "HUEJOTZINGO", "HUEYTAMALCO",
+        "IZÚCAR DE MATAMOROS", "JUAN C. BONILLA", "LAFRAGUA", "LIBRES", "LOS REYES DE JUÁREZ",
+        "MAZAPILTEPEC DE JUÁREZ", "NACAJUCAN", "NEALTICAN", "NICOLÁS BRAVO",
+        "NOPALUCAN", "OCOTEPEC", "OCOYUCAN", "ORIENTAL", "PAHUATLÁN", "PALMAR DE BRAVO",
+        "PANTEPEC", "PETLALCINGO", "PIAXTLA", "PUEBLA", "QUECHOLAC", "RAFAEL LARA GRAJALES",
+        "SAN ANDRÉS CHOLULA", "SAN GABRIEL CHILAC", "SAN GREGORIO ATZOMPA",
+        "SAN JOSÉ CHIAPA", "SAN MARTÍN TEXMELUCAN", "SAN MATÍAS TLALANCALECA",
+        "SAN NICOLÁS DE LOS RANCHOS", "SAN PEDRO CHOLULA", "SAN SALVADOR EL SECO",
+        "SAN SALVADOR EL VERDE", "SAN SEBASTIÁN TLACOTEPEC", "SANTA ISABEL CHOLULA",
+        "SANTIAGO MIAHUATLÁN", "SANTO TOMÁS HUEYOTLIPAN", "SOLTEPEC", "TECALI DE HERRERA",
+        "TECAMACHALCO", "TEHUACÁN", "TEHUITZINGO", "TENAMPULCO", "TEOPANTLÁN",
+        "TEOTLALCO", "TEPANCO DE LÓPEZ", "TEPEACA", "TEPEMAXALCO", "TEPEOJUMA",
+        "TEPETZINTLA", "TEPEXCO", "TEPEXI DE RODRÍGUEZ", "TEPEYAHUALCO", "TETELA DE OCAMPO",
+        "TETELES DE ÁVILA CASTILLO", "TEZIUTLÁN", "TIANGUISMANALCO", "TILAPA",
+        "TLACHICHUCA", "TLACOTEPEC DE BENITO JUÁREZ", "TLACUILOTEPEC", "TLAHUAPAN",
+        "TLALTENANGO", "TLANEPANTLA", "TLAOLA", "TLAPACOYA", "TLAPANALÁ", "TLATLAUQUITEPEC",
+        "TLAXCO", "TOCHIMILCO", "TOCHTEPEC", "TOTOLTEPEC DE GUERRERO", "TULCINGO",
+        "TUZAMAPAN DE GALEANA", "TZICATLACOYAN", "VENUSTIANO CARRANZA", "VICENTE GUERRERO",
+        "XAYACATLÁN DE BRAVO", "XICOTEPEC", "XICOTLÁN", "XIUTETELCO", "XOCHIAPULCO",
+        "XOCHILTEPEC", "XOCHITLÁN DE VICENTE SUÁREZ", "XOCHITLÁN TODOS SANTOS",
+        "YAONÁHUAC", "YEHUALTEPEC", "ZACAPALA", "ZACAPOAXTLA", "ZACATLÁN",
+        "ZAPOTITLÁN", "ZAPOTITLÁN DE MÉNDEZ", "ZARAGOZA", "ZAUTLA", "ZIHUATEUTLA",
+        "ZINACATEPEC", "ZONGOZOTLA", "ZOQUIAPAN", "ZOQUITLÁN"
+      ],
+      "QUERÉTARO": [
+        "AMEALCO DE BONFIL", "ARROYO SECO", "CADEREYTA DE MONTES", "COLÓN",
+        "CORREGIDORA", "EL MARQUÉS", "EZEQUIEL MONTES", "HUIMILPAN",
+        "JALPAN DE SERRA", "LANDA DE MATAMOROS", "PEDRO ESCOBEDO", "PEÑAMILLER",
+        "PINAL DE AMOLES", "QUERÉTARO", "SAN JOAQUÍN", "SAN JUAN DEL RÍO",
+        "TEQUISQUIAPAN", "TOLIMÁN"
+      ],
+      "QUINTANA ROO": [
+        "BACALAR", "BENITO JUÁREZ", "COZUMEL", "FELIPE CARRILLO PUERTO",
+        "ISLA MUJERES", "JOSÉ MARÍA MORELOS", "LÁZARO CÁRDENAS", "OTHÓN P. BLANCO",
+        "PUERTO MORELOS", "SOLIDARIDAD", "TULUM"
+      ],
+      "SAN LUIS POTOSÍ": [
+        "AHUALULCO", "ALAQUINES", "AQUISMÓN", "ARMADILLO DE LOS INFANTE", "AXTLA DE TERRAZAS",
+        "CÁRDENAS", "CATORCE", "CEDRAL", "CERRITOS", "CERRO DE SAN PEDRO", "CHARCAS",
+        "CIUDAD DEL MAÍZ", "CIUDAD FERNÁNDEZ", "CIUDAD VALLES", "COXCATLÁN", "ÉBANO",
+        "EL NARANJO", "GUADALCÁZAR", "HUEHUETLÁN", "LAGUNILLAS", "MATEHUALA",
+        "MATLAPA", "MEXQUITIC DE CARMONA", "MOCTEZUMA", "RAYÓN", "RIOVERDE",
+        "SALINAS", "SAN ANTONIO", "SAN CIRO DE ACOSTA", "SAN LUIS POTOSÍ",
+        "SAN MARTÍN CHALCHICUAUTLA", "SAN NICOLÁS TOLENTINO", "SAN VICENTE TANCUAYALAB",
+        "SANTA CATARINA", "SANTA MARÍA DEL RÍO", "SANTO DOMINGO", "SOLEDAD DE GRACIANO SÁNCHEZ",
+        "TAMASOPO", "TAMAZUNCHALE", "TAMPACÁN", "TAMPAMOLÓN CORONA", "TAMUÍN",
+        "TANCANHUITZ", "TANLAJÁS", "TANQUIÁN DE ESCOBEDO", "TIERRA NUEVA", "VANEGAS",
+        "VENADO", "VILLA DE ARISTA", "VILLA DE ARRIAGA", "VILLA DE GUADALUPE",
+        "VILLA DE LA PAZ", "VILLA DE RAMOS", "VILLA DE REYES", "VILLA HIDALGO",
+        "VILLA JUÁREZ", "XILITLA", "ZARAGOZA"
+      ],
+      "SINALOA": [
+        "AHOME", "ANGOSTURA", "BADIRAGUATO", "CHOIX", "CONCORDIA", "COSALÁ",
+        "CULIACÁN", "ELDORADO", "ELOTA", "ESCUINAPA", "EL FUERTE", "GUASAVE",
+        "JUAN JOSÉ RÍOS", "MAZATLÁN", "MOCORITO", "NAVOLATO", "ROSARIO",
+        "SALVADOR ALVARADO", "SAN IGNACIO", "SINALOA"
+      ],
+      "SONORA": [
+        "ACONCHI", "AGUA PRIETA", "ÁLAMOS", "ALTAR", "ARIVECHI", "ARIZPE", "ATIL",
+        "BACADÉHUACHI", "BACANORA", "BACERAC", "BACOACHI", "BÁCUM", "BANÁMICHI",
+        "BAVIÁCORA", "BAVISPE", "BENITO JUÁREZ", "BENJAMÍN HILL", "CABORCA",
+        "CAJEME", "CANANEA", "CARBÓ", "CUCURPE", "CUMPAS", "DIVISADEROS", "EMPALME",
+        "ETCHOJOA", "FRONTERAS", "GENERAL PLUTARCO ELÍAS CALLES", "GRANADOS",
+        "GUAYMAS", "HERMOSILLO", "HUACHINERA", "HUÁSABAS", "HUATABAMPO", "HUÉPAC",
+        "IMURIS", "LA COLORADA", "MAGDALENA", "MAZATÁN", "MOCTEZUMA", "NACO",
+        "NÁCORI CHICO", "NACOZARI DE GARCÍA", "NAVOJOA", "NOGALES", "ÓNAVAS",
+        "OPODEPE", "OQUITOA", "PITIQUITO", "PUERTO PEÑASCO", "QUIRIEGO", "RAYÓN",
+        "ROSARIO", "SAHUARIPA", "SAN FELIPE DE JESÚS", "SAN IGNACIO RÍO MUERTO",
+        "SAN JAVIER", "SAN LUIS RÍO COLORADO", "SAN MIGUEL DE HORCASITAS",
+        "SAN PEDRO DE LA CUEVA", "SANTA ANA", "SANTA CRUZ", "SÁRIC", "SOYOPA",
+        "SUAQUI GRANDE", "TEPACHE", "TRINCHERAS", "TUBUTAMA", "URES", "VILLA HIDALGO",
+        "VILLA PESQUEIRA", "YÉCORA"
+      ],
+      "TABASCO": [
+        "BALANCÁN", "CÁRDENAS", "CENTLA", "CENTRO", "COMALCALCO", "CUNDUACÁN",
+        "EMILIANO ZAPATA", "HUIMANGUILLO", "JALAPA", "JALPA DE MÉNDEZ", "JONUTA",
+        "MACUSPANA", "NACAJUCA", "PARAÍSO", "TACOTALPA", "TEAPA", "TENOSIQUE"
+      ],
+      "TAMAULIPAS": [
+        "ABASOLO", "ALDAMA", "ALTAMIRA", "ANTIGUO MORELOS", "BURGOS", "BUSTAMANTE",
+        "CAMARGO", "CASAS", "CIUDAD MADERO", "CRUILLAS", "EL MANTE", "GÓMEZ FARÍAS",
+        "GONZÁLEZ", "GÜÉMEZ", "GUERRERO", "GUSTAVO DÍAZ ORDAZ", "HIDALGO",
+        "JAUMAVE", "JIMÉNEZ", "LLERA", "MAINERO", "MATAMOROS", "MÉNDEZ", "MIER",
+        "MIGUEL ALEMÁN", "MIQUIHUANA", "NUEVO LAREDO", "NUEVO MORELOS", "OCAMPO",
+        "PADILLA", "PALMILLAS", "REYNOSA", "RÍO BRAVO", "SAN CARLOS", "SAN FERNANDO",
+        "SAN NICOLÁS", "SOTO LA MARINA", "TAMPICO", "TULA", "VALLE HERMOSO",
+        "VICTORIA", "VILLAGRÁN", "XICOTÉNCATL"
+      ],
+      "TLAXCALA": [
+        "ACUAMANALA DE MIGUEL HIDALGO", "ALTZAYANCA", "AMAXAC DE GUERRERO",
+        "APETATITLÁN DE ANTONIO CARVAJAL", "APIZACO", "ATLANGATEPEC",
+        "BENITO JUÁREZ", "CALPULALPAN", "CHIAUTEMPAN", "CONTLA DE JUAN CUAMATZI",
+        "CUAPIAXTLA", "CUAXOMULCO", "EL CARMEN TEQUEXQUITLA", "EMILIANO ZAPATA",
+        "ESPAÑITA", "HUAMANTLA", "HUEYOTLIPAN", "IXTACUIXTLA DE MARIANO MATAMOROS",
+        "IXTENCO", "LA MAGDALENA TLALTELULCO", "LÁZARO CÁRDENAS", "MAZATECOCHCO DE JOSÉ MARÍA MORELOS",
+        "MUÑOZ DE DOMINGO ARENAS", "NANACAMILPA DE MARIANO ARISTA", "NATÍVITAS",
+        "PANOTLA", "PAPALOTLA DE XICOHTÉNCATL", "SAN DAMIÁN TEXÓLOC",
+        "SAN FRANCISCO TETLANOHCAN", "SAN JERÓNIMO ZACUALPAN", "SAN JOSÉ TEACALCO",
+        "SAN JUAN HUACTZINCO", "SAN LORENZO AXOCOMANITLA", "SAN LUCAS TECOPILCO",
+        "SAN PABLO DEL MONTE", "SANCTORUM DE LÁZARO CÁRDENAS", "SANTA ANA NOPALUCAN",
+        "SANTA APOLONIA TEACALCO", "SANTA CATARINA AYOMETLA", "SANTA CRUZ QUILEHTLA",
+        "SANTA CRUZ TLAXCALA", "SANTA ISABEL XILOXOXTLA", "TENANCINGO",
+        "TEOLOCHOLCO", "TEPETITLA DE LARDIZÁBAL", "TEPEYANCO", "TERRENATE",
+        "TETLA DE LA SOLIDARIDAD", "TETLATLAHUCA", "TLAXCALA", "TLAXCO",
+        "TOCATLÁN", "TOTOLAC", "TZOMPANTEPEC", "XALOZTOC", "XALTOCAN",
+        "XICOHTZINCO", "YAUHQUEMEHCAN", "ZACATELCO", "ZITLALTÉPEC DE TRINIDAD SÁNCHEZ SANTOS"
+      ],
+      "VERACRUZ": [
+        "ACAYUCAN", "ACTOPAN", "AGUA DULCE", "ÁLAMO TEMAPACHE", "ALPATLÁHUAC",
+        "ALTO LUCERO DE GUTIÉRREZ BARRIOS", "ALTOTONGA", "ALVARADO", "AMATITLÁN",
+        "AMATLÁN DE LOS REYES", "ÁNGEL R. CABADA", "ATZACAN", "ATZALAN", "AYAHUALULCO",
+        "BANDERILLA", "BENITO JUÁREZ", "BOCA DEL RÍO", "CALCAHUALCO", "CAMARÓN DE TEJEDA",
+        "CAMERINO Z. MENDOZA", "CARLOS A. CARRILLO", "CARRILLO PUERTO", "CASTILLO DE TEAYO",
+        "CATEMACO", "CAZONES DE HERRERA", "CERRO AZUL", "CHACALTIANGUIS", "CHALMA",
+        "CHICONAMEL", "CHICONQUIACO", "CHICONTEPEC", "CHINAMECA", "CHINAMPA DE GOROSTIZA",
+        "CHOCAMÁN", "CHONTLA", "CHUMATLÁN", "CITLALTÉPETL", "COACOATZINTLA",
+        "COAHUITLÁN", "COATEPEC", "COATZACOALCOS", "COATZINTLA", "COETZALA",
+        "COLIPA", "COMAPA", "CÓRDOBA", "COSAMALOAPAN DE CARPIO", "COSAUTLÁN DE CARVAJAL",
+        "COSCOMATEPEC", "COSOLEACAQUE", "COTAXTLA", "COXQUIHUI", "COYUTLA",
+        "CUICHAPA", "CUITLÁHUAC", "EL HIGO", "EMILIANO ZAPATA", "ESPINAL",
+        "FILOMENO MATA", "FORTÍN", "GUTIÉRREZ ZAMORA", "HIDALGOTITLÁN", "HUATUSCO",
+        "HUAYACOCOTLA", "HUEYAPAN DE OCAMPO", "HUILOAPAN DE CUAUHTÉMOC", "IGNACIO DE LA LLAVE",
+        "ILAMATLÁN", "ISLA", "IXCATEPEC", "IXHUACÁN DE LOS REYES", "IXHUATLÁN DE MADERO",
+        "IXHUATLÁN DEL CAFÉ", "IXHUATLÁN DEL SURESTE", "IXHUATLANCILLO", "IXMATLAHUACAN",
+        "IXTACZOQUITLÁN", "JALACINGO", "JALCOMULCO", "JÁLTIPAN", "JAMAPA",
+        "JESÚS CARRANZA", "JILOTEPEC", "JOSÉ AZUETA", "JUAN RODRÍGUEZ CLARA",
+        "JUCHIQUE DE FERRER", "LA ANTIGUA", "LA PERLA", "LANDERO Y COSS",
+        "LAS CHOAPAS", "LAS MINAS", "LAS VIGAS DE RAMÍREZ", "LERDO DE TEJADA",
+        "LOS REYES", "MAGDALENA", "MALTRATA", "MANLIO FABIO ALTAMIRANO", "MARIANO ESCOBEDO",
+        "MARTÍNEZ DE LA TORRE", "MECATLÁN", "MECAYAPAN", "MEDELLÍN DE BRAVO",
+        "MIAHUATLÁN", "MINATITLÁN", "MISANTLA", "MIXTLA DE ALTAMIRANO", "MOLOACÁN",
+        "NANCHITAL DE LÁZARO CÁRDENAS DEL RÍO", "NAOLINCO", "NARANJAL", "NARANJOS AMATLÁN",
+        "NAUTLA", "NOGALES", "OLUTA", "OMEALCA", "ORIZABA", "OTATITLÁN", "OTEAPAN",
+        "OZULUAMA DE MASCAREÑAS", "PAJAPAN", "PÁNUCO", "PAPANTLA", "PASO DE OVEJAS",
+        "PASO DEL MACHO", "PEROTE", "PLATÓN SÁNCHEZ", "PLAYA VICENTE", "POZA RICA DE HIDALGO",
+        "PUEBLO VIEJO", "PUENTE NACIONAL", "RAFAEL DELGADO", "RAFAEL LUCIO",
+        "RÍO BLANCO", "SALTABARRANCA", "SAN ANDRÉS TENEJAPAN", "SAN ANDRÉS TUXTLA",
+        "SAN JUAN EVANGELISTA", "SAN RAFAEL", "SANTIAGO SOCHIAPAN", "SANTIAGO TUXTLA",
+        "SAYULA DE ALEMÁN", "SOCHIAPA", "SOCONUSCO", "SOLEDAD ATZOMPA", "SOLEDAD DE DOBLADO",
+        "SOTEAPAN", "TAMALÍN", "TAMIAHUA", "TAMPICO ALTO", "TANCOCO", "TANTIMA",
+        "TANTOYUCA", "TATAHUICAPAN DE JUÁREZ", "TATATILA", "TECOLUTLA", "TEHUIPANGO",
+        "TEMPOAL", "TENAMPA", "TENOCHTITLÁN", "TEOCELO", "TEPATLAXCO", "TEPETLÁN",
+        "TEPETZINTLA", "TEQUILA", "TEXCATEPEC", "TEXHUACÁN", "TEXISTEPEC",
+        "TEZONAPA", "TIERRA BLANCA", "TIHUATLÁN", "TLACHICHILCO", "TLACOJALPAN",
+        "TLACOLULAN", "TLACOTALPAN", "TLACOTEPEC DE MEJÍA", "TLALIXCOYAN",
+        "TLALNELHUAYOCAN", "TLALTETELA", "TLAPACOYAN", "TLAQUILPA", "TLILAPAN",
+        "TOMATLÁN", "TONAYÁN", "TOTUTLA", "TRES VALLES", "TUXPAN", "TUXTILLA",
+        "URSULO GALVÁN", "UXPANAPA", "VEGA DE ALATORRE", "VERACRUZ", "VILLA ALDAMA",
+        "XALAPA", "XICO", "XOXOCOTLA", "YANGA", "YECUATLA", "ZACUALPAN",
+        "ZARAGOZA", "ZENTLA", "ZONGOLICA", "ZONTECOMATLÁN DE LÓPEZ Y FUENTES", "ZOZOCOLCO DE HIDALGO"
+      ],
+      "YUCATÁN": [
+        "ABALÁ", "ACANCEH", "AKIL", "BACA", "BOKOBÁ", "BUCTZOTZ", "CACALCHÉN",
+        "CALOTMUL", "CANSAHCAB", "CANTAMAYEC", "CELESTÚN", "CENOTILLO", "CHACSINKÍN",
+        "CHANKOM", "CHAPAB", "CHEMAX", "CHICXULUB PUEBLO", "CHICHIMILÁ", "CHIKINDZONOT",
+        "CHOCHOLÁ", "CHUMAYEL", "CONKAL", "CUNCUNUL", "CUZAMÁ", "DZÁN", "DZEMUL",
+        "DZIDZANTÚN", "DZILAM DE BRAVO", "DZILAM GONZÁLEZ", "DZITÁS", "DZONCAUICH",
+        "ESPITA", "HALACHÓ", "HOCABÁ", "HOCTÚN", "HOMÚN", "HUHÍ", "HUNUCMÁ",
+        "IXIL", "IZAMAL", "KANASÍN", "KANTUNIL", "KAUA", "KINCHIL", "KOPOMÁ",
+        "MAMA", "MANÍ", "MAXCANÚ", "MAYAPÁN", "MÉRIDA", "MOCOCHÁ", "MOTUL",
+        "MUNA", "MUXUPIP", "OPICHÉN", "OXKUTZCAB", "PANABÁ", "PETO", "PROGRESO",
+        "QUINTANA ROO", "RÍO LAGARTOS", "SACALUM", "SAMAHIL", "SAN FELIPE",
+        "SANAHCAT", "SANTA ELENA", "SEYÉ", "SINANCHÉ", "SOTUTA", "SUCILÁ",
+        "SUDZAL", "SUMA", "TAHDZIÚ", "TAHMEK", "TEABO", "TECOH", "TEKAL DE VENEGAS",
+        "TEKANTÓ", "TEKAX", "TEKIT", "TEKOM", "TELCHAC PUEBLO", "TELCHAC PUERTO",
+        "TEMAX", "TEMOZÓN", "TEPAKÁN", "TETIZ", "TEYA", "TICUL", "TIMUCUY",
+        "TINUM", "TIXCACALCUPUL", "TIXKOKOB", "TIXMÉHUAC", "TIXPÉHUAL", "TIZIMÍN",
+        "TUNKÁS", "TZUCACAB", "UAYMA", "UCÚ", "UMÁN", "VALLADOLID", "XOCCHEL",
+        "YAXCABÁ", "YAXKUKUL", "YOBAÍN"
+      ],
+      "ZACATECAS": [
+        "APOZOL", "APULCO", "ATOLINGA", "BENITO JUÁREZ", "CALERA", "CAÑITAS DE FELIPE PESCADOR",
+        "CHALCHIHUITES", "CONCEPCIÓN DEL ORO", "CUAUHTÉMOC", "EL PLATEADO DE JOAQUÍN AMARO",
+        "EL SALVADOR", "FRESNILLO", "GENARO CODINA", "GENERAL ENRIQUE ESTRADA",
+        "GENERAL FRANCISCO R. MURGUÍA", "GENERAL PÁNFILO NATERA", "GUADALUPE",
+        "HUANUSCO", "JALPA", "JEREZ", "JIMÉNEZ DEL TEUL", "JUAN ALDAMA", "JUCHIPILA",
+        "LORETO", "LUIS MOYA", "MAZAPIL", "MELCHOR OCAMPO", "MEZQUITAL DEL ORO",
+        "MIGUEL AUZA", "MOMAX", "MONTE ESCOBEDO", "MORELOS", "MOYAHUA DE ESTRADA",
+        "NOCHISTLÁN DE MEJÍA", "NORIA DE ÁNGELES", "OJOCALIENTE", "PÁNUCO",
+        "PINOS", "RÍO GRANDE", "SAIN ALTO", "SANTA MARÍA DE LA PAZ", "SOMBRERETE",
+        "SUSTICACÁN", "TABASCO", "TEPECHITLÁN", "TEPETONGO", "TEÚL DE GONZÁLEZ ORTEGA",
+        "TLALTENANGO DE SÁNCHEZ ROMÁN", "TRANCOSO", "TRINIDAD GARCÍA DE LA CADENA",
+        "VALPARAÍSO", "VETAGRANDE", "VILLA DE COS", "VILLA GARCÍA", "VILLA GONZÁLEZ ORTEGA",
+        "VILLA HIDALGO", "VILLANUEVA", "ZACATECAS"
+      ]
+    };
+
+    // Oficialías principales reales por municipio/alcaldía (las demás usan 0001 por estándar de cabecera municipal)
+    const OFICIALIAS_REALES = {
+      "BAJA CALIFORNIA|TIJUANA": "0003",
+      "BAJA CALIFORNIA|MEXICALI": "0001",
+      "BAJA CALIFORNIA|ENSENADA": "0001",
+      "BAJA CALIFORNIA|TECATE": "0001",
+      "BAJA CALIFORNIA|PLAYAS DE ROSARITO": "0001",
+      "CIUDAD DE MÉXICO|CUAUHTÉMOC": "0001",
+      "CIUDAD DE MÉXICO|GUSTAVO A. MADERO": "0013",
+      "CIUDAD DE MÉXICO|IZTAPALAPA": "0018",
+      "CIUDAD DE MÉXICO|BENITO JUÁREZ": "0014",
+      "CIUDAD DE MÉXICO|COYOACÁN": "0016",
+      "CIUDAD DE MÉXICO|ÁLVARO OBREGÓN": "0015",
+      "CIUDAD DE MÉXICO|MIGUEL HIDALGO": "0011",
+      "CIUDAD DE MÉXICO|VENUSTIANO CARRANZA": "0012",
+      "CIUDAD DE MÉXICO|TLALPAN": "0017",
+      "CIUDAD DE MÉXICO|AZCAPOTZALCO": "0010",
+      "CIUDAD DE MÉXICO|IZTACALCO": "0019",
+      "CIUDAD DE MÉXICO|XOCHIMILCO": "0021",
+      "CIUDAD DE MÉXICO|TLÁHUAC": "0022",
+      "CIUDAD DE MÉXICO|LA MAGDALENA CONTRERAS": "0020",
+      "CIUDAD DE MÉXICO|CUAJIMALPA DE MORELOS": "0023",
+      "CIUDAD DE MÉXICO|MILPA ALTA": "0024",
+      "JALISCO|GUADALAJARA": "0001",
+      "JALISCO|ZAPOPAN": "0001",
+      "JALISCO|SAN PEDRO TLAQUEPAQUE": "0001",
+      "JALISCO|TLAJOMULCO DE ZÚÑIGA": "0001",
+      "NUEVO LEÓN|MONTERREY": "0001",
+      "NUEVO LEÓN|GUADALUPE": "0001",
+      "NUEVO LEÓN|APODACA": "0001",
+      "NUEVO LEÓN|SAN NICOLÁS DE LOS GARZA": "0001",
+      "ESTADO DE MÉXICO|ECATEPEC DE MORELOS": "0001",
+      "ESTADO DE MÉXICO|NEZAHUALCÓYOTL": "0001",
+      "ESTADO DE MÉXICO|NAUCALPAN DE JUÁREZ": "0001",
+      "ESTADO DE MÉXICO|TOLUCA": "0001",
+      "CHIHUAHUA|JUÁREZ": "0001",
+      "CHIHUAHUA|CHIHUAHUA": "0001",
+      "PUEBLA|PUEBLA": "0001",
+      "GUANAJUATO|LEÓN": "0001",
+      "SONORA|HERMOSILLO": "0001",
+      "SINALOA|CULIACÁN": "0001",
+      "SINALOA|MAZATLÁN": "0001",
+      "HIDALGO|PACHUCA DE SOTO": "0001",
+      "HIDALGO|MINERAL DE LA REFORMA": "0001"
+    };
+
+    const selectEntidad = document.getElementById("entidad");
+    const selectMunicipio = document.getElementById("municipio");
+    const inputOficialia = document.getElementById("oficialia");
+
+    // Autorrellenar Texto de Fecha de Certificación con la fecha actual
+    function cargarFechaCertificacionActual() {
+      const meses = [
+        "enero", "febrero", "marzo", "abril", "mayo", "junio",
+        "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
+      ];
+      const hoy = new Date();
+      const dia = hoy.getDate();
+      const mes = meses[hoy.getMonth()];
+      const anio = hoy.getFullYear();
+      document.getElementById("certFecha").value = `A los ${dia} días del mes de ${mes} de ${anio}. Doy fe.`;
+    }
+
+    function actualizarOficialia(estado, municipio) {
+      const clave = `${estado}|${municipio}`;
+      inputOficialia.value = OFICIALIAS_REALES[clave] || "0001";
+      document.getElementById("lugarNac").value = `${municipio}, ${estado}`;
+    }
+
+    function cargarEntidades() {
+      const estados = Object.keys(ENTIDADES_MUNICIPIOS).sort((a, b) => a.localeCompare(b, "es"));
+      selectEntidad.innerHTML = "";
+      estados.forEach((estado) => {
+        const opt = document.createElement("option");
+        opt.value = estado;
+        opt.textContent = estado;
+        if (estado === "BAJA CALIFORNIA") opt.selected = true;
+        selectEntidad.appendChild(opt);
+      });
+      cargarMunicipios("BAJA CALIFORNIA", "TIJUANA");
+    }
+
+    function cargarMunicipios(estado, municipioSeleccionado = "") {
+      const lista = ENTIDADES_MUNICIPIOS[estado] || [];
+      selectMunicipio.innerHTML = "";
+      lista.forEach((mun) => {
+        const opt = document.createElement("option");
+        opt.value = mun;
+        opt.textContent = mun;
+        if (mun === municipioSeleccionado) opt.selected = true;
+        selectMunicipio.appendChild(opt);
+      });
+      const munActual = selectMunicipio.value;
+      actualizarOficialia(estado, munActual);
+    }
+
+    selectEntidad.addEventListener("change", function() {
+      cargarMunicipios(this.value);
+    });
+
+    selectMunicipio.addEventListener("change", function() {
+      actualizarOficialia(selectEntidad.value, this.value);
+    });
+
+    // Inicializar desplegables y fecha de certificación al cargar
+    cargarEntidades();
+    cargarFechaCertificacionActual();
+
+    // Botón para generar Identificador Electrónico de exactamente 31 dígitos
+    document.getElementById("btnGenId").addEventListener("click", function() {
+      const inputId = document.getElementById("idElec");
+      const actual = inputId.value.replace(/\D/g, "");
+      const base = (actual.length === 31 ? actual : "0200400032026009475044410200400").slice(0, 24);
+      let sufijo = "";
+      for (let i = 0; i < 7; i++) {
+        sufijo += Math.floor(Math.random() * 10);
+      }
+      inputId.value = base + sufijo;
+    });
+
+    // Botón para generar Libro aleatorio (2 dígitos: 01 - 99)
+    document.getElementById("btnGenLibro").addEventListener("click", function() {
+      const num = Math.floor(Math.random() * 99) + 1;
+      document.getElementById("libro").value = String(num).padStart(2, "0");
+    });
+
+    // Botón para generar Número de Acta aleatorio (4 dígitos: 0100 - 9999)
+    document.getElementById("btnGenActa").addEventListener("click", function() {
+      const num = Math.floor(Math.random() * 9900) + 100;
+      document.getElementById("acta").value = String(num).padStart(4, "0");
+    });
+
+        async function comprimirABase64(str) {
+      const bytes = new TextEncoder().encode(str);
+      if (typeof CompressionStream !== 'undefined') {
+        const cs = new CompressionStream('deflate-raw');
+        const writer = cs.writable.getWriter();
+        writer.write(bytes);
+        writer.close();
+        const compressed = await new Response(cs.readable).arrayBuffer();
+        const arr = new Uint8Array(compressed);
+        let bin = '';
+        for (let i = 0; i < arr.length; i++) bin += String.fromCharCode(arr[i]);
+        return 'z' + btoa(bin).replace(/=+$/, '');
+      }
+      let bin = '';
+      for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+      return 'r' + btoa(bin).replace(/=+$/, '');
+    }
+
+    async function construirUrl() {
+      const nombre = document.getElementById('nombre').value.trim().toUpperCase();
+      const ap1 = document.getElementById('apellido1').value.trim().toUpperCase();
+      const ap2 = document.getElementById('apellido2').value.trim().toUpperCase();
+      const curp = document.getElementById('curp').value.trim().toUpperCase();
+      const entidad = document.getElementById('entidad').value.trim().toUpperCase();
+      const municipio = document.getElementById('municipio').value.trim().toUpperCase();
+      const oficialia = document.getElementById('oficialia').value.trim().toUpperCase();
+      const fechaReg = document.getElementById('fechaReg').value.trim().toUpperCase();
+      const libro = document.getElementById('libro').value.trim().toUpperCase();
+      const acta = document.getElementById('acta').value.trim().toUpperCase();
+      const sexo = document.getElementById('sexo').value.trim().toUpperCase();
+      const fechaNac = document.getElementById('fechaNac').value.trim().toUpperCase();
+      const lugarNac = document.getElementById('lugarNac').value.trim().toUpperCase();
+
+      const p1Nombre = document.getElementById('p1Nombre').value.trim().toUpperCase();
+      const p1Ap1 = document.getElementById('p1Ap1').value.trim().toUpperCase();
+      const p1Ap2 = document.getElementById('p1Ap2').value.trim().toUpperCase();
+
+      const p2Nombre = document.getElementById('p2Nombre').value.trim().toUpperCase();
+      const p2Ap1 = document.getElementById('p2Ap1').value.trim().toUpperCase();
+      const p2Ap2 = document.getElementById('p2Ap2').value.trim().toUpperCase();
+
+      const idElec = document.getElementById('idElec').value.trim().toUpperCase();
+      const certFecha = document.getElementById('certFecha').value.trim();
+      const rawText = document.getElementById('rawText').value.trim();
+
+      // Empaquetado compacto separado por "|" (omite rawText si es automático)
+      const campos = [
+        idElec, curp, entidad, municipio, oficialia, fechaReg, libro, acta,
+        nombre, ap1, ap2, sexo === 'MUJER' ? 'F' : 'M', fechaNac, lugarNac,
+        p1Nombre, p1Ap1, p1Ap2, p2Nombre, p2Ap1, p2Ap2, certFecha
+      ];
+      if (rawText) campos.push(rawText);
+
+            const encoded = await comprimirABase64(campos.join('|'));
+      const firma = generarFirmaIntegridad(encoded);
+      return `https://www.cevar-registrocivil-gob-mx.com/eVAR/Valida.do?folio=${encoded}${firma}`;
+    }
+
+    function generarFirmaIntegridad(str) {
+      let h1 = 0x811c9dc5;
+      for (let i = 0; i < str.length; i++) {
+        h1 ^= str.charCodeAt(i);
+        h1 = Math.imul(h1, 0x01000193);
+      }
+      return (h1 >>> 0).toString(36).padStart(7, '0').slice(-7);
+    }
+
+    document.getElementById('generadorForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      window.location.href = await construirUrl();
+    });
+
+    document.getElementById('btnCopiar').addEventListener('click', async function() {
+      const fullUrl = await construirUrl();
+      const box = document.getElementById('linkBox');
+      box.style.display = 'block';
+      box.textContent = fullUrl;
+      navigator.clipboard.writeText(fullUrl).then(() => {
+        const btn = document.getElementById('btnCopiar');
+        btn.textContent = '¡Copiado!';
+        setTimeout(() => (btn.textContent = 'Copiar Enlace'), 2000);
+      });
+    });
+
+    // Generar Código QR con el enlace completo
+    let qrInstance = null;
+    document.getElementById('btnGenerarQR').addEventListener('click', async function() {
+      const form = document.getElementById('generadorForm');
+      if (!form.reportValidity()) return;
+
+      const fullUrl = await construirUrl();
+
+
+      const box = document.getElementById('linkBox');
+      box.style.display = 'block';
+      box.textContent = fullUrl;
+
+      const qrContainer = document.getElementById('qrcode');
+      qrContainer.innerHTML = "";
+
+      qrInstance = new QRCode(qrContainer, {
+        text: fullUrl,
+        width: 220,
+        height: 220,
+        colorDark: "#0f172a",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.M
+      });
+
+      const qrPanel = document.getElementById('qrPanel');
+      qrPanel.style.display = 'block';
+      qrPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+
+
+    // Descargar la imagen PNG del QR generado
+    document.getElementById('btnDescargarQR').addEventListener('click', function() {
+      const qrContainer = document.getElementById('qrcode');
+      const img = qrContainer.querySelector('img');
+      const canvas = qrContainer.querySelector('canvas');
+      const curp = document.getElementById('curp').value.trim().toUpperCase() || 'DOCUMENTO';
+
+      let dataUrl = "";
+      if (canvas) {
+        dataUrl = canvas.toDataURL("image/png");
+      } else if (img && img.src) {
+        dataUrl = img.src;
+      }
+
+      if (dataUrl) {
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = `QR_${curp}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+    });
+
+        // Ocultar panel del QR
+    document.getElementById('btnCerrarQR').addEventListener('click', function() {
+      document.getElementById('qrPanel').style.display = 'none';
+    });
+
+    // Helper para generar DataURL PNG de un QR sin mostrarlo en pantalla
+    function generarQrPngDataUrl(texto) {
+      return new Promise((resolve) => {
+        const tempDiv = document.createElement('div');
+        tempDiv.style.position = 'fixed';
+        tempDiv.style.left = '-9999px';
+        document.body.appendChild(tempDiv);
+
+        new QRCode(tempDiv, {
+          text: texto,
+          width: 300,
+          height: 300,
+          colorDark: '#000000',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+
+        setTimeout(() => {
+          const canvas = tempDiv.querySelector('canvas');
+          const img = tempDiv.querySelector('img');
+          const dataUrl = canvas ? canvas.toDataURL('image/png') : (img ? img.src : '');
+          document.body.removeChild(tempDiv);
+          resolve(dataUrl);
+        }, 60);
+      });
+    }
+
+           // Mapa exacto de las 32 entidades -> nombre de archivo trasero en minúsculas
+    const ARCHIVOS_REVERSO_ESTADO = {
+      "AGUASCALIENTES": "aguascalientes.pdf",
+      "BAJA CALIFORNIA": "bajacalifornia.pdf",
+      "BAJA CALIFORNIA SUR": "bajacaliforniasur.pdf",
+      "CAMPECHE": "campeche.pdf",
+      "CHIAPAS": "chiapas.pdf",
+      "CHIHUAHUA": "chihuahua.pdf",
+      "CIUDAD DE MÉXICO": "cdmx.pdf",
+      "COAHUILA": "coahuila.pdf",
+      "COLIMA": "colima.pdf",
+      "DURANGO": "durango.pdf",
+      "ESTADO DE MÉXICO": "edomex.pdf",
+      "GUANAJUATO": "guanajuato.pdf",
+      "GUERRERO": "guerrero.pdf",
+      "HIDALGO": "hidalgo.pdf",
+      "JALISCO": "jalisco.pdf",
+      "MICHOACÁN": "michoacan.pdf",
+      "MORELOS": "morelos.pdf",
+      "NAYARIT": "nayarit.pdf",
+      "NUEVO LEÓN": "nuevoleon.pdf",
+      "OAXACA": "oaxaca.pdf",
+      "PUEBLA": "puebla.pdf",
+      "QUERÉTARO": "queretaro.pdf",
+      "QUINTANA ROO": "quintanaroo.pdf",
+      "SAN LUIS POTOSÍ": "sanluispotosi.pdf",
+      "SINALOA": "sinaloa.pdf",
+      "SONORA": "sonora.pdf",
+      "TABASCO": "tabasco.pdf",
+      "TAMAULIPAS": "tamaulipas.pdf",
+      "TLAXCALA": "tlaxcala.pdf",
+      "VERACRUZ": "veracruz.pdf",
+      "YUCATÁN": "yucatan.pdf",
+      "ZACATECAS": "zacatecas.pdf"
+    };
+
+    // Rellenar Fruta.pdf (frontal) y anexar la hoja trasera del estado seleccionado
+    document.getElementById('btnDescargarPDF').addEventListener('click', async function() {
+      const form = document.getElementById('generadorForm');
+      if (!form.reportValidity()) return;
+
+      const btn = this;
+      const textoOriginal = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Generando PDF...';
+
+      try {
+        const fullUrl = await construirUrl();
+
+        const box = document.getElementById('linkBox');
+        box.style.display = 'block';
+        box.textContent = fullUrl;
+
+        // Cargar plantilla PDF frontal desde el repositorio
+        const pdfResponse = await fetch('/Fruta.pdf');
+        if (!pdfResponse.ok) {
+          throw new Error('No se encontró /Fruta.pdf en el servidor.');
+        }
+
+        const pdfBytes = await pdfResponse.arrayBuffer();
+
+        const { PDFDocument, StandardFonts } = PDFLib;
+        const pdfDoc = await PDFDocument.load(pdfBytes);
+        const pdfForm = pdfDoc.getForm();
+        const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+        const helveticaRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+        // Campos que llevan letra negrita
+        const camposNegrita = new Set([
+          'numero_acta',
+          'libro',
+          'fecha_registro',
+          'oficialia',
+          'curp',
+          'entidad_registro'
+        ]);
+
+        // Mapa exacto con los nombres de campos creados en Sejda
+        const mapaCampos = {
+          identificador: document.getElementById('idElec').value.trim().toUpperCase(),
+          curp: document.getElementById('curp').value.trim().toUpperCase(),
+          entidad_registro: document.getElementById('entidad').value.trim().toUpperCase(),
+          municipio_registro: document.getElementById('municipio').value.trim().toUpperCase(),
+          oficialia: document.getElementById('oficialia').value.trim().toUpperCase(),
+          fecha_registro: document.getElementById('fechaReg').value.trim().toUpperCase(),
+          libro: document.getElementById('libro').value.trim().toUpperCase(),
+          numero_acta: document.getElementById('acta').value.trim().toUpperCase(),
+          nombre: document.getElementById('nombre').value.trim().toUpperCase(),
+          primer_apellido: document.getElementById('apellido1').value.trim().toUpperCase(),
+          segundo_apellido: document.getElementById('apellido2').value.trim().toUpperCase(),
+          sexo: document.getElementById('sexo').value.trim().toUpperCase(),
+          fecha_nacimiento: document.getElementById('fechaNac').value.trim().toUpperCase(),
+          lugar_nacimiento: document.getElementById('lugarNac').value.trim().toUpperCase(),
+          nombre_padre1: document.getElementById('p1Nombre').value.trim().toUpperCase(),
+          primerapellido_padre1: document.getElementById('p1Ap1').value.trim().toUpperCase(),
+          segundoapellido_padre1: document.getElementById('p1Ap2').value.trim().toUpperCase(),
+          nombre_padre2: document.getElementById('p2Nombre').value.trim().toUpperCase(),
+          primerapellido_padre2: document.getElementById('p2Ap1').value.trim().toUpperCase(),
+          segundoapellido_padre2: document.getElementById('p2Ap2').value.trim().toUpperCase(),
+          doyfe: document.getElementById('certFecha').value.trim()
+        };
+
+        // Rellenar los 21 campos de texto (negrita solo en los 6 indicados)
+        for (const [nombreCampo, valor] of Object.entries(mapaCampos)) {
+          try {
+            const field = pdfForm.getTextField(nombreCampo);
+            field.setText(valor);
+            field.updateAppearances(camposNegrita.has(nombreCampo) ? helveticaBold : helveticaRegular);
+          } catch (e) {
+            console.warn(`Campo no encontrado en PDF: ${nombreCampo}`);
+          }
+        }
+
+        // Generar QR con el enlace completo y dibujarlo exactamente en las coordenadas de "codigo_qr"
+        const qrDataUrl = await generarQrPngDataUrl(fullUrl);
+        if (qrDataUrl) {
+          const qrImage = await pdfDoc.embedPng(qrDataUrl);
+          try {
+            const qrField = pdfForm.getField('codigo_qr');
+            const widgets = qrField.acroField.getWidgets();
+            if (widgets.length > 0) {
+              const rect = widgets[0].getRectangle();
+              const page = pdfDoc.getPages()[0];
+              const size = Math.min(rect.width, rect.height);
+              const offsetX = rect.x + (rect.width - size) / 2;
+              const offsetY = rect.y + (rect.height - size) / 2;
+
+              page.drawImage(qrImage, {
+                x: offsetX,
+                y: offsetY,
+                width: size,
+                height: size
+              });
+            }
+            if (typeof qrField.setText === 'function') {
+              qrField.setText('');
+            }
+          } catch (e) {
+            console.warn('No se encontró el campo codigo_qr en el PDF:', e);
+          }
+        }
+
+        // Aplanar el formulario frontal
+        pdfForm.flatten();
+
+        // Buscar y anexar la página trasera correspondiente al estado seleccionado
+        const archivoReverso = ARCHIVOS_REVERSO_ESTADO[mapaCampos.entidad_registro];
+        if (archivoReverso) {
+          try {
+            const revResp = await fetch(`/${archivoReverso}`);
+            if (revResp.ok) {
+              const revBytes = await revResp.arrayBuffer();
+              const revDoc = await PDFDocument.load(revBytes);
+              const [paginaTrasera] = await pdfDoc.copyPages(revDoc, [0]);
+              pdfDoc.addPage(paginaTrasera);
+            } else {
+              console.warn(`Reverso aún no subido al repo: /${archivoReverso}`);
+            }
+          } catch (errRev) {
+            console.warn(`No se pudo cargar /${archivoReverso}:`, errRev);
+          }
+        }
+
+        const finalPdfBytes = await pdfDoc.save();
+        const blob = new Blob([finalPdfBytes], { type: 'application/pdf' });
+        const downloadUrl = URL.createObjectURL(blob);
+
+        const curpArchivo = mapaCampos.curp || 'ACTA_GENERADA';
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = `${curpArchivo}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(() => URL.revokeObjectURL(downloadUrl), 5000);
+      } catch (err) {
+        alert('Error al generar el PDF: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = textoOriginal;
+      }
+    });
+
+  </script>
+</body>
+
+</html>
