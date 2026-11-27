@@ -1403,11 +1403,12 @@
         box.style.display = 'block';
         box.textContent = fullUrl;
 
-        // Cargar plantilla PDF frontal desde el repositorio
-        const pdfResponse = await fetch('/Fruta.pdf');
+                // Cargar plantilla PDF frontal desde la misma carpeta
+        const pdfResponse = await fetch('Fruta.pdf');
         if (!pdfResponse.ok) {
-          throw new Error('No se encontró /Fruta.pdf en el servidor.');
+          throw new Error('No se encontró Fruta.pdf en esta carpeta.');
         }
+
 
         const pdfBytes = await pdfResponse.arrayBuffer();
 
@@ -1495,23 +1496,24 @@
         // Aplanar el formulario frontal
         pdfForm.flatten();
 
-        // Buscar y anexar la página trasera correspondiente al estado seleccionado
+                // Buscar y anexar la página trasera correspondiente al estado seleccionado
         const archivoReverso = ARCHIVOS_REVERSO_ESTADO[mapaCampos.entidad_registro];
         if (archivoReverso) {
           try {
-            const revResp = await fetch(`/${archivoReverso}`);
+            const revResp = await fetch(archivoReverso);
             if (revResp.ok) {
               const revBytes = await revResp.arrayBuffer();
               const revDoc = await PDFDocument.load(revBytes);
               const [paginaTrasera] = await pdfDoc.copyPages(revDoc, [0]);
               pdfDoc.addPage(paginaTrasera);
             } else {
-              console.warn(`Reverso aún no subido al repo: /${archivoReverso}`);
+              console.warn(`Reverso aún no subido a la carpeta: ${archivoReverso}`);
             }
           } catch (errRev) {
-            console.warn(`No se pudo cargar /${archivoReverso}:`, errRev);
+            console.warn(`No se pudo cargar ${archivoReverso}:`, errRev);
           }
         }
+
 
         const finalPdfBytes = await pdfDoc.save();
         const blob = new Blob([finalPdfBytes], { type: 'application/pdf' });
